@@ -1,13 +1,32 @@
 package com.team.app.di
 
 
+import android.content.Context
+import androidx.room.Room
+import com.team.app.data.database.InventoryDatabase
+import com.team.app.data.repositories.ShopRepository
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class DataModule {
+    @Provides
+    @Singleton
+    fun provideItemDatabase(@ApplicationContext context: Context): InventoryDatabase {
+        return Room.databaseBuilder(context, InventoryDatabase::class.java, "inventory_database")
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    fun provideItemRepository(inventoryDb: InventoryDatabase): ShopRepository {
+        return ShopRepository(inventoryDb.itemDao())
+    }
 
 //    @Provides
 //    fun providesNetworkRepository(@ApplicationContext context: Context): NetworkRepository {
