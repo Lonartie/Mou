@@ -1,31 +1,40 @@
 package com.team.app.ui.home
 
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.lonartie.bookdiary.data.repositories.SettingsRepository
 import com.team.app.R
 import com.team.app.data.model.Attributes
+import com.team.app.data.model.Item
+import com.team.app.data.model.ItemType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.math.min
 
 @HiltViewModel
-class HomePageViewModel @Inject constructor() : ViewModel() {
-    val attributes = mutableStateOf(Attributes(20, 90, 90, 40))
-    val figureState = mutableIntStateOf(R.drawable.figure_happy)
+class HomePageViewModel @Inject constructor(
+    private val settings: SettingsRepository
+) : ViewModel() {
 
-    private fun getMinimalAttributeValue(): Int {
+    val firstStart = settings.firstStart
+    val attributes = settings.attributes
+    val currentFood = settings.currentFood
+    val currentToy = settings.currentToy
+    val currentMisc = settings.currentMisc
+    val figureState = mutableIntStateOf(R.drawable.figure_happy)
+	
+	private fun getMinimalAttributeValue(attributes: Attributes): Int {
         return min(
-            attributes.value.hunger,
+            attributes.hunger,
             min(
-                attributes.value.happiness,
-                attributes.value.health
+                attributes.happiness,
+                attributes.health
             )
         )
 
     }
-    fun setFigureState() {
-        val minimalValue = getMinimalAttributeValue()
+    fun setFigureState(attributes: Attributes) {
+        val minimalValue = getMinimalAttributeValue(attributes)
         figureState.intValue = when {
             minimalValue >= 75 -> R.drawable.figure_happy
             minimalValue >= 50 -> R.drawable.figure_lonely
@@ -33,35 +42,58 @@ class HomePageViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun openMoneyScreen() {
+    suspend fun onStart(isFirst : Boolean) {
+        var item = Item(ItemType.FOOD, "Chicken", 10, 10)
+        println("current food: $item")
+        settings.saveCurrentItem(item)
+        item = Item(ItemType.TOY, "Ball", 5, 5)
+        println("current toy: $item")
+        settings.saveCurrentItem(item)
+        item = Item(ItemType.MEDICINE, "Medicine", 15, 15)
+        println("current misc: $item")
+        settings.saveCurrentItem(item)
+    }
+
+    suspend fun openMoneyScreen() {
         println("Open money screen")
     }
 
-    fun openShop() {
+    suspend fun openShop() {
         println("Open shop")
     }
 
-    fun giveFood() {
-        println("Give food")
+    suspend fun giveFood(item: Item, attributes: Attributes) {
+        val newAttributes = attributes.copy(hunger = attributes.hunger + item.actionValue)
+        settings.saveAttributes(newAttributes)
+        setFigureState(attributes)
+        println("hunger before: ${attributes.hunger}, after: ${newAttributes.hunger}")
     }
 
-    fun selectFood() {
+    suspend fun selectFood() {
         println("Select food")
     }
 
-    fun giveToy() {
-        println("Give toy")
+    suspend fun giveToy(item: Item, attributes: Attributes) {
+        val newAttributes = attributes.copy(happiness = attributes.happiness + item.actionValue)
+        settings.saveAttributes(newAttributes)
+        setFigureState(attributes)
+        println("happiness before: ${attributes.happiness}, after: ${newAttributes.happiness}")
     }
 
-    fun selectToy() {
+    suspend fun selectToy() {
         println("Select toy")
     }
 
-    fun giveItem() {
-        println("Give item")
+    suspend fun giveItem(item: Item, attributes: Attributes) {
+        if (item.itemType == ItemType.MEDICINE) {
+            val newAttributes = attributes.copy(health = attributes.health + item.actionValue)
+            settings.saveAttributes(newAttributes)
+            setFigureState(attributes)
+            println("health before: ${attributes.health}, after: ${newAttributes.health}")
+        }
     }
 
-    fun selectItem() {
+    suspend fun selectItem() {
         println("Select item")
     }
 }
