@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.team.app.service.NotificationService
+import com.team.app.service.NotificationService.Companion.NOTIFICATION_CHANNEL_ID
 import dagger.hilt.android.HiltAndroidApp
 
 
@@ -20,7 +21,7 @@ class AppApplication : Application(), Configuration.Provider {
     override fun onCreate() {
 
         super.onCreate()
-        createNotifationChannel()
+        createNotificationChannel()
     }
 
 
@@ -30,18 +31,23 @@ class AppApplication : Application(), Configuration.Provider {
             .build()
     }
     @SuppressLint("ObsoleteSdkInt")
-    private fun createNotifationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            val channel = NotificationChannel (
-                NotificationService.NOTIFICATION_CHANNEL_ID,
-                "Notification",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            channel.description = "Reminder to feed me!"
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private fun createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is not in the Support Library.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Mou - Notification"
+            val descriptionText = "When your mini-Me calls for you"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance).apply{
+                description = descriptionText
+            }
+            // Register the channel with the system.
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
+
 
 
 }
