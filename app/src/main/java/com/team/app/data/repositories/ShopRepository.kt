@@ -9,7 +9,7 @@ class ShopRepository(
 ) {
     suspend fun buyItem(item: Item) {
         itemDao.getItemByType(item.type).collect {
-            if (item.count > 1) {
+            if (it.count > 1) {
                 itemDao.updateItem(item)
             } else {
                 itemDao.addItem(item)
