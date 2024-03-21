@@ -4,6 +4,7 @@ package com.team.app.ui.home
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -50,7 +51,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +62,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import com.team.app.R
 import com.team.app.data.model.Attributes
 
@@ -123,19 +128,26 @@ fun TopRow(viewModel: HomePageViewModel = hiltViewModel()) {
                     onClick = viewModel::openMoneyScreen
                 )
             ) {
-                Icon(
-                    Icons.Rounded.MonetizationOn,
+                Image(
+                    painterResource(id = R.drawable.coins),
                     contentDescription = "Coins",
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier
+                        .size(30.dp)
+                        .graphicsLayer(
+                            scaleX = 1.2f,
+                            scaleY = 1.2f
+                        )
                 )
                 Text(attributes.coins.toString() + "€", fontSize = 15.sp)
             }
-            Icon(
-                Icons.Rounded.ShoppingBasket,
+            Image(
+                painterResource(id = R.drawable.shop),
                 contentDescription = "Items",
-                modifier = Modifier.size(40.dp).combinedClickable(
-                    onClick = viewModel::openShop
-                )
+                modifier = Modifier
+                    .size(40.dp)
+                    .combinedClickable(
+                        onClick = viewModel::openShop
+                    )
             )
         }
     })
@@ -168,21 +180,24 @@ fun BottomRow(viewModel: HomePageViewModel = hiltViewModel()) {
         ) {
             NavigationButton(
                 name = "Food",
-                icon = Icons.Rounded.Fastfood,
+                image = painterResource(R.drawable.chicken_leg),
+                scale = 1.75f,
                 onClick = viewModel::giveFood,
                 onLongClick = viewModel::selectFood
             )
             VerticalDivider()
             NavigationButton(
-                name = "Games",
-                icon = Icons.Rounded.Games,
+                name = "Toys",
+                image = painterResource(R.drawable.toy_mouse),
+                scale = 1.2f,
                 onClick = viewModel::giveToy,
                 onLongClick = viewModel::selectToy
             )
             VerticalDivider()
             NavigationButton(
                 name = "Items",
-                icon = Icons.Rounded.Architecture,
+                image = painterResource(R.drawable.potion),
+                scale = 1.2f,
                 onClick = viewModel::giveItem,
                 onLongClick = viewModel::selectItem
             )
@@ -236,7 +251,8 @@ fun VerticalDivider() {
 @Composable
 fun NavigationButton(
     name: String = "Name",
-    icon: ImageVector? = null,
+    image: Painter? = painterResource(id = R.drawable.chicken_leg),
+    scale: Float = 1.0f,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {}
 ) {
@@ -250,13 +266,18 @@ fun NavigationButton(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        if (icon != null) {
-            Icon(
-                icon,
+        if (image != null) {
+            Image(
+                image,
                 contentDescription = name,
                 modifier = Modifier
                     .padding(end = 10.dp)
                     .align(Alignment.CenterVertically)
+                    .size(40.dp)
+                    .graphicsLayer(
+                        scaleX = scale,
+                        scaleY = scale
+                    )
             )
         }
         Text(
