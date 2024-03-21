@@ -30,6 +30,7 @@ class NotificationService(
             .setContentText(messgae)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
             .build()
 
 
