@@ -77,10 +77,6 @@ fun HomePage(
             InventoryItem(Item(ItemType.MEDICINE, "", 0, 0), 0)
         )
     ).value
-    val item = Item(ItemType.FOOD, "", 0, 0)
-    @Suppress("UNUSED_VARIABLE") val invItems = viewModel.inventoryItems.collectAsState(
-        initial = InventoryItem(item, 0)
-    ).value
 
     LaunchedEffect(Unit) {
         viewModel.onStart()
