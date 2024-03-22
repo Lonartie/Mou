@@ -91,7 +91,8 @@ fun HomePage(
                 viewModel::giveItem,
                 viewModel::selectFood,
                 viewModel::selectToy,
-                viewModel::selectItem)
+                viewModel::selectItem
+            )
         }
     ) { innerPadding ->
         Content(innerPadding, viewModel.figureState.value)
@@ -99,7 +100,7 @@ fun HomePage(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-//@Preview
+@Preview
 @Composable
 fun TopRow(
     attributes: Attributes = Attributes(10, 20, 30, 40),
@@ -268,7 +269,8 @@ fun BottomRow(
                 image = painterResource(R.drawable.potion),
                 scale = 1.2f,
                 onClick = {
-                    coro.launch { giveItem(currentMisc, attributes)
+                    coro.launch {
+                        giveItem(currentMisc, attributes)
                     }
                 },
                 onLongClick = { coro.launch { selectItem() } }
@@ -360,8 +362,12 @@ fun NavigationButton(
     }
 }
 
+@Preview
 @Composable
-fun Figure(image: Int, modifier: Modifier = Modifier) {
+fun Figure(
+    image: Int = R.drawable.figure_happy,
+    modifier: Modifier = Modifier
+) {
     Image(
         painter = painterResource(id = image),
         contentDescription = null,
@@ -369,6 +375,7 @@ fun Figure(image: Int, modifier: Modifier = Modifier) {
     )
 }
 
+@Preview
 @Composable
 fun Ground(modifier: Modifier = Modifier) {
     Image(
@@ -378,8 +385,12 @@ fun Ground(modifier: Modifier = Modifier) {
     )
 }
 
+@Preview
 @Composable
-fun Background(image: Int, modifier: Modifier = Modifier) {
+fun Background(
+    image: Int = R.drawable.background_evening,
+    modifier: Modifier = Modifier
+) {
     Image(
         painter = painterResource(id = image),
         contentDescription = null,
