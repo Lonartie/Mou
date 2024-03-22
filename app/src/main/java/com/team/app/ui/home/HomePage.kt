@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -41,6 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -54,21 +56,33 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.team.app.R
 import com.team.app.data.model.Attributes
+import com.team.app.data.model.Hotbar
+import com.team.app.data.model.InventoryItem
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
+import com.team.app.utils.Constants
 import kotlinx.coroutines.launch
 
-@Preview
 @Composable
-fun HomePage(viewModel: HomePageViewModel = hiltViewModel()) {
-    val firstStart = viewModel.firstStart.collectAsState(initial = true)
+fun HomePage(
+    openShop: () -> Unit = {},
+    viewModel: HomePageViewModel = hiltViewModel()
+) {
     val attributes = viewModel.attributes.collectAsState(
         initial = Attributes(0, 0, 0, 0)
-    )
+    ).value
+    val hotbar = viewModel.hotbar.collectAsState(
+        initial = Hotbar(
+            InventoryItem(Item(ItemType.FOOD, "", 0, 0), 0),
+            InventoryItem(Item(ItemType.TOY, "", 0, 0), 0),
+            InventoryItem(Item(ItemType.MEDICINE, "", 0, 0), 0)
+        )
+    ).value
+    val item = Item(ItemType.FOOD, "", 0, 0)
 
     LaunchedEffect(Unit) {
-        viewModel.onStart(firstStart.value)
-        viewModel.setFigureState(attributes.value)
+        viewModel.onStart()
+        viewModel.setFigureState(attributes)
     }
 
     Scaffold(
@@ -76,23 +90,33 @@ fun HomePage(viewModel: HomePageViewModel = hiltViewModel()) {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface),
         topBar = {
-            TopRow(viewModel)
+            TopRow(attributes, openShop, viewModel::openMoneyScreen)
         },
         bottomBar = {
-            BottomRow(viewModel)
+            BottomRow(
+                hotbar,
+                attributes,
+                viewModel::giveToy,
+                viewModel::giveFood,
+                viewModel::giveItem,
+                viewModel::selectFood,
+                viewModel::selectToy,
+                viewModel::selectItem
+            )
         }
     ) { innerPadding ->
-        Content(innerPadding, viewModel)
+        Content(innerPadding, viewModel.figureState.value)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun TopRow(viewModel: HomePageViewModel = hiltViewModel()) {
-    val attributes = viewModel.attributes.collectAsState(
-        initial = Attributes(0, 0, 0, 0)
-    )
+fun TopRow(
+    attributes: Attributes = Attributes(10, 20, 30, 40),
+    openShop: suspend () -> Unit = {},
+    openMoneyScreen: suspend () -> Unit = {}
+) {
     val coro = rememberCoroutineScope()
 
     TopAppBar(title = {
@@ -115,19 +139,19 @@ fun TopRow(viewModel: HomePageViewModel = hiltViewModel()) {
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 AttributeBar(
-                    progress = attributes.value.happiness.toFloat() / 100,
+                    progress = attributes.happiness.toFloat() / 100,
                     icon = Icons.Rounded.ChildCare,
                     name = "Happiness",
                     color = Color.Yellow,
                 )
                 AttributeBar(
-                    progress = attributes.value.hunger.toFloat() / 100,
+                    progress = attributes.hunger.toFloat() / 100,
                     icon = Icons.Rounded.Fastfood,
                     name = "Hunger",
                     color = Color.hsl(30f, 0.96f, 0.55f, 1f)
                 )
                 AttributeBar(
-                    progress = attributes.value.health.toFloat() / 100,
+                    progress = attributes.health.toFloat() / 100,
                     icon = Icons.Rounded.ControlPoint,
                     name = "Health",
                     color = Color.hsl(117f, 0.96f, 0.55f, 1f)
@@ -136,7 +160,7 @@ fun TopRow(viewModel: HomePageViewModel = hiltViewModel()) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.combinedClickable(
-                    onClick = { coro.launch { viewModel.openMoneyScreen() } }
+                    onClick = { coro.launch { openMoneyScreen() } }
                 )
             ) {
                 Image(
@@ -149,7 +173,7 @@ fun TopRow(viewModel: HomePageViewModel = hiltViewModel()) {
                             scaleY = 1.2f
                         )
                 )
-                Text(attributes.value.coins.toString() + "€", fontSize = 15.sp)
+                Text(attributes.coins.toString() + "€", fontSize = 15.sp)
             }
             Image(
                 painterResource(id = R.drawable.shop),
@@ -157,7 +181,7 @@ fun TopRow(viewModel: HomePageViewModel = hiltViewModel()) {
                 modifier = Modifier
                     .size(40.dp)
                     .combinedClickable(
-                        onClick = { coro.launch { viewModel.openShop() } }
+                        onClick = { coro.launch { openShop() } }
                     )
             )
         }
@@ -168,22 +192,28 @@ fun TopRow(viewModel: HomePageViewModel = hiltViewModel()) {
 @Composable
 fun Content(
     innerPadding: PaddingValues = PaddingValues(0.dp),
-    viewModel: HomePageViewModel = hiltViewModel()
+    figureState: Int = R.drawable.figure_happy
 ) {
-
-    Background(image = R.drawable.background_evening,
-               modifier = Modifier
-                   .fillMaxSize()
-                   .scale(5f))
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    Background(
+        image = R.drawable.background_evening,
         modifier = Modifier
             .fillMaxSize()
-            .offset(y = 190.dp)
+            .scale(5f)
+    )
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
     ) {
+        Spacer(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1f)
+        )
         Figure(
-            image = viewModel.figureState.intValue,
+            image = figureState,
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -191,34 +221,26 @@ fun Content(
             modifier = Modifier
                 .fillMaxWidth()
         )
+
     }
-    Text(
-        modifier = Modifier
-            .fillMaxSize()
-            .wrapContentHeight(align = Alignment.CenterVertically)
-            .padding(innerPadding),
-        text = viewModel.stepCoins.intValue.toString() + " steps taken today",
-        textAlign = TextAlign.Center,
-        fontSize = 20.sp
-    )
 }
 
 @Preview
 @Composable
-fun BottomRow(viewModel: HomePageViewModel = hiltViewModel()) {
-    val attributes = viewModel.attributes.collectAsState(
-        initial = Attributes(0, 0, 0, 0)
-    )
-    val currentFood = viewModel.currentFood.collectAsState(
-        initial = Item(ItemType.FOOD, "Chicken", 10, 10)
-    )
-    val currentToy = viewModel.currentToy.collectAsState(
-        initial = Item(ItemType.TOY, "Ball", 10, 10)
-    )
-    val currentMisc = viewModel.currentMisc.collectAsState(
-        initial = Item(ItemType.MISC, "Potion", 10, 10)
-    )
-
+fun BottomRow(
+    hotbar: Hotbar = Hotbar(
+        foodItem = InventoryItem(Item(ItemType.FOOD, "Chicken", 10, 10), 3),
+        toyItem = InventoryItem(Item(ItemType.TOY, "Mouse", 5, 5), 2),
+        miscItem = InventoryItem(Item(ItemType.MEDICINE, "Health Potion", 15, 15), 1)
+    ),
+    attributes: Attributes = Attributes(10, 20, 30, 40),
+    giveToy: suspend (Item, Attributes) -> Unit = { _, _ -> },
+    giveFood: suspend (Item, Attributes) -> Unit = { _, _ -> },
+    giveItem: suspend (Item, Attributes) -> Unit = { _, _ -> },
+    selectFood: suspend () -> Unit = {},
+    selectToy: suspend () -> Unit = {},
+    selectItem: suspend () -> Unit = {}
+) {
     val coro = rememberCoroutineScope()
 
     BottomAppBar {
@@ -236,40 +258,37 @@ fun BottomRow(viewModel: HomePageViewModel = hiltViewModel()) {
         ) {
             NavigationButton(
                 name = "Food",
-                image = painterResource(R.drawable.chicken_leg),
-                scale = 1.75f,
+                image = painterResource(Constants.getItemResource(hotbar.foodItem.item.name)),
+                scale = Constants.getItemScalingFactor(hotbar.foodItem.item.name),
+                counter = hotbar.foodItem.quantity,
                 onClick = {
                     coro.launch {
-                        viewModel.giveFood(
-                            currentFood.value,
-                            attributes.value
-                        )
+                        giveFood(hotbar.foodItem.item, attributes)
                     }
                 },
-                onLongClick = { coro.launch { viewModel.selectFood() } }
+                onLongClick = { coro.launch { selectFood() } }
             )
             VerticalDivider()
             NavigationButton(
                 name = "Toys",
-                image = painterResource(R.drawable.toy_mouse),
-                scale = 1.2f,
-                onClick = { coro.launch { viewModel.giveToy(currentToy.value, attributes.value) } },
-                onLongClick = { coro.launch { viewModel.selectToy() } }
+                image = painterResource(Constants.getItemResource(hotbar.toyItem.item.name)),
+                scale = Constants.getItemScalingFactor(hotbar.toyItem.item.name),
+                counter = hotbar.toyItem.quantity,
+                onClick = { coro.launch { giveToy(hotbar.toyItem.item, attributes) } },
+                onLongClick = { coro.launch { selectToy() } }
             )
             VerticalDivider()
             NavigationButton(
                 name = "Items",
-                image = painterResource(R.drawable.potion),
-                scale = 1.2f,
+                image = painterResource(Constants.getItemResource(hotbar.miscItem.item.name)),
+                scale = Constants.getItemScalingFactor(hotbar.miscItem.item.name),
+                counter = hotbar.miscItem.quantity,
                 onClick = {
                     coro.launch {
-                        viewModel.giveItem(
-                            currentMisc.value,
-                            attributes.value
-                        )
+                        giveItem(hotbar.miscItem.item, attributes)
                     }
                 },
-                onLongClick = { coro.launch { viewModel.selectItem() } }
+                onLongClick = { coro.launch { selectItem() } }
             )
         }
     }
@@ -321,7 +340,8 @@ fun VerticalDivider() {
 @Composable
 fun NavigationButton(
     name: String = "Name",
-    image: Painter? = painterResource(id = R.drawable.chicken_leg),
+    image: Painter = painterResource(id = R.drawable.chicken_leg),
+    counter: Int = 0,
     scale: Float = 1.0f,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {}
@@ -336,18 +356,33 @@ fun NavigationButton(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        if (image != null) {
+        Box {
             Image(
                 image,
                 contentDescription = name,
                 modifier = Modifier
                     .padding(end = 10.dp)
-                    .align(Alignment.CenterVertically)
                     .size(40.dp)
                     .graphicsLayer(
                         scaleX = scale,
                         scaleY = scale
                     )
+            )
+
+            Text(
+                text = counter.toString(),
+                color = Color.White,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = 5.dp, y = (-15).dp)
+                    .padding(5.dp)
+                    .drawBehind {
+                        drawCircle(
+                            color = Color.Red,
+                            radius = 10.dp.toPx()
+                        )
+                    },
+                fontSize = 15.sp
             )
         }
         Text(
@@ -358,8 +393,12 @@ fun NavigationButton(
     }
 }
 
+@Preview
 @Composable
-fun Figure(image : Int, modifier: Modifier = Modifier) {
+fun Figure(
+    image: Int = R.drawable.figure_happy,
+    modifier: Modifier = Modifier
+) {
     Image(
         painter = painterResource(id = image),
         contentDescription = null,
@@ -367,6 +406,7 @@ fun Figure(image : Int, modifier: Modifier = Modifier) {
     )
 }
 
+@Preview
 @Composable
 fun Ground(modifier: Modifier = Modifier) {
     Image(
@@ -376,8 +416,12 @@ fun Ground(modifier: Modifier = Modifier) {
     )
 }
 
+@Preview
 @Composable
-fun Background(image: Int, modifier: Modifier = Modifier) {
+fun Background(
+    image: Int = R.drawable.background_evening,
+    modifier: Modifier = Modifier
+) {
     Image(
         painter = painterResource(id = image),
         contentDescription = null,

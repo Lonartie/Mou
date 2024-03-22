@@ -1,13 +1,20 @@
 package com.team.app
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.team.app.workers.StepCounterWorker
+import com.team.app.service.NotificationService
+import com.team.app.service.NotificationService.Companion.NOTIFICATION_CHANNEL_ID
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -19,6 +26,7 @@ class AppApplication : Application(), Configuration.Provider {
     lateinit var hiltWorkerFactory: HiltWorkerFactory
 
     override fun onCreate() {
+
         super.onCreate()
         val myWork = PeriodicWorkRequestBuilder<StepCounterWorker>(
             15, TimeUnit.MINUTES).build()
@@ -26,11 +34,33 @@ class AppApplication : Application(), Configuration.Provider {
                 enqueueUniquePeriodicWork("StepCounterWorker",
                     ExistingPeriodicWorkPolicy.UPDATE, myWork)
         Log.d("AppApplication", "WorkManager started")
+        createNotificationChannel()
     }
+
+
     override fun getWorkManagerConfiguration(): Configuration {
         return Configuration.Builder()
             .setWorkerFactory(hiltWorkerFactory)
             .build()
     }
+    @SuppressLint("ObsoleteSdkInt")
+    private fun createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is not in the Support Library.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Mou - Notification"
+            val descriptionText = "When your mini-Me calls for you"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance).apply{
+                description = descriptionText
+            }
+            // Register the channel with the system.
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+
 
 }

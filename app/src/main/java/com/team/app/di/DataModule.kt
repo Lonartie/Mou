@@ -6,20 +6,63 @@ import android.hardware.Sensor
 import android.hardware.SensorManager
 import androidx.room.Room
 import androidx.work.WorkManager
+import androidx.room.Room
 import com.lonartie.bookdiary.data.repositories.SettingsRepository
 import com.team.app.data.database.StepCounterDatabase
 import com.team.app.data.database.StepsDao
 import com.team.app.data.repositories.StepCounterRepository
+import com.team.app.data.database.AttributesDatabase
+import com.team.app.data.database.ItemsDatabase
+import com.team.app.data.repositories.AttributesRepository
+import com.team.app.data.repositories.HotbarRepository
+import com.team.app.data.repositories.InventoryRepository
+import com.team.app.data.repositories.ItemsRepository
 import com.team.app.utils.dataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class DataModule {
+    @Provides
+    @Singleton
+    fun provideItemsDatabase(@ApplicationContext context: Context): ItemsDatabase {
+        return Room.databaseBuilder(context, ItemsDatabase::class.java, "items_database")
+            .createFromAsset("database/prefilled_items.db")
+            .build()
+    }
+
+    @Provides
+    fun provideItemsRepository(itemsDb: ItemsDatabase): ItemsRepository {
+        return ItemsRepository(itemsDb.itemsDao())
+    }
+
+    @Provides
+    fun provideInventoryRepository(itemsDb: ItemsDatabase, itemsRepo: ItemsRepository): InventoryRepository {
+        return InventoryRepository(itemsDb.inventoryDao(), itemsRepo)
+    }
+
+    @Provides
+    fun provideHotbarRepository(itemsDb: ItemsDatabase, inventoryRepo: InventoryRepository): HotbarRepository {
+        return HotbarRepository(itemsDb.hotbarDao(), inventoryRepo)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAttributesDatabase(@ApplicationContext context: Context): AttributesDatabase {
+        return Room.databaseBuilder(context, AttributesDatabase::class.java, "attributes_database")
+            .createFromAsset("database/prefilled_attributes.db")
+            .build()
+    }
+
+    @Provides
+    fun provideAttributesRepository(attributesDatabase: AttributesDatabase): AttributesRepository {
+        return AttributesRepository(attributesDatabase.attributesDao())
+    }
 
 //    @Provides
 //    fun providesNetworkRepository(@ApplicationContext context: Context): NetworkRepository {
