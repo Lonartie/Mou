@@ -8,7 +8,7 @@ import com.team.app.data.model.Attributes as AttributesModel
 class AttributesRepository(
     private val attributesDao: AttributesDao
 ) {
-    fun getAttributes(): Flow<AttributesModel> {
+    fun getAttributesFlow(): Flow<AttributesModel> {
         return attributesDao.getAttributesFlow().map { attr ->
             AttributesModel(
                 coins = attr.coins,
@@ -18,6 +18,8 @@ class AttributesRepository(
             )
         }
     }
+
+    suspend fun getAttributes() = attributesDao.getAttributes()
 
     suspend fun updateCoins(coins: Int) {
         val attr = attributesDao.getAttributes()[0]

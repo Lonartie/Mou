@@ -1,5 +1,6 @@
 package com.team.app.ui.shop
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,11 +26,14 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.team.app.R
 import com.team.app.data.database.model.Item
+import com.team.app.utils.Constants
 
 @Composable
 fun ShopScreen(
@@ -38,6 +42,7 @@ fun ShopScreen(
     viewModel: ShopViewModel = hiltViewModel()
 ) {
     val items = viewModel.itemsFlow.collectAsState(emptyList()).value
+    val attributes = viewModel.attributesFlow.collectAsState(null).value
 
     Scaffold(
         topBar = { ShopTopAppBar(onBackClick = onBackClick) }
@@ -51,6 +56,12 @@ fun ShopScreen(
                 modifier = Modifier.padding(8.dp)
             )
 
+            Text(
+                text = stringResource(id = R.string.current_balance) + " ${attributes?.coins} Coins",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(8.dp)
+            )
+
             Spacer(modifier = Modifier.size(20.dp))
 
             LazyVerticalGrid(
@@ -61,7 +72,7 @@ fun ShopScreen(
                     ItemCard(
                         it,
                         { viewModel.buyItem(it) },
-                        Modifier.padding(8.dp)
+                        Modifier.padding(4.dp)
                     )
                 }
             }
@@ -113,14 +124,18 @@ fun ItemCard(
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(2.dp)
+            modifier = Modifier.padding(8.dp)
         ) {
             Text(
                 text = item.name,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
             Spacer(modifier = Modifier.size(8.dp))
-            //Image(painter = painterResource(id = 0 /*item.imageId*/), contentDescription = null)
+            Image(
+                painter = painterResource(Constants.getItemResource(item.name)),
+                contentDescription = null,
+                modifier = Modifier.scale(Constants.getItemScalingFactor(item.name) * 0.5f)
+            )
             Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = "${item.price} Coins",

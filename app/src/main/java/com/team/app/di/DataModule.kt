@@ -35,8 +35,10 @@ class DataModule {
     }
 
     @Provides
-    fun provideInventoryRepository(itemsDb: ItemsDatabase, itemsRepo: ItemsRepository): InventoryRepository {
-        return InventoryRepository(itemsDb.inventoryDao(), itemsRepo)
+    fun provideInventoryRepository(
+        itemsDb: ItemsDatabase, itemsRepo: ItemsRepository, attributesRepo: AttributesRepository
+    ): InventoryRepository {
+        return InventoryRepository(itemsDb.inventoryDao(), itemsRepo, attributesRepo)
     }
 
     @Provides

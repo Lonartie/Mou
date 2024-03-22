@@ -4,5 +4,14 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.team.app.data.database.model.InventoryItem
+import com.team.app.data.database.model.Item
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
+fun Item.toInventoryItem(quantity: Int): InventoryItem {
+    return InventoryItem(
+        itemID = id,
+        quantity = quantity
+    )
+}

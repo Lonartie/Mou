@@ -1,5 +1,6 @@
 package com.team.app.utils
 
+import androidx.annotation.DrawableRes
 import com.team.app.R
 
 class Constants {
@@ -11,7 +12,7 @@ class Constants {
             "Health Potion" to Pair(R.drawable.potion, 1.2f),
         )
 
-        fun getItemResource(name: String) = ITEM_NAME_TO_RESOURCE_MAP[name]?.first ?: R.drawable.coins
+        @DrawableRes fun getItemResource(name: String) = ITEM_NAME_TO_RESOURCE_MAP[name]?.first ?: R.drawable.coins
         fun getItemScalingFactor(name: String) = ITEM_NAME_TO_RESOURCE_MAP[name]?.second ?: 1f
     }
 }

@@ -26,7 +26,7 @@ class HomePageViewModel @Inject constructor(
 ) : ViewModel() {
 
     val figureState = mutableIntStateOf(R.drawable.figure_happy)
-    val attributes: Flow<Attributes> = attributesRepo.getAttributes()
+    val attributes: Flow<Attributes> = attributesRepo.getAttributesFlow()
     val hotbar: Flow<Hotbar> = hotbarRepo.getHotbar()
     val inventoryItems: Flow<InventoryItem> = inventoryRepo.getItemsFlow()
 

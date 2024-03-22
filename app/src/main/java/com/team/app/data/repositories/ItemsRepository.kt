@@ -9,7 +9,7 @@ class ItemsRepository(
     private val itemsDao: ItemsDao
 ) {
     fun getItemsFlow() = itemsDao.getItemsFlow()
-    suspend fun getItemByID(id: Int) : ItemModel {
+    suspend fun getItemByID(id: Int): ItemModel {
         val item : Item = itemsDao.getItem(id)
         return ItemModel(
             ItemType.entries[item.type],
@@ -19,7 +19,7 @@ class ItemsRepository(
         )
     }
 
-    suspend fun findByName(name: String) : Int {
+    suspend fun findByName(name: String): Int {
         return itemsDao.findByName(name)
     }
 }
