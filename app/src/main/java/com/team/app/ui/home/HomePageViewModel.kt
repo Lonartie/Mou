@@ -6,7 +6,6 @@ import com.lonartie.bookdiary.data.repositories.SettingsRepository
 import com.team.app.R
 import com.team.app.data.model.Attributes
 import com.team.app.data.model.Hotbar
-import com.team.app.data.model.InventoryItem
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import com.team.app.data.repositories.AttributesRepository
@@ -14,6 +13,7 @@ import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -27,8 +27,11 @@ class HomePageViewModel @Inject constructor(
 
     val figureState = mutableIntStateOf(R.drawable.figure_happy)
     val attributes: Flow<Attributes> = attributesRepo.getAttributes()
-    val hotbar: Flow<Hotbar> = hotbarRepo.getHotbar()
-    val inventoryItems: Flow<InventoryItem> = inventoryRepo.getItemsFlow()
+
+    val hotbar: Flow<Hotbar> = inventoryRepo.getItemsFlow()
+        .map {
+            hotbarRepo.getHotbar()
+        }
 
     private fun getMinimalAttributeValue(attributes: Attributes): Int {
         return min(
