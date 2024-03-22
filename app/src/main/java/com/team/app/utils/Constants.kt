@@ -13,9 +13,5 @@ class Constants {
 
         fun getItemResource(name: String) = ITEM_NAME_TO_RESOURCE_MAP[name]?.first ?: R.drawable.coins
         fun getItemScalingFactor(name: String) = ITEM_NAME_TO_RESOURCE_MAP[name]?.second ?: 1f
-
-        const val foodPrice = 5
-        const val healthBoosterPrice = 20
-        const val toyPrice = 15
     }
 }

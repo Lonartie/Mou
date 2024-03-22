@@ -8,6 +8,7 @@ import com.team.app.data.model.Item as ItemModel
 class ItemsRepository(
     private val itemsDao: ItemsDao
 ) {
+    fun getItemsFlow() = itemsDao.getItemsFlow()
     suspend fun getItemByID(id: Int) : ItemModel {
         val item : Item = itemsDao.getItem(id)
         return ItemModel(
