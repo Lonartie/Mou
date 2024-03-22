@@ -28,4 +28,7 @@ interface InventoryDao {
 
     @Query("SELECT * FROM inventory WHERE id = :id")
     suspend fun getItem(id: Int): InventoryItem
+
+    @Query("SELECT id FROM inventory WHERE itemID = :itemID")
+    suspend fun findByItemID(itemID: Int): Int
 }
