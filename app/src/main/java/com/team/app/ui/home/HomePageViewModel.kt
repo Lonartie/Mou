@@ -1,15 +1,15 @@
 package com.team.app.ui.home
 
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.lonartie.bookdiary.data.repositories.SettingsRepository
 import com.team.app.R
 import com.team.app.data.model.Attributes
+import com.team.app.data.model.Hotbar
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import com.team.app.data.repositories.AttributesRepository
+import com.team.app.data.repositories.HotbarRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -18,14 +18,13 @@ import kotlin.math.min
 @HiltViewModel
 class HomePageViewModel @Inject constructor(
     private val settings: SettingsRepository,
-    private val attributesRepo: AttributesRepository
+    private val attributesRepo: AttributesRepository,
+    private val hotbarRepo: HotbarRepository
 ) : ViewModel() {
 
-    val currentFood = settings.currentFood
-    val currentToy = settings.currentToy
-    val currentMisc = settings.currentMisc
     val figureState = mutableIntStateOf(R.drawable.figure_happy)
     val attributes : Flow<Attributes> = attributesRepo.getAttributes()
+    val hotbar : Flow<Hotbar> = hotbarRepo.getHotbar()
 	
 	private fun getMinimalAttributeValue(attributes: Attributes): Int {
         return min(

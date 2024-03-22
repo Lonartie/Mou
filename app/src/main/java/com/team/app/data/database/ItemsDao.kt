@@ -26,4 +26,7 @@ interface ItemsDao {
 
     @Query("SELECT * FROM items")
     fun getItemsFlow(): Flow<Item>
+
+    @Query("SELECT * FROM items WHERE id = :id")
+    suspend fun getItem(id: Int): Item
 }

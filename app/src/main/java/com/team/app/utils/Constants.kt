@@ -1,12 +1,18 @@
 package com.team.app.utils
 
+import com.team.app.R
+
 class Constants {
     companion object {
-//        const val GOOGLE_BOOKS_API_BASE = "https://www.googleapis.com/books/v1/"
-        const val DEFAULT_COINS = 100
-        const val DEFAULT_HUNGER = 10
-        const val DEFAULT_HAPPINESS = 10
-        const val DEFAULT_HEALTH = 10
+
+        val ITEM_NAME_TO_RESOURCE_MAP = mapOf(
+            "Chicken" to Pair(R.drawable.chicken_leg, 1.75f),
+            "Mouse" to Pair(R.drawable.toy_mouse, 1.2f),
+            "Health Potion" to Pair(R.drawable.potion, 1.2f),
+        )
+
+        fun getItemResource(name: String) = ITEM_NAME_TO_RESOURCE_MAP[name]?.first ?: R.drawable.coins
+        fun getItemScalingFactor(name: String) = ITEM_NAME_TO_RESOURCE_MAP[name]?.second ?: 1f
 
         const val foodPrice = 5
         const val healthBoosterPrice = 20
