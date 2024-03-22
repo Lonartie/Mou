@@ -54,13 +54,13 @@ class HomePageViewModel @Inject constructor(
         settings.saveCurrentItem(item)
     }
 
-    suspend fun openMoneyScreen() {
-        println("Open money screen")
-    }
+    //suspend fun openMoneyScreen() {
+    //    println("Open money screen")
+    //}
 
-    suspend fun openShop() {
-        println("Open shop")
-    }
+    //suspend fun openShop() {
+    //    println("Open shop")
+    //}
 
     suspend fun giveFood(item: Item, attributes: Attributes) {
         val newAttributes = attributes.copy(hunger = attributes.hunger + item.actionValue)

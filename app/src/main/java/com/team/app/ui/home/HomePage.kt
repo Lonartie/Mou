@@ -56,9 +56,12 @@ import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import kotlinx.coroutines.launch
 
-@Preview
+//@Preview
 @Composable
-fun HomePage(viewModel: HomePageViewModel = hiltViewModel()) {
+fun HomePage(
+    onShopClick: () -> Unit,
+    viewModel: HomePageViewModel = hiltViewModel()
+) {
     val firstStart = viewModel.firstStart.collectAsState(initial = true)
     val attributes = viewModel.attributes.collectAsState(
         initial = Attributes(0, 0, 0, 0)
@@ -96,7 +99,7 @@ fun HomePage(viewModel: HomePageViewModel = hiltViewModel()) {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
+//@Preview
 @Composable
 fun TopRow(
     attributes: Attributes = Attributes(10, 20, 30, 40),
