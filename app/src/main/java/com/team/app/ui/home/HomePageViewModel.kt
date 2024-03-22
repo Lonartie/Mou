@@ -1,19 +1,22 @@
 package com.team.app.ui.home
 
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.lonartie.bookdiary.data.repositories.SettingsRepository
 import com.team.app.R
 import com.team.app.data.model.Attributes
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
+import com.team.app.data.repositories.StepCounterRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.math.min
 
 @HiltViewModel
 class HomePageViewModel @Inject constructor(
-    private val settings: SettingsRepository
+    private val settings: SettingsRepository,
+    private val stepCounter: StepCounterRepository
 ) : ViewModel() {
 
     val firstStart = settings.firstStart
@@ -22,6 +25,7 @@ class HomePageViewModel @Inject constructor(
     val currentToy = settings.currentToy
     val currentMisc = settings.currentMisc
     val figureState = mutableIntStateOf(R.drawable.figure_happy)
+    val stepCoins = mutableIntStateOf(0) //TODO remove
 	
 	private fun getMinimalAttributeValue(attributes: Attributes): Int {
         return min(
@@ -43,6 +47,7 @@ class HomePageViewModel @Inject constructor(
     }
 
     suspend fun onStart(isFirst : Boolean) {
+        settings.saveAttributes(Attributes(0,0,0,0))
         var item = Item(ItemType.FOOD, "Chicken", 10, 10)
         println("current food: $item")
         settings.saveCurrentItem(item)
@@ -52,6 +57,21 @@ class HomePageViewModel @Inject constructor(
         item = Item(ItemType.MEDICINE, "Medicine", 15, 15)
         println("current misc: $item")
         settings.saveCurrentItem(item)
+
+        fetchStepData()
+    }
+
+    private suspend fun fetchStepData() {
+        stepCounter.addSteps()
+
+        val steps = stepCounter.loadStepsSinceTerminate()
+        println("steps: $steps")
+        if (steps == 0L) return
+        // set stepCoins Value to steps
+        stepCoins.intValue += steps.toInt()
+
+        // clear database
+        stepCounter.clearSteps()
     }
 
     suspend fun openMoneyScreen() {
@@ -60,6 +80,7 @@ class HomePageViewModel @Inject constructor(
 
     suspend fun openShop() {
         println("Open shop")
+        stepCounter.addSteps()
     }
 
     suspend fun giveFood(item: Item, attributes: Attributes) {

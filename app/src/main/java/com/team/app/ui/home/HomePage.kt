@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ChildCare
 import androidx.compose.material.icons.rounded.ControlPoint
@@ -169,18 +170,7 @@ fun Content(
     innerPadding: PaddingValues = PaddingValues(0.dp),
     viewModel: HomePageViewModel = hiltViewModel()
 ) {
-	/*
-    Text(
-        modifier = Modifier
-            .fillMaxSize()
-            .wrapContentHeight(align = Alignment.CenterVertically)
-            .padding(innerPadding),
-        text = "Homepage",
-        textAlign = TextAlign.Center,
-        fontSize = 20.sp
-    )
 
-     */
     Background(image = R.drawable.background_evening,
                modifier = Modifier
                    .fillMaxSize()
@@ -201,8 +191,16 @@ fun Content(
             modifier = Modifier
                 .fillMaxWidth()
         )
-
     }
+    Text(
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentHeight(align = Alignment.CenterVertically)
+            .padding(innerPadding),
+        text = viewModel.stepCoins.intValue.toString() + " steps taken today",
+        textAlign = TextAlign.Center,
+        fontSize = 20.sp
+    )
 }
 
 @Preview
