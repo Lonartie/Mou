@@ -59,7 +59,7 @@ import kotlinx.coroutines.launch
 //@Preview
 @Composable
 fun HomePage(
-    onShopClick: () -> Unit,
+    openShop: () -> Unit = {},
     viewModel: HomePageViewModel = hiltViewModel()
 ) {
     val firstStart = viewModel.firstStart.collectAsState(initial = true)
@@ -78,7 +78,7 @@ fun HomePage(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface),
         topBar = {
-            TopRow(attributes.value, viewModel::openShop, viewModel::openMoneyScreen)
+            TopRow(attributes.value, openShop, viewModel::openMoneyScreen)
         },
         bottomBar = {
             BottomRow(

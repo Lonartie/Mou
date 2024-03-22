@@ -17,7 +17,7 @@ fun MouNavHost(
     ) {
         composable(route = Screen.Home.route) {
             HomePage(
-                onShopClick = { navController.navigate(Screen.Shop.route) }
+                openShop = { navController.navigate(Screen.Shop.route) }
             )
         }
         composable(route = Screen.Shop.route) {
