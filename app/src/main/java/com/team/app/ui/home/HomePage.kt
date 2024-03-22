@@ -78,7 +78,6 @@ fun HomePage(
             InventoryItem(Item(ItemType.MEDICINE, "", 0, 0), 0)
         )
     ).value
-    val item = Item(ItemType.FOOD, "", 0, 0)
 
     LaunchedEffect(Unit) {
         viewModel.onStart()

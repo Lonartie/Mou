@@ -17,4 +17,8 @@ class ItemsRepository(
             item.actionValue
         )
     }
+
+    suspend fun findByName(name: String) : Int {
+        return itemsDao.findByName(name)
+    }
 }

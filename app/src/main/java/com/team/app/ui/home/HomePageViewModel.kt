@@ -12,8 +12,10 @@ import com.team.app.data.model.ItemType
 import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.HotbarRepository
+import com.team.app.data.repositories.InventoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -22,17 +24,17 @@ class HomePageViewModel @Inject constructor(
     private val settings: SettingsRepository,
     private val stepCounter: StepCounterRepository,
     private val attributesRepo: AttributesRepository,
+    private val inventoryRepo: InventoryRepository,
     private val hotbarRepo: HotbarRepository
 ) : ViewModel() {
 
-    val figureState =
-        mutableIntStateOf(R.drawable.figure_happy)
-    val stepCoins =
-        mutableIntStateOf(0) //TODO remove
-    val attributes: Flow<Attributes> =
-        attributesRepo.getAttributes()
-    val hotbar: Flow<Hotbar> =
-        hotbarRepo.getHotbar()
+    val figureState = mutableIntStateOf(R.drawable.figure_happy)
+    val attributes: Flow<Attributes> = attributesRepo.getAttributes()
+
+    val hotbar: Flow<Hotbar> = inventoryRepo.getItemsFlow()
+        .map {
+            hotbarRepo.getHotbar()
+        }
 
     private fun getMinimalAttributeValue(attributes: Attributes): Int {
         return min(
@@ -98,7 +100,7 @@ class HomePageViewModel @Inject constructor(
         println("steps: $steps")
         if (steps == 0L) return
         // set stepCoins Value to steps
-        stepCoins.intValue += steps.toInt()
+        //stepCoins.intValue += steps.toInt()
 
         // clear database
         stepCounter.clearSteps()
@@ -110,11 +112,11 @@ class HomePageViewModel @Inject constructor(
 
     suspend fun openShop() {
         println("Open shop")
-        stepCounter.addSteps()
     }
 
     suspend fun giveFood(item: Item, attributes: Attributes) {
         attributesRepo.updateHunger(attributes.hunger + item.actionValue)
+        inventoryRepo.removeOne(item)
         setFigureState(attributes)
     }
 
@@ -124,6 +126,7 @@ class HomePageViewModel @Inject constructor(
 
     suspend fun giveToy(item: Item, attributes: Attributes) {
         attributesRepo.updateHappiness(attributes.happiness + item.actionValue)
+        inventoryRepo.removeOne(item)
         setFigureState(attributes)
     }
 
@@ -134,6 +137,7 @@ class HomePageViewModel @Inject constructor(
     suspend fun giveItem(item: Item, attributes: Attributes) {
         if (item.itemType == ItemType.MEDICINE) {
             attributesRepo.updateHealth(attributes.health + item.actionValue)
+            inventoryRepo.removeOne(item)
             setFigureState(attributes)
         }
     }
