@@ -5,8 +5,6 @@ import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import androidx.room.Room
-import androidx.work.WorkManager
-import androidx.room.Room
 import com.lonartie.bookdiary.data.repositories.SettingsRepository
 import com.team.app.data.database.StepCounterDatabase
 import com.team.app.data.database.StepsDao

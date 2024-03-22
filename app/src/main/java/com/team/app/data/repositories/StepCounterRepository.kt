@@ -87,6 +87,8 @@ class StepCounterRepository @Inject constructor(
 
     suspend fun addSteps() {
         val steps = steps() - getMaxSteps()
+        Log.d(Constants.STEP_COUNTER_TAG, "Adding steps: $steps")
+        if (steps == 0L) return
         storeSteps(steps)
     }
 

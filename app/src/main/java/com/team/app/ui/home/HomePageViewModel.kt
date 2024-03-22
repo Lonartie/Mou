@@ -20,18 +20,21 @@ import kotlin.math.min
 @HiltViewModel
 class HomePageViewModel @Inject constructor(
     private val settings: SettingsRepository,
-    private val stepCounter: StepCounterRepository
-    private val settings: SettingsRepository,
+    private val stepCounter: StepCounterRepository,
     private val attributesRepo: AttributesRepository,
     private val hotbarRepo: HotbarRepository
 ) : ViewModel() {
 
-    val figureState = mutableIntStateOf(R.drawable.figure_happy)
-    val stepCoins = mutableIntStateOf(0) //TODO remove
-    val attributes : Flow<Attributes> = attributesRepo.getAttributes()
-    val hotbar : Flow<Hotbar> = hotbarRepo.getHotbar()
+    val figureState =
+        mutableIntStateOf(R.drawable.figure_happy)
+    val stepCoins =
+        mutableIntStateOf(0) //TODO remove
+    val attributes: Flow<Attributes> =
+        attributesRepo.getAttributes()
+    val hotbar: Flow<Hotbar> =
+        hotbarRepo.getHotbar()
 
-	private fun getMinimalAttributeValue(attributes: Attributes): Int {
+    private fun getMinimalAttributeValue(attributes: Attributes): Int {
         return min(
             attributes.hunger,
             min(
@@ -41,27 +44,46 @@ class HomePageViewModel @Inject constructor(
         )
 
     }
+
     fun setFigureState(attributes: Attributes) {
-        val minimalValue = getMinimalAttributeValue(attributes)
-        figureState.intValue = when {
-            minimalValue >= 75 -> R.drawable.figure_happy
-            minimalValue >= 50 -> R.drawable.figure_lonely
-            else -> R.drawable.figure_angry
-        }
+        val minimalValue =
+            getMinimalAttributeValue(attributes)
+        figureState.intValue =
+            when {
+                minimalValue >= 75 -> R.drawable.figure_happy
+                minimalValue >= 50 -> R.drawable.figure_lonely
+                else -> R.drawable.figure_angry
+            }
     }
 
-    suspend fun onStart(isFirst : Boolean) {
-        settings.saveAttributes(Attributes(0,0,0,0))
     suspend fun onStart() {
-        var item = Item(ItemType.FOOD, "Chicken", 10, 10)
+        var item =
+            Item(
+                ItemType.FOOD,
+                "Chicken",
+                10,
+                10
+            )
         println("current food: $item")
         settings.saveCurrentItem(item)
 
-        item = Item(ItemType.TOY, "Ball", 5, 5)
+        item =
+            Item(
+                ItemType.TOY,
+                "Ball",
+                5,
+                5
+            )
         println("current toy: $item")
         settings.saveCurrentItem(item)
 
-        item = Item(ItemType.MEDICINE, "Medicine", 15, 15)
+        item =
+            Item(
+                ItemType.MEDICINE,
+                "Medicine",
+                15,
+                15
+            )
         println("current misc: $item")
         settings.saveCurrentItem(item)
 
@@ -71,7 +93,8 @@ class HomePageViewModel @Inject constructor(
     private suspend fun fetchStepData() {
         stepCounter.addSteps()
 
-        val steps = stepCounter.loadStepsSinceTerminate()
+        val steps =
+            stepCounter.loadStepsSinceTerminate()
         println("steps: $steps")
         if (steps == 0L) return
         // set stepCoins Value to steps

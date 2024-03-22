@@ -21,7 +21,10 @@ class StepCounterWorker @AssistedInject constructor(
         Log.d(TAG, "Starting worker...")
 
         val stepsSinceLastTermination = repository.steps() - repository.getMaxSteps()
-        if (stepsSinceLastTermination == 0L) return Result.success()
+        if (stepsSinceLastTermination == 0L) {
+            Log.d(TAG, "No new steps since last termination")
+            return Result.success()
+        }
 
         Log.d(TAG, "Received steps from step sensor: $stepsSinceLastTermination")
         repository.storeSteps(stepsSinceLastTermination)
