@@ -2,6 +2,7 @@ package com.team.app.data.repositories
 
 import com.team.app.data.database.HotbarDao
 import com.team.app.data.model.Hotbar
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class HotbarRepository(
@@ -23,5 +24,15 @@ class HotbarRepository(
             toyItem = inventoryRepo.getItemByID(hotbar[0].toy),
             miscItem = inventoryRepo.getItemByID(hotbar[0].misc)
         )
+    }
+
+    fun getHotbarFlow() : Flow<Hotbar> {
+        return hotbarDao.getItemsFlow().map {
+            Hotbar(
+                foodItem = inventoryRepo.getItemByID(it.food),
+                toyItem = inventoryRepo.getItemByID(it.toy),
+                miscItem = inventoryRepo.getItemByID(it.misc)
+            )
+        }
     }
 }

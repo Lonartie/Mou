@@ -1,6 +1,7 @@
 package com.team.app.ui.home
 
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.lonartie.bookdiary.data.repositories.SettingsRepository
 import com.team.app.R
@@ -11,9 +12,9 @@ import com.team.app.data.model.ItemType
 import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
+import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -28,10 +29,14 @@ class HomePageViewModel @Inject constructor(
     val figureState = mutableIntStateOf(R.drawable.figure_happy)
     val attributes: Flow<Attributes> = attributesRepo.getAttributes()
 
-    val hotbar: Flow<Hotbar> = inventoryRepo.getItemsFlow()
-        .map {
-            hotbarRepo.getHotbar()
-        }
+    val hotbar = mutableStateOf(
+        Hotbar(
+            INVALID_INVENTORY_ITEM,
+            INVALID_INVENTORY_ITEM,
+            INVALID_INVENTORY_ITEM
+        )
+    )
+    val inventoryItems = inventoryRepo.getItemsFlow()
 
     private fun getMinimalAttributeValue(attributes: Attributes): Int {
         return min(
@@ -42,6 +47,10 @@ class HomePageViewModel @Inject constructor(
             )
         )
 
+    }
+
+    suspend fun updateHotbar() {
+        hotbar.value = hotbarRepo.getHotbar()
     }
 
     fun setFigureState(attributes: Attributes) {
@@ -76,9 +85,12 @@ class HomePageViewModel @Inject constructor(
     }
 
     suspend fun giveFood(item: Item, attributes: Attributes) {
+        if (item.name == "") return
+
         attributesRepo.updateHunger(attributes.hunger + item.actionValue)
         inventoryRepo.removeOne(item)
         setFigureState(attributes)
+        updateHotbar()
     }
 
     suspend fun selectFood() {
@@ -86,9 +98,12 @@ class HomePageViewModel @Inject constructor(
     }
 
     suspend fun giveToy(item: Item, attributes: Attributes) {
+        if (item.name == "") return
+
         attributesRepo.updateHappiness(attributes.happiness + item.actionValue)
         inventoryRepo.removeOne(item)
         setFigureState(attributes)
+        updateHotbar()
     }
 
     suspend fun selectToy() {
@@ -96,10 +111,13 @@ class HomePageViewModel @Inject constructor(
     }
 
     suspend fun giveItem(item: Item, attributes: Attributes) {
+        if (item.name == "") return
+
         if (item.itemType == ItemType.MEDICINE) {
             attributesRepo.updateHealth(attributes.health + item.actionValue)
             inventoryRepo.removeOne(item)
             setFigureState(attributes)
+            updateHotbar()
         }
     }
 

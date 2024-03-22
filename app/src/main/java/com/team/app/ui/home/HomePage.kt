@@ -70,13 +70,10 @@ fun HomePage(
     val attributes = viewModel.attributes.collectAsState(
         initial = Attributes(0, 0, 0, 0)
     ).value
-    val hotbar = viewModel.hotbar.collectAsState(
-        initial = Hotbar(
-            InventoryItem(Item(ItemType.FOOD, "", 0, 0), 0),
-            InventoryItem(Item(ItemType.TOY, "", 0, 0), 0),
-            InventoryItem(Item(ItemType.MEDICINE, "", 0, 0), 0)
-        )
-    ).value
+    val hotbar = viewModel.hotbar.value
+    LaunchedEffect(Unit) {
+        viewModel.updateHotbar()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.onStart()
@@ -367,21 +364,23 @@ fun NavigationButton(
                     )
             )
 
-            Text(
-                text = counter.toString(),
-                color = Color.White,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = 5.dp, y = (-15).dp)
-                    .padding(5.dp)
-                    .drawBehind {
-                        drawCircle(
-                            color = Color.Red,
-                            radius = 10.dp.toPx()
-                        )
-                    },
-                fontSize = 15.sp
-            )
+            if (counter != 0) {
+                Text(
+                    text = counter.toString(),
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = 5.dp, y = (-15).dp)
+                        .padding(5.dp)
+                        .drawBehind {
+                            drawCircle(
+                                color = Color.Red,
+                                radius = 10.dp.toPx()
+                            )
+                        },
+                    fontSize = 15.sp
+                )
+            }
         }
         Text(
             text = name,
