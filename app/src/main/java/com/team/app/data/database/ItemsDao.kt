@@ -29,4 +29,7 @@ interface ItemsDao {
 
     @Query("SELECT * FROM items WHERE id = :id")
     suspend fun getItem(id: Int): Item
+
+    @Query("SELECT id FROM items WHERE name = :name")
+    suspend fun findByName(name: String): Int
 }
