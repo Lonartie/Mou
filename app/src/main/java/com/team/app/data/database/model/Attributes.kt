@@ -2,10 +2,12 @@ package com.team.app.data.database.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.team.app.data.model.ItemType
 
-@Entity(tableName = "items")
-data class OwnedItem(
+@Entity(tableName = "attributes")
+data class Attributes(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val type: ItemType
+    val coins: Int,
+    val hunger: Int,
+    val happiness: Int,
+    val health: Int
 )

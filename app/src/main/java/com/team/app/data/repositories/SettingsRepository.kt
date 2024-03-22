@@ -15,8 +15,6 @@ import kotlinx.coroutines.flow.map
 
 class SettingsRepository(val dataStore: DataStore<Preferences>) {
 
-    private val FIRST_START_KEY = booleanPreferencesKey("FirstStart")
-    private val ATTRIBUTES_KEY = stringPreferencesKey("Attributes")
     private val CURRENT_FOOD_KEY = stringPreferencesKey("CurrentFood")
     private val CURRENT_TOY_KEY = stringPreferencesKey("CurrentToy")
     private val CURRENT_MISC_KEY = stringPreferencesKey("CurrentMisc")
@@ -24,18 +22,6 @@ class SettingsRepository(val dataStore: DataStore<Preferences>) {
     private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
     private val jsonAttributesAdapter: JsonAdapter<Attributes> = moshi.adapter(Attributes::class.java)
     private val jsonItemAdapter: JsonAdapter<Item> = moshi.adapter(Item::class.java)
-
-    val firstStart = dataStore.data.map { preferences ->
-        preferences[FIRST_START_KEY] ?: true
-    }
-
-    val attributes = dataStore.data.map { preferences ->
-        try {
-            jsonAttributesAdapter.fromJson(preferences[ATTRIBUTES_KEY] ?: "") ?: Attributes(0, 0, 0, 0)
-        } catch (e: Exception) {
-            Attributes(0, 0, 0, 0)
-        }
-    }
 
     val currentFood = dataStore.data.map { preferences ->
         try {
@@ -58,18 +44,6 @@ class SettingsRepository(val dataStore: DataStore<Preferences>) {
             jsonItemAdapter.fromJson(preferences[CURRENT_MISC_KEY] ?: "") ?: Item(ItemType.MISC, "", 0, 0)
         } catch (e: Exception) {
             Item(ItemType.MISC, "", 0, 0)
-        }
-    }
-
-    suspend fun started() {
-        dataStore.edit { settings ->
-            settings[FIRST_START_KEY] = false
-        }
-    }
-
-    suspend fun saveAttributes(attributes: Attributes) {
-        dataStore.edit { settings ->
-            settings[ATTRIBUTES_KEY] = jsonAttributesAdapter.toJson(attributes)
         }
     }
 

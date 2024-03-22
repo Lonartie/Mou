@@ -1,27 +1,31 @@
 package com.team.app.ui.home
 
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.lonartie.bookdiary.data.repositories.SettingsRepository
 import com.team.app.R
 import com.team.app.data.model.Attributes
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
+import com.team.app.data.repositories.AttributesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlin.math.min
 
 @HiltViewModel
 class HomePageViewModel @Inject constructor(
-    private val settings: SettingsRepository
+    private val settings: SettingsRepository,
+    private val attributesRepo: AttributesRepository
 ) : ViewModel() {
 
-    val firstStart = settings.firstStart
-    val attributes = settings.attributes
     val currentFood = settings.currentFood
     val currentToy = settings.currentToy
     val currentMisc = settings.currentMisc
     val figureState = mutableIntStateOf(R.drawable.figure_happy)
+    val attributes : Flow<Attributes> = attributesRepo.getAttributes()
 	
 	private fun getMinimalAttributeValue(attributes: Attributes): Int {
         return min(
@@ -42,13 +46,15 @@ class HomePageViewModel @Inject constructor(
         }
     }
 
-    suspend fun onStart(isFirst : Boolean) {
+    suspend fun onStart() {
         var item = Item(ItemType.FOOD, "Chicken", 10, 10)
         println("current food: $item")
         settings.saveCurrentItem(item)
+
         item = Item(ItemType.TOY, "Ball", 5, 5)
         println("current toy: $item")
         settings.saveCurrentItem(item)
+
         item = Item(ItemType.MEDICINE, "Medicine", 15, 15)
         println("current misc: $item")
         settings.saveCurrentItem(item)
@@ -63,10 +69,8 @@ class HomePageViewModel @Inject constructor(
     }
 
     suspend fun giveFood(item: Item, attributes: Attributes) {
-        val newAttributes = attributes.copy(hunger = attributes.hunger + item.actionValue)
-        settings.saveAttributes(newAttributes)
+        attributesRepo.updateHunger(attributes.hunger + item.actionValue)
         setFigureState(attributes)
-        println("hunger before: ${attributes.hunger}, after: ${newAttributes.hunger}")
     }
 
     suspend fun selectFood() {
@@ -74,10 +78,8 @@ class HomePageViewModel @Inject constructor(
     }
 
     suspend fun giveToy(item: Item, attributes: Attributes) {
-        val newAttributes = attributes.copy(happiness = attributes.happiness + item.actionValue)
-        settings.saveAttributes(newAttributes)
+        attributesRepo.updateHappiness(attributes.happiness + item.actionValue)
         setFigureState(attributes)
-        println("happiness before: ${attributes.happiness}, after: ${newAttributes.happiness}")
     }
 
     suspend fun selectToy() {
@@ -86,10 +88,8 @@ class HomePageViewModel @Inject constructor(
 
     suspend fun giveItem(item: Item, attributes: Attributes) {
         if (item.itemType == ItemType.MEDICINE) {
-            val newAttributes = attributes.copy(health = attributes.health + item.actionValue)
-            settings.saveAttributes(newAttributes)
+            attributesRepo.updateHealth(attributes.health + item.actionValue)
             setFigureState(attributes)
-            println("health before: ${attributes.health}, after: ${newAttributes.health}")
         }
     }
 
