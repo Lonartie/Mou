@@ -35,7 +35,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,21 +60,19 @@ import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import kotlinx.coroutines.launch
 
-//@Preview
 @Composable
 fun HomePage(
     openShop: () -> Unit = {},
     viewModel: HomePageViewModel = hiltViewModel()
 ) {
-    val firstStart = viewModel.firstStart.collectAsState(initial = true)
     val attributes = viewModel.attributes.collectAsState(
         initial = Attributes(0, 0, 0, 0)
-    )
+    ).value
     val item = Item(ItemType.FOOD, "", 0, 0)
 
     LaunchedEffect(Unit) {
-        viewModel.onStart(firstStart.value)
-        viewModel.setFigureState(attributes.value)
+        viewModel.onStart()
+        viewModel.setFigureState(attributes)
     }
 
     Scaffold(
@@ -78,14 +80,14 @@ fun HomePage(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface),
         topBar = {
-            TopRow(attributes.value, openShop, viewModel::openMoneyScreen)
+            TopRow(attributes, openShop, viewModel::openMoneyScreen)
         },
         bottomBar = {
             BottomRow(
                 currentFood = viewModel.currentFood.collectAsState(initial = item).value,
                 currentToy = viewModel.currentToy.collectAsState(initial = item).value,
                 currentMisc = viewModel.currentMisc.collectAsState(initial = item).value,
-                attributes = attributes.value,
+                attributes = attributes,
                 viewModel::giveToy,
                 viewModel::giveFood,
                 viewModel::giveItem,

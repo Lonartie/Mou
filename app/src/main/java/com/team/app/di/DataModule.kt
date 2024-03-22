@@ -6,6 +6,8 @@ import androidx.room.Room
 import com.team.app.data.database.InventoryDatabase
 import com.team.app.data.repositories.ShopRepository
 import com.lonartie.bookdiary.data.repositories.SettingsRepository
+import com.team.app.data.database.AttributesDatabase
+import com.team.app.data.repositories.AttributesRepository
 import com.team.app.utils.dataStore
 import dagger.Module
 import dagger.Provides
@@ -26,8 +28,20 @@ class DataModule {
     }
 
     @Provides
-    fun provideItemRepository(inventoryDb: InventoryDatabase): ShopRepository {
+    fun provideAttributesRepository(inventoryDb: InventoryDatabase): ShopRepository {
         return ShopRepository(inventoryDb.itemDao())
+    }
+    @Provides
+    @Singleton
+    fun provideAttributesDatabase(@ApplicationContext context: Context): AttributesDatabase {
+        return Room.databaseBuilder(context, AttributesDatabase::class.java, "attributes_database")
+            .createFromAsset("database/prefilled_attributes.db")
+            .build()
+    }
+
+    @Provides
+    fun provideItemRepository(attributesDatabase: AttributesDatabase): AttributesRepository {
+        return AttributesRepository(attributesDatabase.attributesDao())
     }
 
 //    @Provides
