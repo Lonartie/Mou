@@ -1,19 +1,10 @@
 package com.team.app.data.repositories
 
 import com.team.app.data.database.ItemDao
-import com.team.app.data.database.model.Item
-import kotlinx.coroutines.flow.collect
+import com.team.app.data.database.model.OwnedItem
 
 class ShopRepository(
     private val itemDao: ItemDao
 ) {
-    suspend fun buyItem(item: Item) {
-        itemDao.getItemByType(item.type).collect {
-            if (it.count > 1) {
-                itemDao.updateItem(item)
-            } else {
-                itemDao.addItem(item)
-            }
-        }
-    }
+    suspend fun buyItem(ownedItem: OwnedItem) = itemDao.addItem(ownedItem)
 }

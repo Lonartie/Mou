@@ -1,8 +1,12 @@
 package com.team.app.data.model
 
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
 data class Attributes(
-    val coins: Int,
-    val hunger: Int, // 0 - 100
-    val happiness: Int, // 0 - 100
-    val health: Int, // 0 - 100
+    @Json(name = "coins") val coins: Int,
+    @Json(name = "hunger") val hunger: Int, // 0 - 100
+    @Json(name = "happiness") val happiness: Int, // 0 - 100
+    @Json(name = "health") val health: Int, // 0 - 100
 )

@@ -5,6 +5,8 @@ import android.content.Context
 import androidx.room.Room
 import com.team.app.data.database.InventoryDatabase
 import com.team.app.data.repositories.ShopRepository
+import com.lonartie.bookdiary.data.repositories.SettingsRepository
+import com.team.app.utils.dataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -62,12 +64,12 @@ class DataModule {
 //            .build()
 //    }
 //
-//    @Provides
-//    fun providesSettingsRepo(@ApplicationContext context: Context): SettingsRepository {
-//        val dataStore = context.dataStore
-//        return SettingsRepository(dataStore)
-//    }
-//
+    @Provides
+    fun providesSettingsRepo(@ApplicationContext context: Context): SettingsRepository {
+        val dataStore = context.dataStore
+        return SettingsRepository(dataStore)
+    }
+
 //    @Provides
 //    fun providesWorkmanager(@ApplicationContext context: Context): WorkManager {
 //        return WorkManager.getInstance(context)
