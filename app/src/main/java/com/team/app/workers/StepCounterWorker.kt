@@ -6,6 +6,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.team.app.data.repositories.StepCounterRepository
+import com.team.app.service.NotificationService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -15,10 +16,13 @@ class StepCounterWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
     val repository: StepCounterRepository,
+    val notificationService: NotificationService,
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
         Log.d(TAG, "Starting worker...")
+        val steps = repository.loadStepsSinceTerminate()
+        notificationService.showNotification("walked steps $steps")
 
         val stepsSinceLastTermination = repository.steps() - repository.getMaxSteps()
         if (stepsSinceLastTermination == 0L) {

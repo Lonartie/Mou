@@ -15,6 +15,7 @@ import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.ItemsRepository
+import com.team.app.service.NotificationService
 import com.team.app.utils.dataStore
 import dagger.Module
 import dagger.Provides
@@ -60,6 +61,11 @@ class DataModule {
     @Provides
     fun provideAttributesRepository(attributesDatabase: AttributesDatabase): AttributesRepository {
         return AttributesRepository(attributesDatabase.attributesDao())
+    }
+
+    @Provides
+    fun providesNotificationService(@ApplicationContext context: Context): NotificationService {
+        return NotificationService(context)
     }
 
 //    @Provides
