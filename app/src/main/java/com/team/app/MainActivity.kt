@@ -3,14 +3,11 @@ package com.team.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.compose.AppTheme
-import com.team.app.service.NotificationService
 import com.team.app.ui.home.HomePage
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -26,8 +23,8 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     HomePage()
-                    }
                 }
             }
         }
     }
+}
