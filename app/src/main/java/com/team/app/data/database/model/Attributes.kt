@@ -1,8 +1,6 @@
 package com.team.app.data.database.model
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "attributes")
