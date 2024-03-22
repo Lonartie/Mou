@@ -25,23 +25,23 @@ class DataModule {
     @Singleton
     fun provideItemsDatabase(@ApplicationContext context: Context): ItemsDatabase {
         return Room.databaseBuilder(context, ItemsDatabase::class.java, "items_database")
-            .fallbackToDestructiveMigration()
+            .createFromAsset("database/prefilled_items.db")
             .build()
-    }
-
-    @Provides
-    fun provideInventoryRepository(itemsDb: ItemsDatabase): InventoryRepository {
-        return InventoryRepository(itemsDb.inventoryDao())
-    }
-
-    @Provides
-    fun provideHotbarRepository(itemsDb: ItemsDatabase): HotbarRepository {
-        return HotbarRepository(itemsDb.hotbarDao())
     }
 
     @Provides
     fun provideItemsRepository(itemsDb: ItemsDatabase): ItemsRepository {
         return ItemsRepository(itemsDb.itemsDao())
+    }
+
+    @Provides
+    fun provideInventoryRepository(itemsDb: ItemsDatabase, itemsRepo: ItemsRepository): InventoryRepository {
+        return InventoryRepository(itemsDb.inventoryDao(), itemsRepo)
+    }
+
+    @Provides
+    fun provideHotbarRepository(itemsDb: ItemsDatabase, inventoryRepo: InventoryRepository): HotbarRepository {
+        return HotbarRepository(itemsDb.hotbarDao(), inventoryRepo)
     }
 
     @Provides
