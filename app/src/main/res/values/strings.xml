@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Mou</string>
     <string name="shop_prompt">Tip on an item you would like to buy.</string>
+    <string name="inventory_prompt">Tip on an item you would like to use.</string>
 </resources>
