@@ -3,11 +3,13 @@ package com.team.app.di
 
 import android.content.Context
 import androidx.room.Room
-import com.team.app.data.database.InventoryDatabase
-import com.team.app.data.repositories.ShopRepository
 import com.lonartie.bookdiary.data.repositories.SettingsRepository
 import com.team.app.data.database.AttributesDatabase
+import com.team.app.data.database.ItemsDatabase
 import com.team.app.data.repositories.AttributesRepository
+import com.team.app.data.repositories.HotbarRepository
+import com.team.app.data.repositories.InventoryRepository
+import com.team.app.data.repositories.ItemsRepository
 import com.team.app.utils.dataStore
 import dagger.Module
 import dagger.Provides
@@ -21,16 +23,27 @@ import javax.inject.Singleton
 class DataModule {
     @Provides
     @Singleton
-    fun provideItemDatabase(@ApplicationContext context: Context): InventoryDatabase {
-        return Room.databaseBuilder(context, InventoryDatabase::class.java, "inventory_database")
+    fun provideItemsDatabase(@ApplicationContext context: Context): ItemsDatabase {
+        return Room.databaseBuilder(context, ItemsDatabase::class.java, "items_database")
             .fallbackToDestructiveMigration()
             .build()
     }
 
     @Provides
-    fun provideAttributesRepository(inventoryDb: InventoryDatabase): ShopRepository {
-        return ShopRepository(inventoryDb.itemDao())
+    fun provideInventoryRepository(itemsDb: ItemsDatabase): InventoryRepository {
+        return InventoryRepository(itemsDb.inventoryDao())
     }
+
+    @Provides
+    fun provideHotbarRepository(itemsDb: ItemsDatabase): HotbarRepository {
+        return HotbarRepository(itemsDb.hotbarDao())
+    }
+
+    @Provides
+    fun provideItemsRepository(itemsDb: ItemsDatabase): ItemsRepository {
+        return ItemsRepository(itemsDb.itemsDao())
+    }
+
     @Provides
     @Singleton
     fun provideAttributesDatabase(@ApplicationContext context: Context): AttributesDatabase {
@@ -40,7 +53,7 @@ class DataModule {
     }
 
     @Provides
-    fun provideItemRepository(attributesDatabase: AttributesDatabase): AttributesRepository {
+    fun provideAttributesRepository(attributesDatabase: AttributesDatabase): AttributesRepository {
         return AttributesRepository(attributesDatabase.attributesDao())
     }
 
