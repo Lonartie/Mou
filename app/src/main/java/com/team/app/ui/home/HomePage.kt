@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ChildCare
 import androidx.compose.material.icons.rounded.ControlPoint
@@ -61,6 +60,7 @@ import com.team.app.data.model.InventoryItem
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import com.team.app.utils.Constants
+import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
 import kotlinx.coroutines.launch
 
 @Composable
@@ -72,13 +72,9 @@ fun HomePage(
         initial = Attributes(0, 0, 0, 0)
     ).value
     val hotbar = viewModel.hotbar.value
-    LaunchedEffect(Unit) {
-        viewModel.updateHotbar()
-    }
 
     LaunchedEffect(Unit) {
         viewModel.onStart()
-        viewModel.setFigureState(attributes)
     }
 
     Scaffold(

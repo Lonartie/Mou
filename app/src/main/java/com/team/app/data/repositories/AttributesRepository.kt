@@ -8,13 +8,24 @@ import com.team.app.data.model.Attributes as AttributesModel
 class AttributesRepository(
     private val attributesDao: AttributesDao
 ) {
-    fun getAttributes(): Flow<AttributesModel> {
+    fun getAttributesFlow(): Flow<AttributesModel> {
         return attributesDao.getAttributesFlow().map { attr ->
             AttributesModel(
                 coins = attr.coins,
                 hunger = attr.hunger,
                 happiness = attr.happiness,
                 health = attr.health
+            )
+        }
+    }
+
+    suspend fun getAttributes() : AttributesModel {
+        return attributesDao.getAttributes()[0].let {
+            AttributesModel(
+                coins = it.coins,
+                hunger = it.hunger,
+                happiness = it.happiness,
+                health = it.health
             )
         }
     }
