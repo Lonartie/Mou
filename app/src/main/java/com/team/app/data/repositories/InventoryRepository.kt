@@ -40,4 +40,6 @@ class InventoryRepository(
             invItem.quantity
         )
     }
+
+    suspend fun getItems() = inventoryDao.getItems()
 }

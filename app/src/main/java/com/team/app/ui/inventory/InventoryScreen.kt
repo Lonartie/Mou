@@ -1,6 +1,6 @@
 package com.team.app.ui.inventory
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,18 +22,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.team.app.R
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
+import com.team.app.utils.Constants
 
-@Preview
 @Composable
 fun InventoryScreen(
-    itemType: ItemType? = null,
-    onBackClick: () -> Unit = {}
+    itemType: ItemType,
+    onBackClick: () -> Unit,
+    viewModel: InventoryViewModel = hiltViewModel()
 ) {
     Scaffold (
         topBar = { InventoryTopAppBar(onBackClick = onBackClick) }
@@ -49,9 +53,9 @@ fun InventoryScreen(
             Spacer(modifier = Modifier.size(16.dp))
 
             LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-                items(listOf(null)) {
+                items(viewModel.getItemsWithType(itemType)) {
                     ItemCard(
-                        item = it,
+                        item = viewModel.getItemWithID(it.itemID),
                         onClick = {
                             onBackClick()
                         }
@@ -68,7 +72,7 @@ fun InventoryScreen(
 @Composable
 fun InventoryTopAppBar(
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit
 ) {
     CenterAlignedTopAppBar(
         title = { Text("Inventory") },
@@ -90,15 +94,22 @@ fun InventoryTopAppBar(
 @Composable
 fun ItemCard(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
-    item: Item? = null
+    onClick: () -> Unit,
+    item: Item
 ) {
-    Card(
-        modifier = modifier
-            .clickable { onClick() }
-    ) {
+    Card(modifier = modifier) {
         Column {
-            Text(text = item!!.name)
+            Text(text = item.name)
+            Spacer(modifier = Modifier.size(8.dp))
+            Image(
+                painter = painterResource(id = Constants.getItemResource(item.name)),
+                contentDescription = null,
+                modifier = Modifier.scale(Constants.getItemScalingFactor(item.name) * 0.5f)
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            Button(onClick = onClick) {
+                Text(text = stringResource(id = R.string.use_item))
+            }
         }
     }
 }

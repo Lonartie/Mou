@@ -30,6 +30,9 @@ interface ItemsDao {
     @Query("SELECT * FROM items WHERE id = :id")
     suspend fun getItem(id: Int): Item?
 
+    @Query("SELECT * FROM items WHERE id = :id")
+    fun getItemFlow(id: Int): Flow<Item>?
+
     @Query("SELECT id FROM items WHERE name = :name")
     suspend fun findByName(name: String): Int?
 }
