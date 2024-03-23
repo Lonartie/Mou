@@ -19,7 +19,16 @@ class AttributesRepository(
         }
     }
 
-    suspend fun getAttributes() = attributesDao.getAttributes()
+    suspend fun getAttributes() : AttributesModel {
+        return attributesDao.getAttributes()[0].let {
+            AttributesModel(
+                coins = it.coins,
+                hunger = it.hunger,
+                happiness = it.happiness,
+                health = it.health
+            )
+        }
+    }
 
     suspend fun updateCoins(coins: Int) {
         val attr = attributesDao.getAttributes()[0]

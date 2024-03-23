@@ -2,14 +2,20 @@ package com.team.app.di
 
 
 import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import androidx.room.Room
-import com.lonartie.bookdiary.data.repositories.SettingsRepository
+import com.team.app.data.repositories.SettingsRepository
+import com.team.app.data.database.StepCounterDatabase
+import com.team.app.data.database.StepsDao
+import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.data.database.AttributesDatabase
 import com.team.app.data.database.ItemsDatabase
 import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.ItemsRepository
+import com.team.app.service.NotificationService
 import com.team.app.utils.dataStore
 import dagger.Module
 import dagger.Provides
@@ -59,6 +65,11 @@ class DataModule {
         return AttributesRepository(attributesDatabase.attributesDao())
     }
 
+    @Provides
+    fun providesNotificationService(@ApplicationContext context: Context): NotificationService {
+        return NotificationService(context)
+    }
+
 //    @Provides
 //    fun providesNetworkRepository(@ApplicationContext context: Context): NetworkRepository {
 //        return NetworkRepository(context)
@@ -93,10 +104,34 @@ class DataModule {
 //            .build()
 //    }
 //
+    // provide StepCounterDao
+    @Provides
+    fun providesStepDatabase(@ApplicationContext context: Context) : StepCounterDatabase {
+        return Room.databaseBuilder(context, StepCounterDatabase::class.java, "stepcounterdatabase")
+            .build()
+    }
+
+    @Provides
+    fun providesStepCounterDao(database: StepCounterDatabase) = database.stepsDao()
     @Provides
     fun providesSettingsRepo(@ApplicationContext context: Context): SettingsRepository {
         val dataStore = context.dataStore
         return SettingsRepository(dataStore)
+    }
+
+    @Provides
+    fun providesStepCounterRepository(sensorManager: SensorManager, stepsDao: StepsDao) : StepCounterRepository {
+        return StepCounterRepository(sensorManager, stepsDao)
+    }
+
+    @Provides
+    fun providesSensorManager(@ApplicationContext context: Context) : SensorManager {
+        return context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    }
+
+    @Provides
+    fun providesStepCounterSensor(sensorManager: SensorManager) : Sensor? {
+        return sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
     }
 
 //    @Provides

@@ -60,6 +60,7 @@ import com.team.app.data.model.InventoryItem
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import com.team.app.utils.Constants
+import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
 import kotlinx.coroutines.launch
 
 @Composable
@@ -70,21 +71,10 @@ fun HomePage(
     val attributes = viewModel.attributes.collectAsState(
         initial = Attributes(0, 0, 0, 0)
     ).value
-    val hotbar = viewModel.hotbar.collectAsState(
-        initial = Hotbar(
-            InventoryItem(Item(ItemType.FOOD, "", 0, 0), 0),
-            InventoryItem(Item(ItemType.TOY, "", 0, 0), 0),
-            InventoryItem(Item(ItemType.MEDICINE, "", 0, 0), 0)
-        )
-    ).value
-    val item = Item(ItemType.FOOD, "", 0, 0)
-    @Suppress("UNUSED_VARIABLE") val invItems = viewModel.inventoryItems.collectAsState(
-        initial = InventoryItem(item, 0)
-    ).value
+    val hotbar = viewModel.hotbar.value
 
     LaunchedEffect(Unit) {
         viewModel.onStart()
-        viewModel.setFigureState(attributes)
     }
 
     Scaffold(
@@ -371,21 +361,23 @@ fun NavigationButton(
                     )
             )
 
-            Text(
-                text = counter.toString(),
-                color = Color.White,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = 5.dp, y = (-15).dp)
-                    .padding(5.dp)
-                    .drawBehind {
-                        drawCircle(
-                            color = Color.Red,
-                            radius = 10.dp.toPx()
-                        )
-                    },
-                fontSize = 15.sp
-            )
+            if (counter != 0) {
+                Text(
+                    text = counter.toString(),
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = 5.dp, y = (-15).dp)
+                        .padding(5.dp)
+                        .drawBehind {
+                            drawCircle(
+                                color = Color.Red,
+                                radius = 10.dp.toPx()
+                            )
+                        },
+                    fontSize = 15.sp
+                )
+            }
         }
         Text(
             text = name,

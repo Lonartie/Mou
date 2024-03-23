@@ -1,25 +1,53 @@
 package com.team.app.data.repositories
 
 import com.team.app.data.database.ItemsDao
-import com.team.app.data.database.model.Item
 import com.team.app.data.model.ItemType
+import com.team.app.utils.Constants.Companion.INVALID_ITEM
+import kotlinx.coroutines.flow.map
 import com.team.app.data.model.Item as ItemModel
 
 class ItemsRepository(
     private val itemsDao: ItemsDao
 ) {
-    fun getItemsFlow() = itemsDao.getItemsFlow()
     suspend fun getItemByID(id: Int): ItemModel {
-        val item : Item = itemsDao.getItem(id)
-        return ItemModel(
-            ItemType.entries[item.type],
-            item.name,
-            item.price,
-            item.actionValue
-        )
+        val item = itemsDao.getItem(id)
+        if (item != null) {
+            return ItemModel(
+                ItemType.entries[item.type],
+                item.name,
+                item.price,
+                item.actionValue
+            )
+        } else {
+            return INVALID_ITEM
+        }
     }
 
-    suspend fun findByName(name: String): Int {
+    fun getItemsFlow() = itemsDao.getItemsFlow()
+        .map { items ->
+            items.map {
+                ItemModel(
+                    ItemType.entries[it.type],
+                    it.name,
+                    it.price,
+                    it.actionValue
+                )
+            }
+        }
+
+    fun getItemsNoInvalidFlow() = itemsDao.getItemsNoInvalidFlow()
+        .map { items ->
+            items.map {
+                ItemModel(
+                    ItemType.entries[it.type],
+                    it.name,
+                    it.price,
+                    it.actionValue
+                )
+            }
+        }
+
+    suspend fun findIDByName(name: String): Int? {
         return itemsDao.findByName(name)
     }
 }

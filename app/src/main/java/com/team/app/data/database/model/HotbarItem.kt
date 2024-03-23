@@ -7,19 +7,19 @@ import androidx.room.PrimaryKey
     tableName = "hotbar",
     foreignKeys = [
         androidx.room.ForeignKey(
-            entity = Item::class,
+            entity = InventoryItem::class,
             parentColumns = ["id"],
             childColumns = ["food"],
             onUpdate = androidx.room.ForeignKey.CASCADE,
         ),
         androidx.room.ForeignKey(
-            entity = Item::class,
+            entity = InventoryItem::class,
             parentColumns = ["id"],
             childColumns = ["toy"],
             onUpdate = androidx.room.ForeignKey.CASCADE,
         ),
         androidx.room.ForeignKey(
-            entity = Item::class,
+            entity = InventoryItem::class,
             parentColumns = ["id"],
             childColumns = ["misc"],
             onUpdate = androidx.room.ForeignKey.CASCADE,
