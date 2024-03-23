@@ -54,10 +54,6 @@ class HomePageViewModel @Inject constructor(
         println("Open money screen")
     }
 
-    suspend fun openShop() {
-        println("Open shop")
-    }
-
     suspend fun giveFood(item: Item, attributes: Attributes) {
         if (item.name == "") return
 
@@ -65,19 +61,11 @@ class HomePageViewModel @Inject constructor(
         giveGeneric(item, attributes)
     }
 
-    suspend fun selectFood() {
-        println("Select food")
-    }
-
     suspend fun giveToy(item: Item, attributes: Attributes) {
         if (item.name == "") return
 
         attributesRepo.updateHappiness(attributes.happiness + item.actionValue)
         giveGeneric(item, attributes)
-    }
-
-    suspend fun selectToy() {
-        println("Select toy")
     }
 
     suspend fun giveItem(item: Item, attributes: Attributes) {
@@ -110,10 +98,6 @@ class HomePageViewModel @Inject constructor(
         inventoryRepo.removeOne(item)
         updateHotbar()
         setFigureState(attributes)
-    }
-
-    suspend fun selectItem() {
-        println("Select item")
     }
 
     private suspend fun fetchStepData() {

@@ -66,6 +66,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomePage(
     openShop: () -> Unit = {},
+    selectFood: () -> Unit = {},
+    selectToy: () -> Unit = {},
+    selectItem: () -> Unit = {},
     viewModel: HomePageViewModel = hiltViewModel()
 ) {
     val attributes = viewModel.attributes.collectAsState(
@@ -91,9 +94,9 @@ fun HomePage(
                 viewModel::giveToy,
                 viewModel::giveFood,
                 viewModel::giveItem,
-                viewModel::selectFood,
-                viewModel::selectToy,
-                viewModel::selectItem
+                selectFood,
+                selectToy,
+                selectItem
             )
         }
     ) { innerPadding ->
