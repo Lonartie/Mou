@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,9 +16,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ChildCare
 import androidx.compose.material.icons.rounded.ControlPoint
@@ -39,6 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -52,25 +56,29 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.team.app.R
 import com.team.app.data.model.Attributes
+import com.team.app.data.model.Hotbar
+import com.team.app.data.model.InventoryItem
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
+import com.team.app.utils.Constants
 import kotlinx.coroutines.launch
 
-//@Preview
 @Composable
 fun HomePage(
     openShop: () -> Unit = {},
     viewModel: HomePageViewModel = hiltViewModel()
 ) {
-    val firstStart = viewModel.firstStart.collectAsState(initial = true)
     val attributes = viewModel.attributes.collectAsState(
         initial = Attributes(0, 0, 0, 0)
-    )
-    val item = Item(ItemType.FOOD, "", 0, 0)
+    ).value
+    val hotbar = viewModel.hotbar.value
+    LaunchedEffect(Unit) {
+        viewModel.updateHotbar()
+    }
 
     LaunchedEffect(Unit) {
-        viewModel.onStart(firstStart.value)
-        viewModel.setFigureState(attributes.value)
+        viewModel.onStart()
+        viewModel.setFigureState(attributes)
     }
 
     Scaffold(
@@ -78,14 +86,12 @@ fun HomePage(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface),
         topBar = {
-            TopRow(attributes.value, openShop, viewModel::openMoneyScreen)
+            TopRow(attributes, openShop, viewModel::openMoneyScreen)
         },
         bottomBar = {
             BottomRow(
-                currentFood = viewModel.currentFood.collectAsState(initial = item).value,
-                currentToy = viewModel.currentToy.collectAsState(initial = item).value,
-                currentMisc = viewModel.currentMisc.collectAsState(initial = item).value,
-                attributes = attributes.value,
+                hotbar,
+                attributes,
                 viewModel::giveToy,
                 viewModel::giveFood,
                 viewModel::giveItem,
@@ -218,9 +224,11 @@ fun Content(
 @Preview
 @Composable
 fun BottomRow(
-    currentFood: Item = Item(ItemType.FOOD, "food", 10, 10),
-    currentToy: Item = Item(ItemType.FOOD, "food", 10, 10),
-    currentMisc: Item = Item(ItemType.FOOD, "food", 10, 10),
+    hotbar: Hotbar = Hotbar(
+        foodItem = InventoryItem(Item(ItemType.FOOD, "Chicken", 10, 10), 3),
+        toyItem = InventoryItem(Item(ItemType.TOY, "Mouse", 5, 5), 2),
+        miscItem = InventoryItem(Item(ItemType.MEDICINE, "Health Potion", 15, 15), 1)
+    ),
     attributes: Attributes = Attributes(10, 20, 30, 40),
     giveToy: suspend (Item, Attributes) -> Unit = { _, _ -> },
     giveFood: suspend (Item, Attributes) -> Unit = { _, _ -> },
@@ -246,11 +254,12 @@ fun BottomRow(
         ) {
             NavigationButton(
                 name = "Food",
-                image = painterResource(R.drawable.chicken_leg),
-                scale = 1.75f,
+                image = painterResource(Constants.getItemResource(hotbar.foodItem.item.name)),
+                scale = Constants.getItemScalingFactor(hotbar.foodItem.item.name),
+                counter = hotbar.foodItem.quantity,
                 onClick = {
                     coro.launch {
-                        giveFood(currentFood, attributes)
+                        giveFood(hotbar.foodItem.item, attributes)
                     }
                 },
                 onLongClick = { coro.launch { selectFood() } }
@@ -258,19 +267,21 @@ fun BottomRow(
             VerticalDivider()
             NavigationButton(
                 name = "Toys",
-                image = painterResource(R.drawable.toy_mouse),
-                scale = 1.2f,
-                onClick = { coro.launch { giveToy(currentToy, attributes) } },
+                image = painterResource(Constants.getItemResource(hotbar.toyItem.item.name)),
+                scale = Constants.getItemScalingFactor(hotbar.toyItem.item.name),
+                counter = hotbar.toyItem.quantity,
+                onClick = { coro.launch { giveToy(hotbar.toyItem.item, attributes) } },
                 onLongClick = { coro.launch { selectToy() } }
             )
             VerticalDivider()
             NavigationButton(
                 name = "Items",
-                image = painterResource(R.drawable.potion),
-                scale = 1.2f,
+                image = painterResource(Constants.getItemResource(hotbar.miscItem.item.name)),
+                scale = Constants.getItemScalingFactor(hotbar.miscItem.item.name),
+                counter = hotbar.miscItem.quantity,
                 onClick = {
                     coro.launch {
-                        giveItem(currentMisc, attributes)
+                        giveItem(hotbar.miscItem.item, attributes)
                     }
                 },
                 onLongClick = { coro.launch { selectItem() } }
@@ -325,7 +336,8 @@ fun VerticalDivider() {
 @Composable
 fun NavigationButton(
     name: String = "Name",
-    image: Painter? = painterResource(id = R.drawable.chicken_leg),
+    image: Painter = painterResource(id = R.drawable.chicken_leg),
+    counter: Int = 0,
     scale: Float = 1.0f,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {}
@@ -340,19 +352,36 @@ fun NavigationButton(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        if (image != null) {
+        Box {
             Image(
                 image,
                 contentDescription = name,
                 modifier = Modifier
                     .padding(end = 10.dp)
-                    .align(Alignment.CenterVertically)
                     .size(40.dp)
                     .graphicsLayer(
                         scaleX = scale,
                         scaleY = scale
                     )
             )
+
+            if (counter != 0) {
+                Text(
+                    text = counter.toString(),
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = 5.dp, y = (-15).dp)
+                        .padding(5.dp)
+                        .drawBehind {
+                            drawCircle(
+                                color = Color.Red,
+                                radius = 10.dp.toPx()
+                            )
+                        },
+                    fontSize = 15.sp
+                )
+            }
         }
         Text(
             text = name,

@@ -2,25 +2,39 @@ package com.team.app
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.util.Log
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.team.app.workers.StepCounterWorker
 import com.team.app.service.NotificationService
 import com.team.app.service.NotificationService.Companion.NOTIFICATION_CHANNEL_ID
 import dagger.hilt.android.HiltAndroidApp
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 
 @HiltAndroidApp
 class AppApplication : Application(), Configuration.Provider {
-
+    @Inject
     lateinit var hiltWorkerFactory: HiltWorkerFactory
 
     override fun onCreate() {
 
         super.onCreate()
+        val myWork = PeriodicWorkRequestBuilder<StepCounterWorker>(
+            15, TimeUnit.MINUTES).build()
+        WorkManager.getInstance(this).
+                enqueueUniquePeriodicWork("StepCounterWorker",
+                    ExistingPeriodicWorkPolicy.UPDATE, myWork)
+        Log.d("AppApplication", "WorkManager started")
         createNotificationChannel()
     }
 
