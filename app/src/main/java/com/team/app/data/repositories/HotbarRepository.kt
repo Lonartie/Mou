@@ -18,12 +18,13 @@ class HotbarRepository(
     }
 
     suspend fun getHotbar() : Hotbar {
-        val hotbar = hotbarDao.getItems()
-        return Hotbar(
-            foodItem = inventoryRepo.getItemByID(hotbar[0].food),
-            toyItem = inventoryRepo.getItemByID(hotbar[0].toy),
-            miscItem = inventoryRepo.getItemByID(hotbar[0].misc)
-        )
+        return hotbarDao.getItems()[0].let {
+            Hotbar(
+                foodItem = inventoryRepo.getItemByID(it.food),
+                toyItem = inventoryRepo.getItemByID(it.toy),
+                miscItem = inventoryRepo.getItemByID(it.misc)
+            )
+        }
     }
 
     fun getHotbarFlow() : Flow<Hotbar> {
@@ -34,5 +35,29 @@ class HotbarRepository(
                 miscItem = inventoryRepo.getItemByID(it.misc)
             )
         }
+    }
+
+    suspend fun setFood(invID: Int) {
+        val hotbar = hotbarDao.getItems()[0]
+        println("setFood to $invID")
+        hotbarDao.updateItem(hotbar.copy(food = invID))
+        val nhotbar = hotbarDao.getItems()[0].food
+        println("Success: ${nhotbar == invID}")
+    }
+
+    suspend fun setToy(invID: Int) {
+        val hotbar = hotbarDao.getItems()[0]
+        println("setToy to $invID")
+        hotbarDao.updateItem(hotbar.copy(toy = invID))
+        val nhotbar = hotbarDao.getItems()[0].toy
+        println("Success: ${nhotbar == invID}")
+    }
+
+    suspend fun setMisc(invID: Int) {
+        val hotbar = hotbarDao.getItems()[0]
+        println("setMisc to $invID")
+        hotbarDao.updateItem(hotbar.copy(misc = invID))
+        val nhotbar = hotbarDao.getItems()[0].misc
+        println("Success: ${nhotbar == invID}")
     }
 }

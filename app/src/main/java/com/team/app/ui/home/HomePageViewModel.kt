@@ -2,18 +2,17 @@ package com.team.app.ui.home
 
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.lonartie.bookdiary.data.repositories.SettingsRepository
 import com.team.app.R
 import com.team.app.data.model.Attributes
 import com.team.app.data.model.Hotbar
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
-import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
+import com.team.app.data.repositories.SettingsRepository
+import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +29,7 @@ class HomePageViewModel @Inject constructor(
 ) : ViewModel() {
 
     val figureState = mutableIntStateOf(R.drawable.figure_happy)
-    val attributes: Flow<Attributes> = attributesRepo.getAttributes()
+    val attributes: Flow<Attributes> = attributesRepo.getAttributesFlow()
 
     val hotbar = mutableStateOf(
         Hotbar(
@@ -39,46 +38,82 @@ class HomePageViewModel @Inject constructor(
             INVALID_INVENTORY_ITEM
         )
     )
-    val inventoryItems = inventoryRepo.getItemsFlow()
-
-    private fun getMinimalAttributeValue(attributes: Attributes): Int {
-        return min(
-            attributes.hunger,
-            min(
-                attributes.happiness,
-                attributes.health
-            )
-        )
-
-    }
 
     suspend fun updateHotbar() {
         hotbar.value = hotbarRepo.getHotbar()
     }
 
-    fun setFigureState(attributes: Attributes) {
-        val minimalValue = getMinimalAttributeValue(attributes)
-        figureState.intValue = when {
-            minimalValue >= 75 -> R.drawable.figure_happy
-            minimalValue >= 50 -> R.drawable.figure_lonely
-            else -> R.drawable.figure_angry
+    suspend fun onStart() {
+        println("onStart")
+        updateHotbar()
+        setFigureState(attributesRepo.getAttributes())
+        fetchStepData() // currently this throws so subsequent functions are not called
+    }
+
+    suspend fun openMoneyScreen() {
+        println("Open money screen")
+    }
+
+    suspend fun openShop() {
+        println("Open shop")
+    }
+
+    suspend fun giveFood(item: Item, attributes: Attributes) {
+        if (item.name == "") return
+
+        attributesRepo.updateHunger(attributes.hunger + item.actionValue)
+        giveGeneric(item, attributes)
+    }
+
+    suspend fun selectFood() {
+        println("Select food")
+    }
+
+    suspend fun giveToy(item: Item, attributes: Attributes) {
+        if (item.name == "") return
+
+        attributesRepo.updateHappiness(attributes.happiness + item.actionValue)
+        giveGeneric(item, attributes)
+    }
+
+    suspend fun selectToy() {
+        println("Select toy")
+    }
+
+    suspend fun giveItem(item: Item, attributes: Attributes) {
+        if (item.name == "") return
+
+        if (item.itemType == ItemType.MEDICINE) {
+            attributesRepo.updateHealth(attributes.health + item.actionValue)
+            giveGeneric(item, attributes)
         }
     }
 
-    suspend fun onStart() {
-        var item = Item(ItemType.FOOD, "Chicken", 10, 10)
-        println("current food: $item")
-        settings.saveCurrentItem(item)
+    suspend fun giveGeneric(item: Item, attributes: Attributes) {
+        if (item.name == "") return
 
-        item = Item(ItemType.TOY, "Ball", 5, 5)
-        println("current toy: $item")
-        settings.saveCurrentItem(item)
+        val items = inventoryRepo.getItems()
+        if (items.any { it.item.name == item.name }) {
+            val invItem = items.first { it.item.name == item.name }
+            if (invItem.quantity == 1) {
+                println("Removing item from hotbar ${item.name} ${item.itemType}")
+                when (item.itemType) {
+                    ItemType.FOOD -> hotbarRepo.setFood(0)
+                    ItemType.TOY -> hotbarRepo.setToy(0)
+                    ItemType.MISC -> hotbarRepo.setMisc(0)
+                    ItemType.MEDICINE -> hotbarRepo.setMisc(0)
+                }
+                println("Updated hotbar: ${hotbarRepo.getHotbar()}")
+            }
+        }
 
-        item = Item(ItemType.MEDICINE, "Medicine", 15, 15)
-        println("current misc: $item")
-        settings.saveCurrentItem(item)
+        inventoryRepo.removeOne(item)
+        updateHotbar()
+        setFigureState(attributes)
+    }
 
-        fetchStepData()
+    suspend fun selectItem() {
+        println("Select item")
     }
 
     private suspend fun fetchStepData() {
@@ -95,52 +130,23 @@ class HomePageViewModel @Inject constructor(
         stepCounter.clearSteps()
     }
 
-    suspend fun openMoneyScreen() {
-        println("Open money screen")
+    private fun getMinimalAttributeValue(attributes: Attributes): Int {
+        return min(
+            attributes.hunger,
+            min(
+                attributes.happiness,
+                attributes.health
+            )
+        )
+
     }
 
-    suspend fun openShop() {
-        println("Open shop")
-    }
-
-    suspend fun giveFood(item: Item, attributes: Attributes) {
-        if (item.name == "") return
-
-        attributesRepo.updateHunger(attributes.hunger + item.actionValue)
-        inventoryRepo.removeOne(item)
-        setFigureState(attributes)
-        updateHotbar()
-    }
-
-    suspend fun selectFood() {
-        println("Select food")
-    }
-
-    suspend fun giveToy(item: Item, attributes: Attributes) {
-        if (item.name == "") return
-
-        attributesRepo.updateHappiness(attributes.happiness + item.actionValue)
-        inventoryRepo.removeOne(item)
-        setFigureState(attributes)
-        updateHotbar()
-    }
-
-    suspend fun selectToy() {
-        println("Select toy")
-    }
-
-    suspend fun giveItem(item: Item, attributes: Attributes) {
-        if (item.name == "") return
-
-        if (item.itemType == ItemType.MEDICINE) {
-            attributesRepo.updateHealth(attributes.health + item.actionValue)
-            inventoryRepo.removeOne(item)
-            setFigureState(attributes)
-            updateHotbar()
+    private fun setFigureState(attributes: Attributes) {
+        val minimalValue = getMinimalAttributeValue(attributes)
+        figureState.intValue = when {
+            minimalValue >= 75 -> R.drawable.figure_happy
+            minimalValue >= 50 -> R.drawable.figure_lonely
+            else -> R.drawable.figure_angry
         }
-    }
-
-    suspend fun selectItem() {
-        println("Select item")
     }
 }

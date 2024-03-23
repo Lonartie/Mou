@@ -5,7 +5,7 @@ import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import androidx.room.Room
-import com.lonartie.bookdiary.data.repositories.SettingsRepository
+import com.team.app.data.repositories.SettingsRepository
 import com.team.app.data.database.StepCounterDatabase
 import com.team.app.data.database.StepsDao
 import com.team.app.data.repositories.StepCounterRepository
@@ -41,8 +41,10 @@ class DataModule {
     }
 
     @Provides
-    fun provideInventoryRepository(itemsDb: ItemsDatabase, itemsRepo: ItemsRepository): InventoryRepository {
-        return InventoryRepository(itemsDb.inventoryDao(), itemsRepo)
+    fun provideInventoryRepository(
+        itemsDb: ItemsDatabase, itemsRepo: ItemsRepository, attributesRepo: AttributesRepository
+    ): InventoryRepository {
+        return InventoryRepository(itemsDb.inventoryDao(), itemsRepo, attributesRepo)
     }
 
     @Provides
