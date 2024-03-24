@@ -27,6 +27,6 @@ interface StocksService {
     suspend fun getTimeSeries(
         @Query("symbol") symbol: String,
         @Query("interval") interval: String,
-        @Query("size") size: Int
+        @Query("outputsize") size: Int
     ): Response<StockTimeSeries>
 }
