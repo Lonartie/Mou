@@ -1,8 +1,11 @@
 package com.team.app.ui.investment
 
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.madrapps.plot.line.DataPoint
+import com.patrykandpatrick.vico.core.model.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.model.ExtraStore
+import com.patrykandpatrick.vico.core.model.lineSeries
 import com.team.app.data.model.StockTimeSeries
 import com.team.app.data.repositories.InvestmentsRepository
 import com.team.app.data.repositories.StocksRepository
@@ -10,7 +13,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 import javax.inject.Inject
+import kotlin.math.max
+import kotlin.math.min
 
 @HiltViewModel
 class InvestmentPageViewModel @Inject constructor(
@@ -19,18 +26,16 @@ class InvestmentPageViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var symbol = ""
-    private var timeSeriesAxisData = emptyList<String>()
-    val currentCategory = mutableStateOf(StocksRepository.TimeSeriesCategory.YEAR)
-    val currentTimeSeries = mutableStateOf(emptyList<DataPoint>())
+    val currentCategory = mutableStateOf(StocksRepository.TimeSeriesCategory.DAY)
+    val modelProducer = CartesianChartModelProducer.build()
+    val xAxisKey = ExtraStore.Key<List<String>>()
+    val minMaxKey = ExtraStore.Key<Pair<Float,Float>>()
+    val minY = mutableFloatStateOf(0f)
+    val maxY = mutableFloatStateOf(1f)
 
     suspend fun init(symbol: String) {
         this.symbol = symbol
         updateTimeSeries()
-    }
-
-    fun indexMapper(i: Float): String {
-        if (i < 0 || i >= timeSeriesAxisData.size) return ""
-        return timeSeriesAxisData[i.toInt()]
     }
 
     suspend fun changeCategory(category: StocksRepository.TimeSeriesCategory) {
@@ -38,7 +43,7 @@ class InvestmentPageViewModel @Inject constructor(
         updateTimeSeries()
     }
 
-    suspend fun updateTimeSeries() {
+    private suspend fun updateTimeSeries() {
         val timeSeries = stocksRepo.getTimeSeries(symbol, currentCategory.value)
         when (currentCategory.value) {
             StocksRepository.TimeSeriesCategory.DAY -> transformDay(timeSeries)
@@ -48,53 +53,125 @@ class InvestmentPageViewModel @Inject constructor(
         }
     }
 
-    private fun transformDay(timeSeries: StockTimeSeries) {
-        val data: MutableList<String> = mutableListOf()
-        currentTimeSeries.value = timeSeries.values.mapIndexed { i, sv ->
-            val time = LocalDateTime.parse(
-                sv.datetime,
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            )
-            val timeStr = time.hour.toString()
-            data.add(timeStr)
-            DataPoint((timeSeries.values.size - 1 - i).toFloat(), sv.close.toFloat())
-        }.reversed()
-        timeSeriesAxisData = data.reversed()
+    private suspend fun transformDay(timeSeries: StockTimeSeries) {
+        val xValues = mutableListOf<String>()
+        val yValues = mutableListOf<Number>()
+
+        var minY = Float.MAX_VALUE
+        var maxY = Float.MIN_VALUE
+        timeSeries.values
+            .reversed()
+            .forEach {
+                val date = LocalDateTime.parse(
+                    it.datetime,
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                )
+                val xValue = date.format(DateTimeFormatter.ofPattern("HH:mm"))
+                val yValue = it.close.toFloat()
+                xValues.add(xValue)
+                yValues.add(yValue)
+                minY = min(minY, yValue)
+                maxY = max(maxY, yValue)
+            }
+        val range = maxY - minY
+        minY -= (range * 0.1f)
+        maxY += (range * 0.1f)
+        modelProducer.tryRunTransaction {
+            lineSeries { series(yValues) }
+            updateExtras {
+                it[xAxisKey] = xValues
+                it[minMaxKey] = minY to maxY
+            }
+        }
     }
 
-    private fun transformWeek(timeSeries: StockTimeSeries) {
-        val data: MutableList<String> = mutableListOf()
-        currentTimeSeries.value = timeSeries.values.mapIndexed { i, sv ->
-            val time = LocalDate.parse(sv.datetime)
-            val timeStr = time.dayOfWeek.getDisplayName(
-                java.time.format.TextStyle.SHORT,
-                java.util.Locale.US
-            )
-            data.add(timeStr)
-            DataPoint((timeSeries.values.size - 1 - i).toFloat(), sv.close.toFloat())
-        }.reversed()
-        timeSeriesAxisData = data.reversed()
+    private suspend fun transformWeek(timeSeries: StockTimeSeries) {
+        val xValues = mutableListOf<String>()
+        val yValues = mutableListOf<Number>()
+
+        var minY = Float.MAX_VALUE
+        var maxY = Float.MIN_VALUE
+
+        timeSeries.values
+            .reversed()
+            .forEach {
+                val date = LocalDate.parse(it.datetime)
+                val xValue = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.US)
+                val yValue = it.close.toFloat()
+                xValues.add(xValue)
+                yValues.add(yValue)
+                minY = min(minY, yValue)
+                maxY = max(maxY, yValue)
+            }
+        val range = maxY - minY
+        minY -= (range * 0.1f)
+        maxY += (range * 0.1f)
+        modelProducer.tryRunTransaction {
+            lineSeries { series(yValues) }
+            updateExtras {
+                it[xAxisKey] = xValues
+                it[minMaxKey] = minY to maxY
+            }
+        }
     }
 
-    private fun transformMonth(timeSeries: StockTimeSeries) {
-        val data: MutableList<String> = mutableListOf()
-        currentTimeSeries.value = timeSeries.values.mapIndexed { i, sv ->
-            val time = LocalDate.parse(sv.datetime)
-            val timeStr = time.dayOfMonth.toString()
-            data.add(timeStr)
-            DataPoint((timeSeries.values.size - 1 - i).toFloat(), sv.close.toFloat())
-        }.reversed()
-        timeSeriesAxisData = data.reversed()
+    private suspend fun transformMonth(timeSeries: StockTimeSeries) {
+        val xValues = mutableListOf<String>()
+        val yValues = mutableListOf<Number>()
+
+        var minY = Float.MAX_VALUE
+        var maxY = Float.MIN_VALUE
+
+        timeSeries.values
+            .reversed()
+            .forEach {
+                val date = LocalDate.parse(it.datetime)
+                val xValue = date.format(DateTimeFormatter.ofPattern("dd. MMM", Locale.US))
+                val yValue = it.close.toFloat()
+                xValues.add(xValue)
+                yValues.add(yValue)
+                minY = min(minY, yValue)
+                maxY = max(maxY, yValue)
+            }
+        val range = maxY - minY
+        minY -= (range * 0.1f)
+        maxY += (range * 0.1f)
+        modelProducer.tryRunTransaction {
+            lineSeries { series(yValues) }
+            updateExtras {
+                it[xAxisKey] = xValues
+                it[minMaxKey] = minY to maxY
+            }
+        }
     }
 
-    private fun transformYear(timeSeries: StockTimeSeries) {
-        val data: MutableList<String> = mutableListOf()
-        currentTimeSeries.value = timeSeries.values.mapIndexed { i, sv ->
-            val time = LocalDate.parse(sv.datetime)
-            val timeStr = time.monthValue.toString()
-            data.add(timeStr)
-            DataPoint((timeSeries.values.size - 1 - i).toFloat(), sv.close.toFloat())
-        }.reversed()
-        timeSeriesAxisData = data.reversed()
+    private suspend fun transformYear(timeSeries: StockTimeSeries) {
+        val xValues = mutableListOf<String>()
+        val yValues = mutableListOf<Number>()
+
+        var minY = Float.MAX_VALUE
+        var maxY = Float.MIN_VALUE
+
+        timeSeries.values
+            .reversed()
+            .forEach {
+                val date = LocalDate.parse(it.datetime)
+                val xValue = date.month.getDisplayName(TextStyle.SHORT, Locale.US)
+                val yValue = it.close.toFloat()
+                xValues.add(xValue)
+                yValues.add(yValue)
+                minY = min(minY, yValue)
+                maxY = max(maxY, yValue)
+            }
+        val range = maxY - minY
+        minY -= (range * 0.1f)
+        maxY += (range * 0.1f)
+        modelProducer.tryRunTransaction {
+            lineSeries { series(yValues) }
+            updateExtras {
+                it[xAxisKey] = xValues
+                it[minMaxKey] = minY to maxY
+            }
+        }
     }
 }

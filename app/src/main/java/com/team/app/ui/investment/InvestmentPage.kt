@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -22,20 +21,33 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.madrapps.plot.line.DataPoint
-import com.madrapps.plot.line.LineGraph
-import com.madrapps.plot.line.LinePlot
+import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
+import com.patrykandpatrick.vico.compose.chart.CartesianChartHost
+import com.patrykandpatrick.vico.compose.chart.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.chart.rememberCartesianChart
+import com.patrykandpatrick.vico.core.axis.AxisItemPlacer
+import com.patrykandpatrick.vico.core.chart.values.AxisValueOverrider
+import com.patrykandpatrick.vico.core.model.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.model.ExtraStore
+import com.patrykandpatrick.vico.sample.showcase.rememberMarker
 import com.team.app.data.repositories.StocksRepository
 import kotlinx.coroutines.launch
 import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.log10
+import kotlin.math.max
+import kotlin.math.pow
+import kotlin.math.sign
 
 @Composable
 @Preview
@@ -45,8 +57,10 @@ fun InvestmentPage(
     viewModel: InvestmentPageViewModel = hiltViewModel()
 ) {
     val title = "Investment: $symbol"
-    val points = viewModel.currentTimeSeries.value
     val currentCategory = viewModel.currentCategory.value
+    val modelProducer = viewModel.modelProducer
+    val xAxisKey = viewModel.xAxisKey
+    val minMaxKey = viewModel.minMaxKey
     val coro = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -56,11 +70,12 @@ fun InvestmentPage(
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = { TopAppBar(title = title, onBackClick = goBack) }) { contentPadding ->
         Content(
-            points = points,
             currentCategory = currentCategory,
-            indexMapper = viewModel::indexMapper,
             onCategoryChanged = { coro.launch { viewModel.changeCategory(it) } },
-            contentPadding = contentPadding
+            modelProducer = modelProducer,
+            contentPadding = contentPadding,
+            xAxisKey = xAxisKey,
+            minMaxKey = minMaxKey
         )
     }
 }
@@ -92,10 +107,11 @@ fun TopAppBar(
 @Preview
 fun Content(
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    points: List<DataPoint> = listOf(DataPoint(0.0F, 0.0F), DataPoint(10.0F, 10.0F)),
     currentCategory: StocksRepository.TimeSeriesCategory = StocksRepository.TimeSeriesCategory.YEAR,
     onCategoryChanged: (StocksRepository.TimeSeriesCategory) -> Unit = {},
-    indexMapper: (Float) -> String = { it.toString() }
+    modelProducer: CartesianChartModelProducer = CartesianChartModelProducer.build(),
+    xAxisKey: ExtraStore.Key<List<String>> = ExtraStore.Key(),
+    minMaxKey: ExtraStore.Key<Pair<Float, Float>> = ExtraStore.Key(),
 ) {
     Column(
         modifier = Modifier
@@ -109,42 +125,7 @@ fun Content(
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (points.isNotEmpty()) {
-                LineGraph(
-                    plot = LinePlot(
-                        listOf(
-                            LinePlot.Line(
-                                points,
-                                LinePlot.Connection(color = Color.Red),
-                                LinePlot.Intersection(color = Color.Red),
-                                LinePlot.Highlight(color = Color.Yellow),
-                            )
-                        ),
-                        grid = LinePlot.Grid(Color.Red),
-                        xAxis = LinePlot.XAxis(
-                            steps = 10,
-                            content = { min, offset, max ->
-                                for (it in 0 until 10) {
-                                    val value = it * offset + min
-                                    val text = indexMapper(value)
-                                    Text(
-                                        text = text,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        style = androidx.compose.material.MaterialTheme.typography.caption,
-                                        color = androidx.compose.material.MaterialTheme.colors.onSurface
-                                    )
-                                    if (value > max) {
-                                        break
-                                    }
-                                }
-                            }
-                        )
-                    ), modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                )
-            }
+            Graph(modelProducer, xAxisKey, minMaxKey)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -167,4 +148,54 @@ fun Content(
             }
         }
     }
+}
+
+@Composable
+@Preview
+fun Graph(
+    modelProducer: CartesianChartModelProducer = CartesianChartModelProducer.build(),
+    xAxisKey: ExtraStore.Key<List<String>> = ExtraStore.Key(),
+    minMaxKey: ExtraStore.Key<Pair<Float, Float>> = ExtraStore.Key(),
+) {
+
+    val minMaxOverrider = object : AxisValueOverrider {
+        override fun getMinY(minX: Float, maxX: Float, extraStore: ExtraStore): Float {
+            return AxisValueOverrider.fixed(
+                minY = extraStore[minMaxKey].first,
+                maxY = extraStore[minMaxKey].second
+            ).getMinY(minX, maxX, extraStore)
+        }
+
+        override fun getMaxY(minY: Float, maxY: Float, extraStore: ExtraStore): Float {
+            return AxisValueOverrider.fixed(
+                minY = extraStore[minMaxKey].first,
+                maxY = extraStore[minMaxKey].second
+            ).getMaxY(minY, maxY, extraStore)
+        }
+
+    }
+
+    val lineLayer = rememberLineCartesianLayer(
+        axisValueOverrider = minMaxOverrider
+    )
+    val chart = rememberCartesianChart(
+        lineLayer,
+        startAxis = rememberStartAxis(
+            itemPlacer = remember {
+                AxisItemPlacer.Vertical.count(count = { 4 })
+            }
+        ),
+        bottomAxis = rememberBottomAxis(
+            valueFormatter = { x, chartValues, _ ->
+                chartValues.model.extraStore[xAxisKey][x.toInt()]
+            },
+        )
+    )
+    val marker = rememberMarker()
+
+    CartesianChartHost(
+        chart = chart,
+        modelProducer = modelProducer,
+        marker = marker,
+    )
 }
