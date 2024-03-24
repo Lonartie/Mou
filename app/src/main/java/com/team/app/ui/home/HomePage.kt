@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -60,7 +61,6 @@ import com.team.app.data.model.InventoryItem
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import com.team.app.utils.Constants
-import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
 import kotlinx.coroutines.launch
 
 @Composable
@@ -136,19 +136,19 @@ fun TopRow(
                 AttributeBar(
                     progress = attributes.happiness.toFloat() / 100,
                     icon = Icons.Rounded.ChildCare,
-                    name = "Happiness",
+                    name = stringResource(id = R.string.happiness),
                     color = Color.Yellow,
                 )
                 AttributeBar(
                     progress = attributes.hunger.toFloat() / 100,
                     icon = Icons.Rounded.Fastfood,
-                    name = "Hunger",
+                    name = stringResource(id = R.string.hunger),
                     color = Color.hsl(30f, 0.96f, 0.55f, 1f)
                 )
                 AttributeBar(
                     progress = attributes.health.toFloat() / 100,
                     icon = Icons.Rounded.ControlPoint,
-                    name = "Health",
+                    name = stringResource(id = R.string.health),
                     color = Color.hsl(117f, 0.96f, 0.55f, 1f)
                 )
             }
@@ -160,7 +160,7 @@ fun TopRow(
             ) {
                 Image(
                     painterResource(id = R.drawable.coins),
-                    contentDescription = "Coins",
+                    contentDescription = stringResource(id = R.string.coins),
                     modifier = Modifier
                         .size(30.dp)
                         .graphicsLayer(
@@ -172,7 +172,7 @@ fun TopRow(
             }
             Image(
                 painterResource(id = R.drawable.shop),
-                contentDescription = "Items",
+                contentDescription = stringResource(id = R.string.items),
                 modifier = Modifier
                     .size(40.dp)
                     .combinedClickable(
@@ -252,7 +252,7 @@ fun BottomRow(
                 )
         ) {
             NavigationButton(
-                name = "Food",
+                name = stringResource(id = R.string.food),
                 image = painterResource(Constants.getItemResource(hotbar.foodItem.item.name)),
                 scale = Constants.getItemScalingFactor(hotbar.foodItem.item.name),
                 counter = hotbar.foodItem.quantity,
@@ -265,7 +265,7 @@ fun BottomRow(
             )
             VerticalDivider()
             NavigationButton(
-                name = "Toys",
+                name = stringResource(id = R.string.toys),
                 image = painterResource(Constants.getItemResource(hotbar.toyItem.item.name)),
                 scale = Constants.getItemScalingFactor(hotbar.toyItem.item.name),
                 counter = hotbar.toyItem.quantity,
@@ -274,7 +274,7 @@ fun BottomRow(
             )
             VerticalDivider()
             NavigationButton(
-                name = "Items",
+                name = stringResource(id = R.string.items),
                 image = painterResource(Constants.getItemResource(hotbar.miscItem.item.name)),
                 scale = Constants.getItemScalingFactor(hotbar.miscItem.item.name),
                 counter = hotbar.miscItem.quantity,

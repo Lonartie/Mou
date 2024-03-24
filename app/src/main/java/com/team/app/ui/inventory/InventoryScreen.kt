@@ -129,7 +129,7 @@ fun InventoryTopAppBar(
             IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = null
+                    contentDescription = stringResource(id = R.string.back_button)
                 )
             }
         }
@@ -167,7 +167,7 @@ fun ItemCard(
                     painter = painterResource(
                         id = Constants.getItemResource(inventoryItem.item.name)
                     ),
-                    contentDescription = null,
+                    contentDescription = inventoryItem.item.name,
                     modifier = Modifier
                         .scale(Constants.getItemScalingFactor(inventoryItem.item.name) * 0.5f)
                 )

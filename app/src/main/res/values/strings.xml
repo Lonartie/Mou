@@ -4,4 +4,12 @@
     <string name="current_balance">Current balance: </string>
     <string name="no_items">You do not own items of this category.</string>
     <string name="select_item">SELECT ITEM</string>
+    <string name="happiness">Happiness</string>
+    <string name="hunger">Hunger</string>
+    <string name="health">Health</string>
+    <string name="coins">Coins</string>
+    <string name="items">Items</string>
+    <string name="food">Food</string>
+    <string name="toys">Toys</string>
+    <string name="back_button">Back button</string>
 </resources>

@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -111,7 +112,7 @@ fun ShopTopAppBar(
 
                     Image(
                         painter = painterResource(id = R.drawable.coins),
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.coins),
                         modifier = Modifier.size(40.dp)
                     )
                 }
@@ -121,7 +122,7 @@ fun ShopTopAppBar(
             IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = null
+                    contentDescription = stringResource(id = R.string.back_button)
                 )
             }
         }
@@ -165,7 +166,7 @@ fun ItemCard(
 
             Image(
                 painter = painterResource(Constants.getItemResource(item.name)),
-                contentDescription = null,
+                contentDescription = item.name,
                 modifier = Modifier.scale(Constants.getItemScalingFactor(item.name) * 0.5f)
             )
 
@@ -189,7 +190,7 @@ fun ItemCard(
 
                     Image(
                         painter = painterResource(id = R.drawable.coins),
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.coins),
                         modifier = Modifier.size(24.dp)
                     )
                 }
