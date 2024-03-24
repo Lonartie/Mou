@@ -60,12 +60,12 @@ import com.team.app.data.model.InventoryItem
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import com.team.app.utils.Constants
-import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomePage(
     openShop: () -> Unit = {},
+    openCoins: () -> Unit = {},
     viewModel: HomePageViewModel = hiltViewModel()
 ) {
     val attributes = viewModel.attributes.collectAsState(
@@ -82,7 +82,7 @@ fun HomePage(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface),
         topBar = {
-            TopRow(attributes, openShop, viewModel::openMoneyScreen)
+            TopRow(attributes, openShop, openCoins)
         },
         bottomBar = {
             BottomRow(

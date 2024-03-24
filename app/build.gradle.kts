@@ -1,3 +1,12 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+fun loadConfigFile(): Properties {
+    val props = Properties()
+    props.load(FileInputStream(rootProject.file("config/secrets.properties")))
+    return props
+}
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -8,6 +17,10 @@ plugins {
 android {
     namespace = "com.team.app"
     compileSdk = 34
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.team.app"
@@ -28,6 +41,11 @@ android {
             )
         }
     }
+
+    buildTypes.forEach {
+        it.buildConfigField("String", "STOCK_API_KEY", "\"${loadConfigFile()["STOCK_API_KEY"] as String}\"")
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17

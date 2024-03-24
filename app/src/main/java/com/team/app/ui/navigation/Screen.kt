@@ -30,4 +30,17 @@ sealed class Screen(
     data object Toys : Screen(route = "toys")
 
     data object Items : Screen(route = "items")
+
+    data object Coins : Screen(route = "coins")
+
+    data object Investments : Screen(route = "investments")
+
+    data object Investment : Screen(
+        route = "investment/{symbol}",
+        navArguments = listOf(
+            navArgument("symbol") { type = NavType.StringType }
+        )
+    ) {
+        fun createRoute(symbol: String) = "investment/$symbol"
+    }
 }

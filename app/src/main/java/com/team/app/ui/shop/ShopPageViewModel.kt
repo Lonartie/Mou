@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ShopViewModel @Inject constructor(
+class ShopPageViewModel @Inject constructor(
     private val inventoryRepo: InventoryRepository,
     private val hotbarRepo: HotbarRepository,
     private val itemsRepo: ItemsRepository,

@@ -39,16 +39,16 @@ import com.team.app.utils.Constants
 
 @Composable
 @Preview
-fun ShopScreen(
+fun ShopPage(
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit,
-    viewModel: ShopViewModel = hiltViewModel()
+    goBack: () -> Unit,
+    viewModel: ShopPageViewModel = hiltViewModel()
 ) {
     val items = viewModel.itemsFlow.collectAsState(emptyList()).value
     val attributes = viewModel.attributesFlow.collectAsState(null).value
 
     Scaffold(
-        topBar = { ShopTopAppBar(onBackClick = onBackClick) }
+        topBar = { ShopTopAppBar(onBackClick = goBack) }
     ) { contentPadding ->
         Column(
             modifier = Modifier.padding(contentPadding)
@@ -88,7 +88,7 @@ fun ShopScreen(
 @Preview
 fun ShopTopAppBar(
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -116,7 +116,7 @@ fun ShopTopAppBar(
 @Preview
 fun ItemCard(
     item: Item = Item(ItemType.FOOD, "Chicken", 5, 1),
-    onClick: () -> Unit,
+    onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Card(

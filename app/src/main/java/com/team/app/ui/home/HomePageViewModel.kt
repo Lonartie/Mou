@@ -13,6 +13,7 @@ import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.SettingsRepository
 import com.team.app.data.repositories.StepCounterRepository
+import com.team.app.data.repositories.StocksRepository
 import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +26,8 @@ class HomePageViewModel @Inject constructor(
     private val stepCounter: StepCounterRepository,
     private val attributesRepo: AttributesRepository,
     private val inventoryRepo: InventoryRepository,
-    private val hotbarRepo: HotbarRepository
+    private val hotbarRepo: HotbarRepository,
+    private val stocksRepo: StocksRepository
 ) : ViewModel() {
 
     val figureState = mutableIntStateOf(R.drawable.figure_happy)
@@ -44,18 +46,13 @@ class HomePageViewModel @Inject constructor(
     }
 
     suspend fun onStart() {
-        println("onStart")
+        // print secret api key provided by buildConfigField
+
+        val appleSymbols = stocksRepo.searchSymbol("nvidia", 25)
+        println("nvidia symbols: $appleSymbols")
         updateHotbar()
         setFigureState(attributesRepo.getAttributes())
         fetchStepData() // currently this throws so subsequent functions are not called
-    }
-
-    suspend fun openMoneyScreen() {
-        println("Open money screen")
-    }
-
-    suspend fun openShop() {
-        println("Open shop")
     }
 
     suspend fun giveFood(item: Item, attributes: Attributes) {
