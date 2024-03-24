@@ -1,29 +1,31 @@
 package com.team.app.ui.inventory
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,12 +34,15 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.team.app.R
 import com.team.app.data.model.InventoryItem
+import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
+import com.team.app.ui.home.Background
 import com.team.app.utils.Constants
 
 @Composable
@@ -49,8 +54,20 @@ fun InventoryScreen(
     val items = viewModel.getItemsWithType(itemType)
 
     Scaffold(
-        topBar = { InventoryTopAppBar(onBackClick = onBackClick) }
+        topBar = {
+            InventoryTopAppBar(
+                onBackClick = onBackClick,
+                itemType = itemType
+            )
+        }
     ) { contentPadding ->
+        Background(
+            image = R.drawable.background_evening,
+            modifier = Modifier
+                .fillMaxSize()
+                .scale(5f)
+        )
+
         Column(
             modifier = Modifier.padding(contentPadding)
         ) {
@@ -62,15 +79,13 @@ fun InventoryScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.size(16.dp))
-
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(4.dp)
             ) {
                 items(items) {
                     ItemCard(
-                        modifier = Modifier.padding(4.dp),
+                        modifier = Modifier.padding(8.dp),
                         inventoryItem = it,
                         onClick = {
                             viewModel.setHotbarItem(it)
@@ -85,21 +100,31 @@ fun InventoryScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+@Preview
 fun InventoryTopAppBar(
-    modifier: Modifier = Modifier,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit = {},
+    itemType: ItemType = ItemType.FOOD
 ) {
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = {
-            Text(
-                text = "Inventory",
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Inventory",
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Text(
+                    text = itemType.toString(),
+                    modifier = Modifier.offset(x = (-12).dp)
+                )
+            }
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        modifier = modifier,
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
@@ -112,27 +137,31 @@ fun InventoryTopAppBar(
 }
 
 @Composable
+@Preview
 fun ItemCard(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    inventoryItem: InventoryItem
+    inventoryItem: InventoryItem = InventoryItem(
+        Item(ItemType.FOOD, "Chicken", 5, 1), 1
+    ),
+    onClick: () -> Unit = {}
 ) {
     Card(
-        modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        )
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        modifier = modifier,
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
     ) {
         Column(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxSize()
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(8.dp)
         ) {
             Text(
                 text = inventoryItem.item.name,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                style = MaterialTheme.typography.bodyMedium
             )
-            Spacer(modifier = Modifier.size(8.dp))
+
             Box {
                 Image(
                     painter = painterResource(
@@ -142,6 +171,7 @@ fun ItemCard(
                     modifier = Modifier
                         .scale(Constants.getItemScalingFactor(inventoryItem.item.name) * 0.5f)
                 )
+
                 Text(
                     text = inventoryItem.quantity.toString(),
                     color = Color.White,
@@ -158,13 +188,17 @@ fun ItemCard(
                     fontSize = 15.sp
                 )
             }
-            Spacer(modifier = Modifier.size(8.dp))
+
             Button(
                 onClick = onClick,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 8.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 12.dp)
             ) {
                 Text(
-                    text = stringResource(id = R.string.use_item)
+                    text = stringResource(id = R.string.select_item),
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
         }

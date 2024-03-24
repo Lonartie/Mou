@@ -43,7 +43,6 @@ import com.team.app.utils.Constants
 
 @Composable
 fun ShopScreen(
-    modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     viewModel: ShopViewModel = hiltViewModel()
 ) {
@@ -56,8 +55,7 @@ fun ShopScreen(
                 onBackClick = onBackClick,
                 currentBalance = attributes?.coins
             )
-        },
-        modifier = modifier
+        }
     ) { contentPadding ->
         Background(
             image = R.drawable.background_evening,
@@ -65,6 +63,7 @@ fun ShopScreen(
                 .fillMaxSize()
                 .scale(5f)
         )
+
         Column(
             modifier = Modifier.padding(contentPadding)
         ) {
@@ -99,13 +98,17 @@ fun ShopTopAppBar(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Shop")
+
                 Spacer(modifier = Modifier.weight(1f))
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.offset(x = (-8).dp)
                 ) {
                     Text(text = currentBalance.toString())
+
                     Spacer(modifier = Modifier.size(4.dp))
+
                     Image(
                         painter = painterResource(id = R.drawable.coins),
                         contentDescription = null,
@@ -150,18 +153,22 @@ fun ItemCard(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.bodyMedium
                 )
+
                 Spacer(modifier = Modifier.weight(1f))
+
                 Text(
                     text = item.itemType.toString(),
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+
             Image(
                 painter = painterResource(Constants.getItemResource(item.name)),
                 contentDescription = null,
                 modifier = Modifier.scale(Constants.getItemScalingFactor(item.name) * 0.5f)
             )
+
             Button(
                 onClick = { onClick() },
                 modifier = Modifier
@@ -177,7 +184,9 @@ fun ItemCard(
                         text = item.price.toString(),
                         style = MaterialTheme.typography.titleMedium
                     )
+
                     Spacer(modifier = Modifier.size(8.dp))
+
                     Image(
                         painter = painterResource(id = R.drawable.coins),
                         contentDescription = null,
