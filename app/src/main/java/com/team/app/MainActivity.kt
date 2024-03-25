@@ -9,7 +9,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
@@ -22,9 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.AppTheme
-import com.team.app.ui.home.HomePage
 import com.team.app.ui.navigation.MouNavHost
-import com.team.app.ui.shop.ShopScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

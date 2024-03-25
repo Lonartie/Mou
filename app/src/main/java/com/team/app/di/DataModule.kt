@@ -5,26 +5,39 @@ import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import androidx.room.Room
-import com.team.app.data.repositories.SettingsRepository
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.team.app.data.database.AttributesDatabase
+import com.team.app.data.database.InvestmentsDatabase
+import com.team.app.data.database.ItemsDatabase
 import com.team.app.data.database.StepCounterDatabase
 import com.team.app.data.database.StepsDao
+import com.team.app.data.network.StocksService
+import com.team.app.data.network.interceptors.RateLimitInterceptor
+import com.team.app.data.network.interceptors.StockApiKeyInterceptor
 import com.team.app.data.repositories.StepCounterRepository
-import com.team.app.data.database.AttributesDatabase
-import com.team.app.data.database.ItemsDatabase
 import com.team.app.data.database.StartTimestampDao
 import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
+import com.team.app.data.repositories.InvestmentsRepository
 import com.team.app.data.repositories.ItemsRepository
 import com.team.app.service.DialogService
+import com.team.app.data.repositories.NetworkRepository
+import com.team.app.data.repositories.SettingsRepository
+import com.team.app.data.repositories.StocksRepository
 import com.team.app.service.NotificationService
 import com.team.app.service.SoundService
+import com.team.app.utils.Constants.Companion.STOCKS_API_BASE
 import com.team.app.utils.dataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -51,7 +64,10 @@ class DataModule {
     }
 
     @Provides
-    fun provideHotbarRepository(itemsDb: ItemsDatabase, inventoryRepo: InventoryRepository): HotbarRepository {
+    fun provideHotbarRepository(
+        itemsDb: ItemsDatabase,
+        inventoryRepo: InventoryRepository
+    ): HotbarRepository {
         return HotbarRepository(itemsDb.hotbarDao(), inventoryRepo)
     }
 
@@ -74,6 +90,39 @@ class DataModule {
     }
 
     @Provides
+    fun providesNetworkRepository(@ApplicationContext context: Context): NetworkRepository {
+        return NetworkRepository(context)
+    }
+
+    @Provides
+    fun providesRetroFit(): Retrofit {
+        val retrofit = Retrofit.Builder().baseUrl(STOCKS_API_BASE).addConverterFactory(
+            MoshiConverterFactory.create(
+                Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+            )
+        )
+
+        val client = OkHttpClient.Builder()
+            .addInterceptor(StockApiKeyInterceptor())
+            .addInterceptor(RateLimitInterceptor())
+            .build()
+
+        retrofit.client(client)
+
+        return retrofit.build()
+    }
+
+    @Provides
+    fun provideStocksAPI(retrofit: Retrofit): StocksService {
+        return retrofit.create(StocksService::class.java)
+    }
+
+    @Provides
+    fun provideStocksRepository(stocksService: StocksService): StocksRepository {
+        return StocksRepository(stocksService)
+    }
+
+    @Provides
     fun provideSoundService(@ApplicationContext context: Context): SoundService {
         return SoundService(context)
     }
@@ -83,43 +132,9 @@ class DataModule {
         return DialogService(context)
     }
 
-//    @Provides
-//    fun providesNetworkRepository(@ApplicationContext context: Context): NetworkRepository {
-//        return NetworkRepository(context)
-//    }
-//
-//    @Provides
-//    fun providesRetroFit(): Retrofit {
-//        return Retrofit.Builder().baseUrl(GOOGLE_BOOKS_API_BASE).addConverterFactory(
-//            MoshiConverterFactory.create(
-//                Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-//            )
-//        ).build()
-//    }
-//
-//    @Provides
-//    fun provideBooksAPI(retrofit: Retrofit): BooksService {
-//        return retrofit.create(BooksService::class.java)
-//    }
-//
-//    @Provides
-//    fun provideBooksRepo(api: BooksService, db: BooksDatabase): BooksRepository {
-//        return BooksRepository(api, db.booksDao())
-//    }
-//
-//    @Provides
-//    fun providesDatabase(@ApplicationContext context: Context): BooksDatabase {
-//        return Room.databaseBuilder(context, BooksDatabase::class.java, "booksdatabase")
-//            .addMigrations(
-//                BooksDatabase.MIGRATION_1_2,
-//                BooksDatabase.MIGRATION_2_3
-//            )
-//            .build()
-//    }
-//
     // provide StepCounterDao
     @Provides
-    fun providesStepDatabase(@ApplicationContext context: Context) : StepCounterDatabase {
+    fun providesStepDatabase(@ApplicationContext context: Context): StepCounterDatabase {
         return Room.databaseBuilder(context, StepCounterDatabase::class.java, "stepcounterdatabase")
             .build()
     }
@@ -129,6 +144,7 @@ class DataModule {
 
     @Provides
     fun providesStepCounterDao(database: StepCounterDatabase) = database.stepsDao()
+
     @Provides
     fun providesSettingsRepo(@ApplicationContext context: Context): SettingsRepository {
         val dataStore = context.dataStore
@@ -141,17 +157,24 @@ class DataModule {
     }
 
     @Provides
-    fun providesSensorManager(@ApplicationContext context: Context) : SensorManager {
+    fun providesSensorManager(@ApplicationContext context: Context): SensorManager {
         return context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
 
     @Provides
-    fun providesStepCounterSensor(sensorManager: SensorManager) : Sensor? {
+    fun providesStepCounterSensor(sensorManager: SensorManager): Sensor? {
         return sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
     }
 
-//    @Provides
-//    fun providesWorkmanager(@ApplicationContext context: Context): WorkManager {
-//        return WorkManager.getInstance(context)
-//    }
+    @Provides
+    fun providesInvestmentsDatabase(@ApplicationContext context: Context): InvestmentsDatabase {
+        return Room.databaseBuilder(context, InvestmentsDatabase::class.java, "investments_database")
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    fun providesInvestmentsRepository(investmentsDatabase: InvestmentsDatabase): InvestmentsRepository {
+        return InvestmentsRepository(investmentsDatabase.investmentsDao())
+    }
 }

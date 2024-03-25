@@ -1,3 +1,12 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+fun loadConfigFile(): Properties {
+    val props = Properties()
+    props.load(FileInputStream(rootProject.file("config/secrets.properties")))
+    return props
+}
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -8,6 +17,10 @@ plugins {
 android {
     namespace = "com.team.app"
     compileSdk = 34
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.team.app"
@@ -28,6 +41,11 @@ android {
             )
         }
     }
+
+    buildTypes.forEach {
+        it.buildConfigField("String", "STOCK_API_KEY", "\"${loadConfigFile()["STOCK_API_KEY"] as String}\"")
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -113,6 +131,21 @@ dependencies {
 
     // Plot
     implementation("com.github.madrapps:plot:0.1.1")
+
+    // For Jetpack Compose.
+    implementation("com.patrykandpatrick.vico:compose:2.0.0-alpha.12")
+
+    // For `compose`. Creates a `ChartStyle` based on an M2 Material Theme.
+    implementation("com.patrykandpatrick.vico:compose-m2:2.0.0-alpha.12")
+
+    // For `compose`. Creates a `ChartStyle` based on an M3 Material Theme.
+    implementation("com.patrykandpatrick.vico:compose-m3:2.0.0-alpha.12")
+
+    // Houses the core logic for charts and other elements. Included in all other modules.
+    implementation("com.patrykandpatrick.vico:core:2.0.0-alpha.12")
+
+    // For the view system.
+    implementation("com.patrykandpatrick.vico:views:2.0.0-alpha.12")
 
     // JUnit Tests
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.1")

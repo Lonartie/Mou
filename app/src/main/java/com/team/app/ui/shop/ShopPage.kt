@@ -44,9 +44,11 @@ import com.team.app.utils.Constants
 import com.team.app.utils.capitalize
 
 @Composable
-fun ShopScreen(
-    onBackClick: () -> Unit,
-    viewModel: ShopViewModel = hiltViewModel()
+@Preview
+fun ShopPage(
+    modifier: Modifier = Modifier,
+    goBack: () -> Unit,
+    viewModel: ShopPageViewModel = hiltViewModel()
 ) {
     val items = viewModel.itemsFlow.collectAsState(emptyList()).value
     val attributes = viewModel.attributesFlow.collectAsState(null).value
@@ -54,7 +56,7 @@ fun ShopScreen(
     Scaffold(
         topBar = {
             ShopTopAppBar(
-                onBackClick = onBackClick,
+                onBackClick = goBack,
                 currentBalance = attributes?.coins
             )
         }
@@ -135,7 +137,7 @@ fun ShopTopAppBar(
 fun ItemCard(
     modifier: Modifier = Modifier,
     item: Item = Item(ItemType.FOOD, "Chicken", 5, 1),
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ) {
     Card(
         colors = CardDefaults.cardColors(

@@ -71,6 +71,7 @@ fun HomePage(
     selectFood: () -> Unit = {},
     selectToy: () -> Unit = {},
     selectItem: () -> Unit = {},
+    openCoins: () -> Unit = {},
     viewModel: HomePageViewModel = hiltViewModel()
 ) {
     val attributes = viewModel.attributes.collectAsState(
@@ -90,7 +91,7 @@ fun HomePage(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface),
         topBar = {
-            TopRow(attributes, openShop, viewModel::openMoneyScreen)
+            TopRow(attributes, openShop, openCoins)
         },
         bottomBar = {
             BottomRow(

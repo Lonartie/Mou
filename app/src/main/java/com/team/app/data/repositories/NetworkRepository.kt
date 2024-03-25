@@ -1,4 +1,4 @@
-package com.lonartie.bookdiary.data.repositories
+package com.team.app.data.repositories
 
 import android.content.Context
 import android.net.ConnectivityManager

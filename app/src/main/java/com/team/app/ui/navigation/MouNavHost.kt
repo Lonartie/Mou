@@ -5,9 +5,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.team.app.data.model.ItemType
+import com.team.app.ui.coins.CoinsPage
 import com.team.app.ui.home.HomePage
 import com.team.app.ui.inventory.InventoryScreen
-import com.team.app.ui.shop.ShopScreen
+import com.team.app.ui.investment.InvestmentPage
+import com.team.app.ui.investments.InvestmentsPage
+import com.team.app.ui.shop.ShopPage
 
 @Composable
 fun MouNavHost(
@@ -22,14 +25,15 @@ fun MouNavHost(
         ) {
             HomePage(
                 openShop = { navController.navigate(Screen.Shop.route) },
+                openCoins = { navController.navigate(Screen.Coins.route) },
                 selectFood = { navController.navigate(Screen.Food.route) },
                 selectToy = { navController.navigate(Screen.Toys.route) },
                 selectItem = { navController.navigate(Screen.Items.route) }
             )
         }
         composable(route = Screen.Shop.route) {
-            ShopScreen(
-                onBackClick = { navController.navigateUp() }
+            ShopPage(
+                goBack = { navController.navigateUp() }
             )
         }
         composable(route = Screen.Food.route) {
@@ -48,6 +52,32 @@ fun MouNavHost(
             InventoryScreen(
                 itemTypes = listOf(ItemType.MEDICINE, ItemType.MISC),
                 onBackClick = { navController.navigateUp() }
+            )
+        }
+        composable(route = Screen.Coins.route) {
+            CoinsPage(
+                goBack = { navController.navigateUp() },
+                openInvestments = { navController.navigate(Screen.Investments.route) }
+            )
+        }
+        composable(route = Screen.Investments.route) {
+            InvestmentsPage(
+                goBack = { navController.navigateUp() },
+                openInvestment = {
+                    symbol ->
+                    val route = Screen.Investment.createRoute(symbol)
+                    navController.navigate(route)
+                }
+            )
+        }
+        composable(
+            route = Screen.Investment.route,
+            arguments = Screen.Investment.navArguments
+        ) {
+            val symbol: String = it.arguments?.getString("symbol") ?: ""
+            InvestmentPage(
+                goBack = { navController.navigateUp() },
+                symbol = symbol.replace("&", "/")
             )
         }
     }

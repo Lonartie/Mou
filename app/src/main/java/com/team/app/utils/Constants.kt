@@ -9,6 +9,8 @@ import com.team.app.data.model.ItemType
 class Constants {
     companion object {
 
+        const val STOCKS_API_BASE = "https://api.twelvedata.com/"
+
         val ITEM_NAME_TO_RESOURCE_MAP = mapOf(
             "Chicken" to Pair(R.drawable.chicken_leg, 1.75f),
             "Mouse" to Pair(R.drawable.toy_mouse, 1.2f),
