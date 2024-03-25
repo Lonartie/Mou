@@ -15,3 +15,5 @@ fun Item.toInventoryItem(quantity: Int): InventoryItem {
         quantity = quantity
     )
 }
+
+fun String.capitalize(): String = this.lowercase().replaceFirstChar { it.uppercase() }

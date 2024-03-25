@@ -44,20 +44,21 @@ import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import com.team.app.ui.home.Background
 import com.team.app.utils.Constants
+import com.team.app.utils.capitalize
 
 @Composable
 fun InventoryScreen(
-    itemType: ItemType,
+    itemTypes: List<ItemType>,
     onBackClick: () -> Unit,
     viewModel: InventoryViewModel = hiltViewModel()
 ) {
-    val items = viewModel.getItemsWithType(itemType)
+    val items = viewModel.getItemsWithTypes(itemTypes)
 
     Scaffold(
         topBar = {
             InventoryTopAppBar(
                 onBackClick = onBackClick,
-                itemType = itemType
+                itemTypes = itemTypes
             )
         }
     ) { contentPadding ->
@@ -103,7 +104,7 @@ fun InventoryScreen(
 @Preview
 fun InventoryTopAppBar(
     onBackClick: () -> Unit = {},
-    itemType: ItemType = ItemType.FOOD
+    itemTypes: List<ItemType> = listOf(ItemType.FOOD, ItemType.MEDICINE)
 ) {
     TopAppBar(
         title = {
@@ -113,14 +114,20 @@ fun InventoryTopAppBar(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Inventory",
+                    text = stringResource(id = R.string.inventory),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
 
+                var types = itemTypes[0].toString().capitalize()
+
+                for (i in 1..<itemTypes.size) {
+                    types += ", ${itemTypes[i].toString().capitalize()}"
+                }
+
                 Text(
-                    text = itemType.toString(),
+                    text = types,
                     modifier = Modifier.offset(x = (-12).dp)
                 )
             }

@@ -41,6 +41,7 @@ import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import com.team.app.ui.home.Background
 import com.team.app.utils.Constants
+import com.team.app.utils.capitalize
 
 @Composable
 fun ShopScreen(
@@ -98,7 +99,7 @@ fun ShopTopAppBar(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Shop")
+                Text(text = stringResource(id = R.string.shop))
 
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -158,7 +159,7 @@ fun ItemCard(
                 Spacer(modifier = Modifier.weight(1f))
 
                 Text(
-                    text = item.itemType.toString(),
+                    text = item.itemType.toString().capitalize(),
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.bodyMedium
                 )

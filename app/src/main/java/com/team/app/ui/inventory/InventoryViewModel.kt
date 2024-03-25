@@ -16,9 +16,9 @@ class InventoryViewModel @Inject constructor(
     private val invRepo: InventoryRepository,
     private val hotbarRepo: HotbarRepository
 ) : ViewModel() {
-    fun getItemsWithType(type: ItemType) = runBlocking {
+    fun getItemsWithTypes(types: List<ItemType>) = runBlocking {
         invRepo.getItems().filter {
-            it.item.itemType == type
+            types.contains(it.item.itemType)
         }
     }
 

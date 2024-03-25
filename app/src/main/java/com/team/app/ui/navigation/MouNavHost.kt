@@ -34,19 +34,19 @@ fun MouNavHost(
         }
         composable(route = Screen.Food.route) {
             InventoryScreen(
-                itemType = ItemType.FOOD,
+                itemTypes = listOf(ItemType.FOOD),
                 onBackClick = { navController.navigateUp() }
             )
         }
         composable(route = Screen.Toys.route) {
             InventoryScreen(
-                itemType = ItemType.TOY,
+                itemTypes = listOf(ItemType.TOY),
                 onBackClick = { navController.navigateUp() }
             )
         }
         composable(route = Screen.Items.route) {
             InventoryScreen(
-                itemType = ItemType.MISC,
+                itemTypes = listOf(ItemType.MEDICINE, ItemType.MISC),
                 onBackClick = { navController.navigateUp() }
             )
         }
