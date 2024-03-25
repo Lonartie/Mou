@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -60,6 +61,7 @@ import com.team.app.data.model.Hotbar
 import com.team.app.data.model.InventoryItem
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
+import com.team.app.service.DialogService
 import com.team.app.utils.Constants
 import kotlinx.coroutines.launch
 
@@ -76,9 +78,12 @@ fun HomePage(
         initial = Attributes(0, 0, 0, 0)
     ).value
     val hotbar = viewModel.hotbar.value
+    val diagService = DialogService(LocalContext.current)
 
     LaunchedEffect(Unit) {
         viewModel.onStart()
+        diagService.showAlertDialog(
+            "Belohnung", "Du hast ${viewModel.earnedCoins.intValue}€ verdient!")
     }
 
     Scaffold(

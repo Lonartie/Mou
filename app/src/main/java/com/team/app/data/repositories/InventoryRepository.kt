@@ -28,9 +28,9 @@ class InventoryRepository(
     }
 
     suspend fun removeOne(item: ItemModel) {
-        val id = itemsRepo.findIDByName(item.name)!!
-        val invID = inventoryDao.findByItemID(id)!!
-        val invItem = inventoryDao.getItem(invID)!!
+        val id = itemsRepo.findIDByName(item.name) ?: return
+        val invID = inventoryDao.findByItemID(id) ?: return
+        val invItem = inventoryDao.getItem(invID) ?: return
         val newInvItem = invItem.copy(quantity = invItem.quantity - 1)
         if (newInvItem.quantity == 0) {
             inventoryDao.removeItem(invItem)
