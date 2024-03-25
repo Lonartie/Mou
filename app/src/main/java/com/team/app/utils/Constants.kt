@@ -23,9 +23,10 @@ class Constants {
         val INVALID_ITEM = Item(ItemType.MISC, "", 0, 0)
         val INVALID_INVENTORY_ITEM = InventoryItem(INVALID_ITEM, 0)
 
-        const val foodPrice = 5
-        const val healthBoosterPrice = 20
-        const val toyPrice = 15
+        const val MAX_HUNGER = 100
+        const val MAX_HAPPINESS = 100
+        const val MAX_HEALTH = 100
+
 //        const val GOOGLE_BOOKS_API_BASE = "https://www.googleapis.com/books/v1/"
         const val STEP_COUNTER_TAG = "STEP_COUNT_LISTENER"
     }

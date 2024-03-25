@@ -1,13 +1,16 @@
 package com.team.app.ui.shop
 
+import androidx.annotation.RawRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.team.app.R
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.ItemsRepository
+import com.team.app.service.SoundService
 import com.team.app.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -17,8 +20,9 @@ import javax.inject.Inject
 class ShopPageViewModel @Inject constructor(
     private val inventoryRepo: InventoryRepository,
     private val hotbarRepo: HotbarRepository,
-    private val itemsRepo: ItemsRepository,
-    private val attributesRepo: AttributesRepository
+    private val soundService: SoundService,
+    private val attributesRepo: AttributesRepository,
+    itemsRepo: ItemsRepository
 ) : ViewModel() {
     var itemsFlow = itemsRepo.getItemsNoInvalidFlow()
         private set
@@ -28,6 +32,15 @@ class ShopPageViewModel @Inject constructor(
 
     fun buyItem(item: Item) {
         viewModelScope.launch {
+            val userCoins = attributesRepo.getAttributes().coins
+
+            // check if user has enough money
+            if (userCoins >= item.price) {
+                viewModelScope.launch {
+                    playSound(R.raw.purchase_item)
+                }
+            }
+
             inventoryRepo.addOne(item)
 
             // keep hotbar up-to-date
@@ -64,4 +77,6 @@ class ShopPageViewModel @Inject constructor(
             }
         }
     }
+
+    private fun playSound(@RawRes res: Int) = soundService.play(res)
 }

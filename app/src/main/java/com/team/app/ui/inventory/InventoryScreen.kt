@@ -1,7 +1,8 @@
-package com.team.app.ui.shop
+package com.team.app.ui.inventory
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -27,16 +27,19 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.team.app.R
+import com.team.app.data.model.InventoryItem
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import com.team.app.ui.home.Background
@@ -44,20 +47,18 @@ import com.team.app.utils.Constants
 import com.team.app.utils.capitalize
 
 @Composable
-@Preview
-fun ShopPage(
-    modifier: Modifier = Modifier,
-    goBack: () -> Unit,
-    viewModel: ShopPageViewModel = hiltViewModel()
+fun InventoryScreen(
+    itemTypes: List<ItemType>,
+    onBackClick: () -> Unit,
+    viewModel: InventoryViewModel = hiltViewModel()
 ) {
-    val items = viewModel.itemsFlow.collectAsState(emptyList()).value
-    val attributes = viewModel.attributesFlow.collectAsState(null).value
+    val items = viewModel.getItemsWithTypes(itemTypes)
 
     Scaffold(
         topBar = {
-            ShopTopAppBar(
-                onBackClick = goBack,
-                currentBalance = attributes?.coins
+            InventoryTopAppBar(
+                onBackClick = onBackClick,
+                itemTypes = itemTypes
             )
         }
     ) { contentPadding ->
@@ -71,15 +72,26 @@ fun ShopPage(
         Column(
             modifier = Modifier.padding(contentPadding)
         ) {
+            if (items.isEmpty()) {
+                Text(
+                    text = stringResource(id = R.string.no_items),
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.padding(4.dp)
             ) {
                 items(items) {
                     ItemCard(
-                        item = it,
-                        onClick = { viewModel.buyItem(it) },
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(8.dp),
+                        inventoryItem = it,
+                        onClick = {
+                            viewModel.setHotbarItem(it)
+                            onBackClick()
+                        }
                     )
                 }
             }
@@ -90,9 +102,9 @@ fun ShopPage(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun ShopTopAppBar(
+fun InventoryTopAppBar(
     onBackClick: () -> Unit = {},
-    currentBalance: Int? = 0
+    itemTypes: List<ItemType> = listOf(ItemType.FOOD, ItemType.MEDICINE)
 ) {
     TopAppBar(
         title = {
@@ -101,24 +113,23 @@ fun ShopTopAppBar(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = stringResource(id = R.string.shop))
+                Text(
+                    text = stringResource(id = R.string.inventory),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.offset(x = (-8).dp)
-                ) {
-                    Text(text = currentBalance.toString())
+                var types = itemTypes[0].toString().capitalize()
 
-                    Spacer(modifier = Modifier.size(4.dp))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.coins),
-                        contentDescription = stringResource(id = R.string.coins),
-                        modifier = Modifier.size(40.dp)
-                    )
+                for (i in 1..<itemTypes.size) {
+                    types += ", ${itemTypes[i].toString().capitalize()}"
                 }
+
+                Text(
+                    text = types,
+                    modifier = Modifier.offset(x = (-12).dp)
+                )
             }
         },
         navigationIcon = {
@@ -136,8 +147,10 @@ fun ShopTopAppBar(
 @Preview
 fun ItemCard(
     modifier: Modifier = Modifier,
-    item: Item = Item(ItemType.FOOD, "Chicken", 5, 1),
-    onClick: () -> Unit = {},
+    inventoryItem: InventoryItem = InventoryItem(
+        Item(ItemType.FOOD, "Chicken", 5, 1), 1
+    ),
+    onClick: () -> Unit = {}
 ) {
     Card(
         colors = CardDefaults.cardColors(
@@ -148,55 +161,52 @@ fun ItemCard(
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(8.dp)
         ) {
-            Row {
-                Text(
-                    text = item.name,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    style = MaterialTheme.typography.bodyMedium
+            Text(
+                text = inventoryItem.item.name,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Box {
+                Image(
+                    painter = painterResource(
+                        id = Constants.getItemResource(inventoryItem.item.name)
+                    ),
+                    contentDescription = inventoryItem.item.name,
+                    modifier = Modifier
+                        .scale(Constants.getItemScalingFactor(inventoryItem.item.name) * 0.5f)
                 )
 
-                Spacer(modifier = Modifier.weight(1f))
-
                 Text(
-                    text = item.itemType.toString().capitalize(),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    style = MaterialTheme.typography.bodyMedium
+                    text = inventoryItem.quantity.toString(),
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = (-30).dp, y = 20.dp)
+                        .padding(5.dp)
+                        .drawBehind {
+                            drawCircle(
+                                color = Color.Red,
+                                radius = 10.dp.toPx()
+                            )
+                        },
+                    fontSize = 15.sp
                 )
             }
 
-            Image(
-                painter = painterResource(Constants.getItemResource(item.name)),
-                contentDescription = item.name,
-                modifier = Modifier.scale(Constants.getItemScalingFactor(item.name) * 0.5f)
-            )
-
             Button(
-                onClick = { onClick() },
+                onClick = onClick,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(bottom = 8.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 12.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(4.dp)
-                ) {
-                    Text(
-                        text = item.price.toString(),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    Spacer(modifier = Modifier.size(8.dp))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.coins),
-                        contentDescription = stringResource(id = R.string.coins),
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
+                Text(
+                    text = stringResource(id = R.string.select_item),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         }
     }

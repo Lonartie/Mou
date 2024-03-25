@@ -8,20 +8,7 @@ sealed class Screen(
     val route: String,
     val navArguments: List<NamedNavArgument> = emptyList()
 ) {
-    data object Home : Screen(
-        route = "home/{foodId}/{toyId}/{itemId}",
-        navArguments = listOf(
-            navArgument("foodId") { type = NavType.IntType },
-            navArgument("toyId") { type = NavType.IntType },
-            navArgument("itemId") { type = NavType.IntType }
-        )
-    ) {
-        fun createRoute(
-            foodId: Int,
-            toyId: Int,
-            itemId: Int
-        ) = "home/{foodId}/{toyId}/{itemId}"
-    }
+    data object Home : Screen(route = "home")
 
     data object Shop : Screen(route = "shop")
 

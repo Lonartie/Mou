@@ -17,6 +17,7 @@ fun Item.toInventoryItem(quantity: Int): InventoryItem {
     )
 }
 
+fun String.capitalize(): String = this.lowercase().replaceFirstChar { it.uppercase() }
 
 
 fun Investment.earningsFromSell(currentPrice: Double): Int {

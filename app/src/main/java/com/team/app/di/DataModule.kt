@@ -25,6 +25,7 @@ import com.team.app.data.repositories.SettingsRepository
 import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.data.repositories.StocksRepository
 import com.team.app.service.NotificationService
+import com.team.app.service.SoundService
 import com.team.app.utils.Constants.Companion.STOCKS_API_BASE
 import com.team.app.utils.dataStore
 import dagger.Module
@@ -117,6 +118,11 @@ class DataModule {
     @Provides
     fun provideStocksRepository(stocksService: StocksService): StocksRepository {
         return StocksRepository(stocksService)
+    }
+
+    @Provides
+    fun provideSoundService(@ApplicationContext context: Context): SoundService {
+        return SoundService(context)
     }
 
     // provide StepCounterDao

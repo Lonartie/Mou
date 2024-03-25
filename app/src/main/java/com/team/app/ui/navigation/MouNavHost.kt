@@ -4,8 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.team.app.data.model.ItemType
 import com.team.app.ui.coins.CoinsPage
 import com.team.app.ui.home.HomePage
+import com.team.app.ui.inventory.InventoryScreen
 import com.team.app.ui.investment.InvestmentPage
 import com.team.app.ui.investments.InvestmentsPage
 import com.team.app.ui.shop.ShopPage
@@ -19,15 +21,14 @@ fun MouNavHost(
         startDestination = Screen.Home.route
     ) {
         composable(
-            route = Screen.Home.route,
-            arguments = Screen.Home.navArguments
+            route = Screen.Home.route
         ) {
-            val foodId: Int = it.arguments?.getInt("foodId") ?: -1
-            val toyId: Int = it.arguments?.getInt("toyId") ?: -1
-            val itemId: Int = it.arguments?.getInt("itemId") ?: -1
             HomePage(
                 openShop = { navController.navigate(Screen.Shop.route) },
-                openCoins = { navController.navigate(Screen.Coins.route) }
+                openCoins = { navController.navigate(Screen.Coins.route) },
+                selectFood = { navController.navigate(Screen.Food.route) },
+                selectToy = { navController.navigate(Screen.Toys.route) },
+                selectItem = { navController.navigate(Screen.Items.route) }
             )
         }
         composable(route = Screen.Shop.route) {
@@ -36,13 +37,22 @@ fun MouNavHost(
             )
         }
         composable(route = Screen.Food.route) {
-            // TODO add food screen
+            InventoryScreen(
+                itemTypes = listOf(ItemType.FOOD),
+                onBackClick = { navController.navigateUp() }
+            )
         }
         composable(route = Screen.Toys.route) {
-            // TODO add toys screen
+            InventoryScreen(
+                itemTypes = listOf(ItemType.TOY),
+                onBackClick = { navController.navigateUp() }
+            )
         }
         composable(route = Screen.Items.route) {
-            // TODO add items screen
+            InventoryScreen(
+                itemTypes = listOf(ItemType.MEDICINE, ItemType.MISC),
+                onBackClick = { navController.navigateUp() }
+            )
         }
         composable(route = Screen.Coins.route) {
             CoinsPage(

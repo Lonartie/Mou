@@ -1,8 +1,10 @@
 package com.team.app.ui.home
 
+import androidx.annotation.RawRes
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.team.app.R
 import com.team.app.data.model.Attributes
 import com.team.app.data.model.Hotbar
@@ -14,9 +16,12 @@ import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.SettingsRepository
 import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.data.repositories.StocksRepository
+import com.team.app.service.SoundService
+import com.team.app.utils.Constants
 import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -27,6 +32,7 @@ class HomePageViewModel @Inject constructor(
     private val attributesRepo: AttributesRepository,
     private val inventoryRepo: InventoryRepository,
     private val hotbarRepo: HotbarRepository,
+    private val soundService: SoundService,
     private val stocksRepo: StocksRepository
 ) : ViewModel() {
 
@@ -57,31 +63,52 @@ class HomePageViewModel @Inject constructor(
 
     suspend fun giveFood(item: Item, attributes: Attributes) {
         if (item.name == "") return
+        if (attributes.hunger == Constants.MAX_HUNGER) return
+
+        viewModelScope.launch {
+            playSound(R.raw.eat)
+        }
 
         attributesRepo.updateHunger(attributes.hunger + item.actionValue)
+        // avoid more than 100% hunger
+        if (attributesRepo.getAttributes().hunger > Constants.MAX_HUNGER) {
+            attributesRepo.updateHunger(Constants.MAX_HUNGER)
+        }
         giveGeneric(item, attributes)
-    }
-
-    suspend fun selectFood() {
-        println("Select food")
     }
 
     suspend fun giveToy(item: Item, attributes: Attributes) {
         if (item.name == "") return
+        if (attributes.happiness == Constants.MAX_HAPPINESS) return
+
+        viewModelScope.launch {
+            playSound(R.raw.toy)
+        }
 
         attributesRepo.updateHappiness(attributes.happiness + item.actionValue)
+        // avoid more than 100% happiness
+        if (attributesRepo.getAttributes().happiness > Constants.MAX_HAPPINESS) {
+            attributesRepo.updateHappiness(Constants.MAX_HAPPINESS)
+        }
         giveGeneric(item, attributes)
-    }
 
-    suspend fun selectToy() {
-        println("Select toy")
     }
 
     suspend fun giveItem(item: Item, attributes: Attributes) {
         if (item.name == "") return
 
         if (item.itemType == ItemType.MEDICINE) {
+            if (attributes.health == Constants.MAX_HEALTH) return
+
+            viewModelScope.launch {
+                playSound(R.raw.item)
+            }
+
             attributesRepo.updateHealth(attributes.health + item.actionValue)
+            // avoid more than 100% health
+            if (attributesRepo.getAttributes().health > Constants.MAX_HEALTH) {
+                attributesRepo.updateHealth(Constants.MAX_HEALTH)
+            }
             giveGeneric(item, attributes)
         }
     }
@@ -109,9 +136,7 @@ class HomePageViewModel @Inject constructor(
         setFigureState(attributes)
     }
 
-    suspend fun selectItem() {
-        println("Select item")
-    }
+    private fun playSound(@RawRes res: Int) = soundService.play(res)
 
     private suspend fun fetchStepData() {
         stepCounter.addSteps()
