@@ -41,6 +41,6 @@ sealed class Screen(
             navArgument("symbol") { type = NavType.StringType }
         )
     ) {
-        fun createRoute(symbol: String) = "investment/$symbol"
+        fun createRoute(symbol: String) = "investment/${symbol.replace("/", "&")}"
     }
 }

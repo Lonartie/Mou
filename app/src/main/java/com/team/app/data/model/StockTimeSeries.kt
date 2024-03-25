@@ -13,18 +13,12 @@ data class StockTimeSeries(
 data class Meta(
     @Json(name = "symbol") val symbol: String,
     @Json(name = "interval") val interval: String,
-    @Json(name = "currency") val currency: String,
-    @Json(name = "exchange_timezone") val exchangeTimezone: String,
-    @Json(name = "exchange") val exchange: String,
+    @Json(name = "currency") val currency: String? = null,
     @Json(name = "type") val type: String
 )
 
 @JsonClass(generateAdapter = true)
 data class StockValue(
     @Json(name = "datetime") val datetime: String,
-    @Json(name = "open") val open: String,
-    @Json(name = "high") val high: String,
-    @Json(name = "low") val low: String,
-    @Json(name = "close") val close: String,
-    @Json(name = "volume") val volume: String
+    @Json(name = "close") val close: String
 )

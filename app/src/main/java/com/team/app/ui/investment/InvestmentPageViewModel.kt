@@ -1,15 +1,22 @@
 package com.team.app.ui.investment
 
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.patrykandpatrick.vico.core.model.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.model.ExtraStore
 import com.patrykandpatrick.vico.core.model.lineSeries
+import com.team.app.data.model.Investment
 import com.team.app.data.model.StockTimeSeries
+import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.InvestmentsRepository
 import com.team.app.data.repositories.NetworkRepository
 import com.team.app.data.repositories.StocksRepository
+import com.team.app.utils.earningsFromSell
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -22,21 +29,34 @@ import kotlin.math.min
 @HiltViewModel
 class InvestmentPageViewModel @Inject constructor(
     private val stocksRepo: StocksRepository,
+    private val attributesRepo: AttributesRepository,
     private val investmentsRepo: InvestmentsRepository,
     private val networkRepo: NetworkRepository
 ) : ViewModel() {
 
     private var symbol = ""
+    private var type = ""
     private var stocksData = mapOf<StocksRepository.TimeSeriesCategory, StockTimeSeries>()
+    val currentPrice = mutableDoubleStateOf(0.0)
     val currentCategory = mutableStateOf(StocksRepository.TimeSeriesCategory.DAY)
     val modelProducer = CartesianChartModelProducer.build()
     val xAxisKey = ExtraStore.Key<List<String>>()
     val minMaxKey = ExtraStore.Key<Pair<Float, Float>>()
     val networkStatus = networkRepo.networkStatus
+    val coins = mutableIntStateOf(0)
+    val leverage = mutableIntStateOf(1)
+    val balance: Flow<Int> = attributesRepo.getAttributesFlow().map {it.coins}
+    var investmentsValue: Flow<Double>? = null
+    var investments: Flow<List<Investment>>? = null
+    val doneLoading = mutableStateOf(false)
 
     suspend fun init(symbol: String) {
+        doneLoading.value = false
         this.symbol = symbol
         if (networkStatus.value.not()) return
+        this.currentPrice.doubleValue = stocksRepo.getPrice(symbol)
+        this.investmentsValue = investmentsRepo.getBalanceFlow(symbol, currentPrice.doubleValue)
+        this.investments = investmentsRepo.getInvestmentsFlow(symbol)
         val stocksData = mapOf(
             StocksRepository.TimeSeriesCategory.DAY to
                     stocksRepo.getTimeSeries(
@@ -60,7 +80,54 @@ class InvestmentPageViewModel @Inject constructor(
                     )
         )
         this.stocksData = stocksData
+        this.type = stocksData[StocksRepository.TimeSeriesCategory.DAY]?.meta?.type ?: ""
         updateTimeSeries()
+        doneLoading.value = true
+    }
+
+    fun changeCoins(input: String) {
+        coins.intValue = input.toIntOrNull() ?: coins.intValue
+    }
+
+    fun changeLeverage(input: String) {
+        leverage.intValue = input.toIntOrNull() ?: leverage.intValue
+    }
+
+    suspend fun buy(): String {
+        var localCoins = coins.intValue
+        val currentAttributes = attributesRepo.getAttributes()
+        if (currentAttributes.coins < localCoins) {
+            return "Not enough coins"
+        }
+        if (localCoins <= 5) {
+            return "Enter amount of coins >= 5"
+        }
+        if (0 >= leverage.intValue || leverage.intValue > 100) {
+            return "Leverage must be between 1 and 100"
+        }
+        localCoins -= 5 // fee
+        attributesRepo.updateCoins(currentAttributes.coins - coins.intValue)
+        val investment = Investment(
+            id = 0,
+            symbol = symbol,
+            price = currentPrice.doubleValue,
+            amount = localCoins.toDouble(),
+            leverage = leverage.intValue.toDouble(),
+            date = System.currentTimeMillis(),
+            type = type
+        )
+        investmentsRepo.addInvestment(investment)
+        coins.intValue = 0
+        leverage.intValue = 0
+        return "Invested $localCoins coins in $symbol"
+    }
+
+    suspend fun onSell(inv: Investment): String {
+        val currentAttributes = attributesRepo.getAttributes()
+        val balanceAfter = inv.earningsFromSell(currentPrice.doubleValue)
+        attributesRepo.updateCoins(currentAttributes.coins + balanceAfter)
+        investmentsRepo.removeInvestment(inv)
+        return "Earned ${balanceAfter.toInt()} coins from selling $symbol"
     }
 
     suspend fun changeCategory(category: StocksRepository.TimeSeriesCategory) {

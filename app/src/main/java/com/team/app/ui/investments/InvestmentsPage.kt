@@ -11,10 +11,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,8 +27,8 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.team.app.data.model.Investment
+import com.team.app.data.model.CombinedInvestments
 import com.team.app.data.model.Symbol
 import kotlinx.coroutines.launch
 
@@ -45,27 +48,39 @@ fun InvestmentsPage(
     openInvestment: (String) -> Unit = {},
     viewModel: InvestmentsPageViewModel = hiltViewModel()
 ) {
-    val myInvestments = viewModel.myInvestments.collectAsState(emptyList()).value
+    val myInvestments = viewModel.myInvestments.value
     val searchText = viewModel.searchText.value
     val searchedStocks = viewModel.searchedStocks.value
     val networkStatus = viewModel.networkStatus.collectAsState(false).value
+    val prices = viewModel.prices.value
+    val doneLoading = viewModel.doneLoading.value
+    val coro = rememberCoroutineScope()
+
+    remember {
+        coro.launch {
+            viewModel.init()
+        }
+    }
 
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = { TopAppBar(onBackClick = goBack) }) { contentPadding ->
         if (networkStatus) {
             Content(
                 investments = myInvestments,
-                getPrice = viewModel::getPrice,
+                prices = prices,
                 searchText = searchText,
                 updateSearchText = viewModel::updateSearch,
                 onSearchTextChange = viewModel::searchStock,
                 searchedStocks = searchedStocks,
                 openInvestment = openInvestment,
-                contentPadding = contentPadding
+                contentPadding = contentPadding,
+                doneLoading = doneLoading,
             )
         } else {
             Text(
-                modifier = Modifier.fillMaxSize().padding(contentPadding),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
                 textAlign = TextAlign.Center,
                 text = "No network connection"
             )
@@ -100,13 +115,13 @@ fun TopAppBar(
 @Composable
 @Preview
 fun Content(
-    investments: List<Investment> = listOf(
-        Investment(
-            0, "AAPL", "Stock", 10.0,
-            100.0, 1.0, System.currentTimeMillis()
+    investments: List<CombinedInvestments> = listOf(
+        CombinedInvestments(
+            "AAPL", 100,
+            115, 0.15
         )
     ),
-    getPrice: suspend (String) -> Double = { _ -> 0.0 },
+    prices: List<Double> = listOf(1.0),
     searchText: String = "AAPL",
     updateSearchText: suspend (String) -> Unit = {},
     onSearchTextChange: suspend (String) -> Unit = {},
@@ -114,7 +129,8 @@ fun Content(
         Symbol("AAPL", "Apple Inc.", "Germany", "Common Stock", "USD")
     ),
     openInvestment: (String) -> Unit = {},
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    doneLoading: Boolean = false
 ) {
     val coro = rememberCoroutineScope()
 
@@ -144,10 +160,22 @@ fun Content(
             }
         }
 
-        LazyColumn {
-            items(investments) { investment ->
+        if (!doneLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+        ) {
+            for (i in investments.indices) {
+                val investment = investments[i]
+                val price = prices.getOrNull(i) ?: 0.0
                 InvestmentCard(
-                    openInvestment = openInvestment, getPrice = getPrice, investment = investment
+                    openInvestment = openInvestment, currentPrice = price, investment = investment
                 )
             }
         }
@@ -158,22 +186,14 @@ fun Content(
 @Composable
 @Preview
 fun InvestmentCard(
-    getPrice: suspend (String) -> Double = { _ -> 0.0 },
-    investment: Investment = Investment(
-        0, "AAPL", "Stock", 10.0,
-        100.0, 1.0, System.currentTimeMillis()
-    ),
+    currentPrice: Double = 1.0,
+    investment: CombinedInvestments =
+        CombinedInvestments(
+            "AAPL", 100,
+            115, 0.15
+        ),
     openInvestment: (String) -> Unit = {},
 ) {
-    var changedInPercent = 0.023
-    var currentAmount = investment.amount * (1 + changedInPercent)
-
-    LaunchedEffect(investment.symbol) {
-        val currentPrice = getPrice(investment.symbol)
-        changedInPercent = (currentPrice - investment.price) / investment.price
-        currentAmount = investment.amount * (1 + changedInPercent)
-    }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -187,13 +207,13 @@ fun InvestmentCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = investment.symbol)
-            Text(text = investment.amount.toString())
-            Text(text = "%.2f".format(currentAmount))
+            Text(text = investment.investedAmount.toString())
             Text(
-                text = "%.2f%%".format(changedInPercent * 100),
-                color = if (changedInPercent > 0) Color.Green
+                text = "%.2f%%".format(investment.percentage * 100),
+                color = if (investment.percentage >= 0) Color.Green
                 else Color.Red
             )
+            Text(text = investment.earnings.toString())
         }
     }
 }

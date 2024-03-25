@@ -20,7 +20,7 @@ class StocksRepository(
         return stocksService
             .searchSymbol(symbol, size).body()!!.data
             .filter {
-                it.currency == "USD"
+                it.currency == "USD" || it.symbol.endsWith("/USD")
             }
     }
 

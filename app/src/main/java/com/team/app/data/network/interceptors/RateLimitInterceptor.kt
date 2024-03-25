@@ -9,36 +9,42 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 class RateLimitInterceptor : Interceptor {
     companion object {
         private const val RATE_LIMIT_PER_MINUTE = 8
+        private var lastRequests = mutableListOf<Long>()
     }
 
-    private var lastRequests = mutableListOf<Long>()
 
     private fun clearOldRequests() {
         val currentTime = System.currentTimeMillis()
-        lastRequests = lastRequests.filter { currentTime - it < 60_000 }.toMutableList()
+        synchronized(lastRequests) {
+            lastRequests = lastRequests.filter { currentTime - it < 60_000 }.toMutableList()
+        }
     }
 
     private fun getDelay(): Long {
         clearOldRequests()
-        if (lastRequests.size < RATE_LIMIT_PER_MINUTE) {
-            return 0
+        synchronized(lastRequests) {
+            if (lastRequests.size < RATE_LIMIT_PER_MINUTE) {
+                return 0
+            }
+            return 60_000 - (System.currentTimeMillis() - lastRequests.first()) + 1_000
         }
-        return 60_000 - (System.currentTimeMillis() - lastRequests.first()) + 1
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val delay = getDelay()
 
         if (delay > 0) {
+            println("Rate limit exceeded, waiting $delay milliseconds")
             Thread.sleep(delay)
         }
-
-        lastRequests.add(System.currentTimeMillis())
 
         var response: Response? = null
         var responseCode: Int? = null
         try {
             response = chain.proceed(chain.request())
+            synchronized(lastRequests) {
+                lastRequests.add(System.currentTimeMillis())
+            }
             val body = response.body?.string()
             response = response.newBuilder()
                 .body(body?.toResponseBody("application/json; charset=utf-8".toMediaType())).build()
@@ -55,6 +61,9 @@ class RateLimitInterceptor : Interceptor {
             Thread.sleep(30_000)
             try {
                 response = chain.proceed(chain.request())
+                synchronized(lastRequests) {
+                    lastRequests.add(System.currentTimeMillis())
+                }
                 val body = response.body?.string()
                 response = response.newBuilder()
                     .body(body?.toResponseBody("application/json; charset=utf-8".toMediaType()))

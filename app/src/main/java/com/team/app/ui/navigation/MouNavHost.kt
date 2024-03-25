@@ -67,7 +67,7 @@ fun MouNavHost(
             val symbol: String = it.arguments?.getString("symbol") ?: ""
             InvestmentPage(
                 goBack = { navController.navigateUp() },
-                symbol = symbol
+                symbol = symbol.replace("&", "/")
             )
         }
     }
