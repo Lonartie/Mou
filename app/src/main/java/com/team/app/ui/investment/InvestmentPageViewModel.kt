@@ -1,6 +1,5 @@
 package com.team.app.ui.investment
 
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.patrykandpatrick.vico.core.model.CartesianChartModelProducer
@@ -26,15 +25,37 @@ class InvestmentPageViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var symbol = ""
+    private var stocksData = mapOf<StocksRepository.TimeSeriesCategory, StockTimeSeries>()
     val currentCategory = mutableStateOf(StocksRepository.TimeSeriesCategory.DAY)
     val modelProducer = CartesianChartModelProducer.build()
     val xAxisKey = ExtraStore.Key<List<String>>()
-    val minMaxKey = ExtraStore.Key<Pair<Float,Float>>()
-    val minY = mutableFloatStateOf(0f)
-    val maxY = mutableFloatStateOf(1f)
+    val minMaxKey = ExtraStore.Key<Pair<Float, Float>>()
 
     suspend fun init(symbol: String) {
         this.symbol = symbol
+        val stocksData = mapOf(
+            StocksRepository.TimeSeriesCategory.DAY to
+                    stocksRepo.getTimeSeries(
+                        symbol,
+                        StocksRepository.TimeSeriesCategory.DAY
+                    ),
+            StocksRepository.TimeSeriesCategory.WEEK to
+                    stocksRepo.getTimeSeries(
+                        symbol,
+                        StocksRepository.TimeSeriesCategory.WEEK
+                    ),
+            StocksRepository.TimeSeriesCategory.MONTH to
+                    stocksRepo.getTimeSeries(
+                        symbol,
+                        StocksRepository.TimeSeriesCategory.MONTH
+                    ),
+            StocksRepository.TimeSeriesCategory.YEAR to
+                    stocksRepo.getTimeSeries(
+                        symbol,
+                        StocksRepository.TimeSeriesCategory.YEAR
+                    )
+        )
+        this.stocksData = stocksData
         updateTimeSeries()
     }
 
@@ -44,7 +65,7 @@ class InvestmentPageViewModel @Inject constructor(
     }
 
     private suspend fun updateTimeSeries() {
-        val timeSeries = stocksRepo.getTimeSeries(symbol, currentCategory.value)
+        val timeSeries = stocksData[currentCategory.value] ?: return
         when (currentCategory.value) {
             StocksRepository.TimeSeriesCategory.DAY -> transformDay(timeSeries)
             StocksRepository.TimeSeriesCategory.WEEK -> transformWeek(timeSeries)

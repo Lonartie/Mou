@@ -7,8 +7,7 @@ import kotlinx.coroutines.flow.map
 import com.team.app.data.model.Investment as InvestmentModel
 
 class InvestmentsRepository(
-    private val investmentsDao: InvestmentsDao,
-    private val stocksRepo: StocksRepository
+    private val investmentsDao: InvestmentsDao
 ) {
     fun getInvestmentsFlow(): Flow<List<InvestmentModel>> {
         return investmentsDao
@@ -21,6 +20,7 @@ class InvestmentsRepository(
                         type = investment.type,
                         amount = investment.amount,
                         price = investment.price,
+                        leverage = investment.leverage,
                         date = investment.date
                     )
                 }
@@ -35,6 +35,7 @@ class InvestmentsRepository(
                 type = investment.type,
                 amount = investment.amount,
                 price = investment.price,
+                        leverage = investment.leverage,
                 date = investment.date
             )
         }
@@ -47,6 +48,7 @@ class InvestmentsRepository(
                 type = investment.type,
                 amount = investment.amount,
                 price = investment.price,
+                        leverage = investment.leverage,
                 date = investment.date
             )
         )
@@ -60,6 +62,7 @@ class InvestmentsRepository(
                 type = investment.type,
                 amount = investment.amount,
                 price = investment.price,
+                leverage = investment.leverage,
                 date = investment.date
             )
         )

@@ -161,12 +161,7 @@ class DataModule {
     }
 
     @Provides
-    fun providesInvestmentsRepository(investmentsDatabase: InvestmentsDatabase, stocksRepository: StocksRepository): InvestmentsRepository {
-        return InvestmentsRepository(investmentsDatabase.investmentsDao(), stocksRepository)
+    fun providesInvestmentsRepository(investmentsDatabase: InvestmentsDatabase): InvestmentsRepository {
+        return InvestmentsRepository(investmentsDatabase.investmentsDao())
     }
-
-//    @Provides
-//    fun providesWorkmanager(@ApplicationContext context: Context): WorkManager {
-//        return WorkManager.getInstance(context)
-//    }
 }

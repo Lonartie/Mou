@@ -10,5 +10,6 @@ data class Investment(
     val type: String,
     val amount: Double,
     val price: Double,
+    val leverage: Double,
     val date: Long,
 )

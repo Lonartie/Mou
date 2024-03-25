@@ -1,31 +1,72 @@
 package com.team.app.data.network.interceptors
 
+import com.squareup.moshi.Moshi
 import okhttp3.Interceptor
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Response
-import kotlin.math.max
+import okhttp3.ResponseBody.Companion.toResponseBody
 
 class RateLimitInterceptor : Interceptor {
     companion object {
         private const val RATE_LIMIT_PER_MINUTE = 8
     }
 
-    private var lastRequestTime = 0L
+    private var lastRequests = mutableListOf<Long>()
+
+    private fun clearOldRequests() {
+        val currentTime = System.currentTimeMillis()
+        lastRequests = lastRequests.filter { currentTime - it < 60_000 }.toMutableList()
+    }
 
     private fun getDelay(): Long {
-        val currentTime = System.currentTimeMillis()
-        val elapsed = currentTime - lastRequestTime
-        val delay = 60_000 / RATE_LIMIT_PER_MINUTE
-        return max(delay - elapsed, 0)
+        clearOldRequests()
+        if (lastRequests.size < RATE_LIMIT_PER_MINUTE) {
+            return 0
+        }
+        return 60_000 - (System.currentTimeMillis() - lastRequests.first()) + 1
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val delay = getDelay()
 
-//        if (delay > 0) {
-//            Thread.sleep(delay)
-//        }
+        if (delay > 0) {
+            Thread.sleep(delay)
+        }
 
-        lastRequestTime = System.currentTimeMillis()
-        return chain.proceed(chain.request())
+        lastRequests.add(System.currentTimeMillis())
+
+        var response: Response? = null
+        var responseCode: Int? = null
+        try {
+            response = chain.proceed(chain.request())
+            val body = response.body?.string()
+            response = response.newBuilder()
+                .body(body?.toResponseBody("application/json; charset=utf-8".toMediaType())).build()
+            Moshi.Builder().build().adapter(Map::class.java)
+                .fromJson(body ?: "")?.let {
+                    responseCode = (it["code"] as Double?)?.toInt()
+                }
+        } catch (_: Exception) {
+        }
+
+        while (response == null || response.code == 429 || responseCode == 429) {
+            response?.close()
+            println("Rate limit exceeded, waiting 30 seconds")
+            Thread.sleep(30_000)
+            try {
+                response = chain.proceed(chain.request())
+                val body = response.body?.string()
+                response = response.newBuilder()
+                    .body(body?.toResponseBody("application/json; charset=utf-8".toMediaType()))
+                    .build()
+                Moshi.Builder().build().adapter(Map::class.java)
+                    .fromJson(body ?: "")?.let {
+                        responseCode = (it["code"] as Double?)?.toInt()
+                    }
+            } catch (_: Exception) {
+            }
+        }
+
+        return response
     }
 }

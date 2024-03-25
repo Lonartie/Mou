@@ -92,7 +92,8 @@ fun TopAppBar(
 fun Content(
     investments: List<Investment> = listOf(
         Investment(
-            0, "AAPL", "Stock", 10.0, 100.0, System.currentTimeMillis()
+            0, "AAPL", "Stock", 10.0,
+            100.0, 1.0, System.currentTimeMillis()
         )
     ),
     getPrice: suspend (String) -> Double = { _ -> 0.0 },
@@ -149,7 +150,8 @@ fun Content(
 fun InvestmentCard(
     getPrice: suspend (String) -> Double = { _ -> 0.0 },
     investment: Investment = Investment(
-        0, "AAPL", "Stock", 10.0, 100.0, System.currentTimeMillis()
+        0, "AAPL", "Stock", 10.0,
+        100.0, 1.0, System.currentTimeMillis()
     ),
     openInvestment: (String) -> Unit = {},
 ) {
