@@ -1,8 +1,10 @@
 package com.team.app.ui.home
 
+import androidx.annotation.RawRes
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.team.app.R
 import com.team.app.data.model.Attributes
 import com.team.app.data.model.Hotbar
@@ -13,9 +15,11 @@ import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.SettingsRepository
 import com.team.app.data.repositories.StepCounterRepository
+import com.team.app.service.SoundService
 import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -25,7 +29,8 @@ class HomePageViewModel @Inject constructor(
     private val stepCounter: StepCounterRepository,
     private val attributesRepo: AttributesRepository,
     private val inventoryRepo: InventoryRepository,
-    private val hotbarRepo: HotbarRepository
+    private val hotbarRepo: HotbarRepository,
+    private val soundService: SoundService
 ) : ViewModel() {
 
     val figureState = mutableIntStateOf(R.drawable.figure_happy)
@@ -57,6 +62,10 @@ class HomePageViewModel @Inject constructor(
     suspend fun giveFood(item: Item, attributes: Attributes) {
         if (item.name == "") return
 
+        viewModelScope.launch {
+            playSound(R.raw.eat)
+        }
+
         attributesRepo.updateHunger(attributes.hunger + item.actionValue)
         giveGeneric(item, attributes)
     }
@@ -64,12 +73,20 @@ class HomePageViewModel @Inject constructor(
     suspend fun giveToy(item: Item, attributes: Attributes) {
         if (item.name == "") return
 
+        viewModelScope.launch {
+            playSound(R.raw.toy)
+        }
+
         attributesRepo.updateHappiness(attributes.happiness + item.actionValue)
         giveGeneric(item, attributes)
     }
 
     suspend fun giveItem(item: Item, attributes: Attributes) {
         if (item.name == "") return
+
+        viewModelScope.launch {
+            playSound(R.raw.item)
+        }
 
         if (item.itemType == ItemType.MEDICINE) {
             attributesRepo.updateHealth(attributes.health + item.actionValue)
@@ -99,6 +116,8 @@ class HomePageViewModel @Inject constructor(
         updateHotbar()
         setFigureState(attributes)
     }
+
+    private suspend fun playSound(@RawRes res: Int) = soundService.play(res)
 
     private suspend fun fetchStepData() {
         stepCounter.addSteps()

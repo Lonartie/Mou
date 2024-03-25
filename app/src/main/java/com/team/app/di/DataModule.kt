@@ -16,6 +16,7 @@ import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.ItemsRepository
 import com.team.app.service.NotificationService
+import com.team.app.service.SoundService
 import com.team.app.utils.dataStore
 import dagger.Module
 import dagger.Provides
@@ -68,6 +69,11 @@ class DataModule {
     @Provides
     fun providesNotificationService(@ApplicationContext context: Context): NotificationService {
         return NotificationService(context)
+    }
+
+    @Provides
+    fun provideSoundService(@ApplicationContext context: Context): SoundService {
+        return SoundService(context)
     }
 
 //    @Provides
