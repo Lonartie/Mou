@@ -5,7 +5,6 @@ import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import androidx.room.Room
-import com.lonartie.bookdiary.data.repositories.NetworkRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.team.app.data.database.AttributesDatabase
@@ -21,6 +20,7 @@ import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.InvestmentsRepository
 import com.team.app.data.repositories.ItemsRepository
+import com.team.app.data.repositories.NetworkRepository
 import com.team.app.data.repositories.SettingsRepository
 import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.data.repositories.StocksRepository

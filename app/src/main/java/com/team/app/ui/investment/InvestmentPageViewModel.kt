@@ -7,6 +7,7 @@ import com.patrykandpatrick.vico.core.model.ExtraStore
 import com.patrykandpatrick.vico.core.model.lineSeries
 import com.team.app.data.model.StockTimeSeries
 import com.team.app.data.repositories.InvestmentsRepository
+import com.team.app.data.repositories.NetworkRepository
 import com.team.app.data.repositories.StocksRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
@@ -22,6 +23,7 @@ import kotlin.math.min
 class InvestmentPageViewModel @Inject constructor(
     private val stocksRepo: StocksRepository,
     private val investmentsRepo: InvestmentsRepository,
+    private val networkRepo: NetworkRepository
 ) : ViewModel() {
 
     private var symbol = ""
@@ -30,9 +32,11 @@ class InvestmentPageViewModel @Inject constructor(
     val modelProducer = CartesianChartModelProducer.build()
     val xAxisKey = ExtraStore.Key<List<String>>()
     val minMaxKey = ExtraStore.Key<Pair<Float, Float>>()
+    val networkStatus = networkRepo.networkStatus
 
     suspend fun init(symbol: String) {
         this.symbol = symbol
+        if (networkStatus.value.not()) return
         val stocksData = mapOf(
             StocksRepository.TimeSeriesCategory.DAY to
                     stocksRepo.getTimeSeries(

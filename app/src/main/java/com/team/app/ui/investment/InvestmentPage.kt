@@ -21,10 +21,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,6 +63,7 @@ fun InvestmentPage(
     val modelProducer = viewModel.modelProducer
     val xAxisKey = viewModel.xAxisKey
     val minMaxKey = viewModel.minMaxKey
+    val networkStatus = viewModel.networkStatus.collectAsState(false).value
     val coro = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -69,14 +72,22 @@ fun InvestmentPage(
 
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = { TopAppBar(title = title, onBackClick = goBack) }) { contentPadding ->
-        Content(
-            currentCategory = currentCategory,
-            onCategoryChanged = { coro.launch { viewModel.changeCategory(it) } },
-            modelProducer = modelProducer,
-            contentPadding = contentPadding,
-            xAxisKey = xAxisKey,
-            minMaxKey = minMaxKey
-        )
+        if (networkStatus) {
+            Content(
+                currentCategory = currentCategory,
+                onCategoryChanged = { coro.launch { viewModel.changeCategory(it) } },
+                modelProducer = modelProducer,
+                contentPadding = contentPadding,
+                xAxisKey = xAxisKey,
+                minMaxKey = minMaxKey
+            )
+        } else {
+            Text(
+                modifier = Modifier.fillMaxSize().padding(contentPadding),
+                textAlign = TextAlign.Center,
+                text = "No network connection"
+            )
+        }
     }
 }
 

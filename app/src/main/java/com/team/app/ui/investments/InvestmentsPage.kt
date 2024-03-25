@@ -30,6 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,19 +48,28 @@ fun InvestmentsPage(
     val myInvestments = viewModel.myInvestments.collectAsState(emptyList()).value
     val searchText = viewModel.searchText.value
     val searchedStocks = viewModel.searchedStocks.value
+    val networkStatus = viewModel.networkStatus.collectAsState(false).value
 
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = { TopAppBar(onBackClick = goBack) }) { contentPadding ->
-        Content(
-            investments = myInvestments,
-            getPrice = viewModel::getPrice,
-            searchText = searchText,
-            updateSearchText = viewModel::updateSearch,
-            onSearchTextChange = viewModel::searchStock,
-            searchedStocks = searchedStocks,
-            openInvestment = openInvestment,
-            contentPadding = contentPadding
-        )
+        if (networkStatus) {
+            Content(
+                investments = myInvestments,
+                getPrice = viewModel::getPrice,
+                searchText = searchText,
+                updateSearchText = viewModel::updateSearch,
+                onSearchTextChange = viewModel::searchStock,
+                searchedStocks = searchedStocks,
+                openInvestment = openInvestment,
+                contentPadding = contentPadding
+            )
+        } else {
+            Text(
+                modifier = Modifier.fillMaxSize().padding(contentPadding),
+                textAlign = TextAlign.Center,
+                text = "No network connection"
+            )
+        }
     }
 }
 
