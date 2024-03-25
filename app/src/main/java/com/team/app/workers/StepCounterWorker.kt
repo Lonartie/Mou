@@ -21,17 +21,15 @@ class StepCounterWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         Log.d(TAG, "Starting worker...")
-        val steps = repository.loadStepsSinceTerminate()
-        notificationService.showNotification("walked steps $steps")
+        val walkedSteps = repository.getStepsSinceStart()
+        notificationService.showNotification("You walked  $walkedSteps steps")
 
-        val stepsSinceLastTermination = repository.steps() - repository.getMaxSteps()
-        if (stepsSinceLastTermination == 0L) {
+        val steps = repository.insertStepCount()
+        if (steps == 0) {
             Log.d(TAG, "No new steps since last termination")
             return Result.success()
         }
 
-        Log.d(TAG, "Received steps from step sensor: $stepsSinceLastTermination")
-        repository.storeSteps(stepsSinceLastTermination)
 
         Log.d(TAG, "Stopping worker...")
         return Result.success()

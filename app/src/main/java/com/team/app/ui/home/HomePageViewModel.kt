@@ -36,6 +36,7 @@ class HomePageViewModel @Inject constructor(
 
     val figureState = mutableIntStateOf(R.drawable.figure_happy)
     val attributes: Flow<Attributes> = attributesRepo.getAttributesFlow()
+    val earnedCoins = mutableIntStateOf(0)
 
     val hotbar = mutableStateOf(
         Hotbar(
@@ -53,7 +54,7 @@ class HomePageViewModel @Inject constructor(
         println("onStart")
         updateHotbar()
         setFigureState(attributesRepo.getAttributes())
-        fetchStepData() // currently this throws so subsequent functions are not called
+        changeCoins() // currently this throws so subsequent functions are not called
     }
 
     suspend fun openMoneyScreen() {
@@ -137,18 +138,15 @@ class HomePageViewModel @Inject constructor(
 
     private fun playSound(@RawRes res: Int) = soundService.play(res)
 
-    private suspend fun fetchStepData() {
-        stepCounter.addSteps()
+    private suspend fun changeCoins() {
+        stepCounter.insertFirstStartTimestamp()
 
-        val steps =
-            stepCounter.loadStepsSinceTerminate()
-        println("steps: $steps")
-        if (steps == 0L) return
-        // set stepCoins Value to steps
-        //stepCoins.intValue += steps.toInt()
+        val steps = stepCounter.getStepsSinceStart()
+        attributesRepo.updateCoins(attributesRepo.getAttributes().coins + steps.toInt())
+        stepCounter.insertStartTimestamp()
+        stepCounter.insertStepCount()
+        earnedCoins.intValue = steps.toInt()
 
-        // clear database
-        stepCounter.clearSteps()
     }
 
     private fun getMinimalAttributeValue(attributes: Attributes): Int {

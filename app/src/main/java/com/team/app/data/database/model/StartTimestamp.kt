@@ -4,9 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "steps")
-data class StepCountData (
+@Entity(tableName = "start_timestamp")
+data class StartTimestamp (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @ColumnInfo val steps: Long,
-    @ColumnInfo val lastLoginId: Int,
+    @ColumnInfo(name = "timestamp") val timestamp: Long,
+    @ColumnInfo val stepcount: Long,
 )

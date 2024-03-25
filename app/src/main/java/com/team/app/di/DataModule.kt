@@ -11,10 +11,12 @@ import com.team.app.data.database.StepsDao
 import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.data.database.AttributesDatabase
 import com.team.app.data.database.ItemsDatabase
+import com.team.app.data.database.StartTimestampDao
 import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.ItemsRepository
+import com.team.app.service.DialogService
 import com.team.app.service.NotificationService
 import com.team.app.service.SoundService
 import com.team.app.utils.dataStore
@@ -76,6 +78,11 @@ class DataModule {
         return SoundService(context)
     }
 
+    @Provides
+    fun provideDialogService(@ApplicationContext context: Context): DialogService {
+        return DialogService(context)
+    }
+
 //    @Provides
 //    fun providesNetworkRepository(@ApplicationContext context: Context): NetworkRepository {
 //        return NetworkRepository(context)
@@ -118,6 +125,9 @@ class DataModule {
     }
 
     @Provides
+    fun providesStartTimestampDao(database: StepCounterDatabase) = database.startTimestampDao()
+
+    @Provides
     fun providesStepCounterDao(database: StepCounterDatabase) = database.stepsDao()
     @Provides
     fun providesSettingsRepo(@ApplicationContext context: Context): SettingsRepository {
@@ -126,8 +136,8 @@ class DataModule {
     }
 
     @Provides
-    fun providesStepCounterRepository(sensorManager: SensorManager, stepsDao: StepsDao) : StepCounterRepository {
-        return StepCounterRepository(sensorManager, stepsDao)
+    fun providesStepCounterRepository(sensorManager: SensorManager, stepsDao: StepsDao, timestampDao: StartTimestampDao) : StepCounterRepository {
+        return StepCounterRepository(sensorManager, stepsDao, timestampDao)
     }
 
     @Provides

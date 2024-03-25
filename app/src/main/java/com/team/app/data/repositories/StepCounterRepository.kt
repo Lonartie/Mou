@@ -7,7 +7,9 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
+import com.team.app.data.database.StartTimestampDao
 import com.team.app.data.database.StepsDao
+import com.team.app.data.database.model.StartTimestamp
 import com.team.app.data.database.model.StepCountData
 import com.team.app.utils.Constants
 import kotlinx.coroutines.Dispatchers
@@ -17,9 +19,12 @@ import kotlinx.coroutines.withContext
 import java.time.Instant
 import javax.inject.Inject
 import kotlin.coroutines.resume
+import kotlin.math.max
+
 class StepCounterRepository @Inject constructor(
     val sensorManager: SensorManager,
     val stepsDao : StepsDao,
+    val timestampsDao : StartTimestampDao,
     ) {
     private val stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
     suspend fun steps() = suspendCancellableCoroutine { continuation ->
@@ -56,40 +61,51 @@ class StepCounterRepository @Inject constructor(
         }
     }
 
-    suspend fun storeSteps(steps: Long) = withContext(Dispatchers.IO) {
-        val stepCountData = StepCountData(
-            steps = steps,
-            createdAt = Instant.now().toString()
-        )
-        Log.d(Constants.STEP_COUNTER_TAG, "Storing steps: $stepCountData")
-        stepsDao.insertAll(stepCountData)
-    }
-
-    suspend fun loadStepsSinceTerminate() : Long = withContext(Dispatchers.IO) {
-        val data = stepsDao.getAll()
-        when {
-            data.isEmpty() -> 0
-            else -> data.sumOf { it.steps }
+    suspend fun insertFirstStartTimestamp() {
+        if (timestampsDao.getAll().isEmpty()) {
+            val timestamp = System.currentTimeMillis()
+            Log.d(Constants.STEP_COUNTER_TAG, "Adding first timestamp: $timestamp")
+            timestampsDao.insert(StartTimestamp(0, timestamp, 0))
         }
     }
 
-    suspend fun clearSteps() = withContext(Dispatchers.IO) {
-        stepsDao.deleteAll()
-    }
+    suspend fun insertStepCount() : Int {
+        val steps = steps()
+        val lastLogin = timestampsDao.getLast()
+        val lastSteps = stepsDao.getByLoginId(lastLogin.id)
 
-    suspend fun getMaxSteps() : Long = withContext(Dispatchers.IO) {
-        val data = stepsDao.getAll()
-        when {
-            data.isEmpty() -> 0
-            else -> data.maxOf { it.steps }
+        if (lastSteps.isEmpty()) {
+            val stepCountData = StepCountData(
+                steps = steps - lastLogin.stepcount,
+                lastLoginId = lastLogin.id)
+            Log.d(Constants.STEP_COUNTER_TAG, "Adding step count: $stepCountData")
+            stepsDao.insertAll(stepCountData)
+            return stepCountData.steps.toInt()
+        } else {
+            val maxSteps = lastSteps.maxOf { it.steps }
+            val difference = max(0, (steps - lastLogin.stepcount) - maxSteps.toInt())
+            val stepCountData = StepCountData(
+                steps = difference,
+                lastLoginId = lastLogin.id)
+            Log.d(Constants.STEP_COUNTER_TAG, "Adding step count: $stepCountData")
+            stepsDao.insertAll(stepCountData)
+            return stepCountData.steps.toInt()
         }
     }
 
-    suspend fun addSteps() {
-        val steps = steps() - getMaxSteps()
-        Log.d(Constants.STEP_COUNTER_TAG, "Adding steps: $steps")
-        if (steps == 0L) return
-        storeSteps(steps)
+    suspend fun insertStartTimestamp() {
+        val timestamp = System.currentTimeMillis()
+        Log.d(Constants.STEP_COUNTER_TAG, "Adding timestamp: $timestamp")
+        timestampsDao.insert(StartTimestamp(0, timestamp, steps()))
+    }
+
+    suspend fun getStepsSinceStart(): Long {
+        val lastLoginId = timestampsDao.getLast().id
+        val data = stepsDao.getByLoginId(lastLoginId)
+        if (data.isEmpty()) {
+            return 0
+        }
+        return data.sumOf { it.steps }
     }
 
 }
