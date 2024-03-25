@@ -16,6 +16,7 @@ import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.SettingsRepository
 import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.service.SoundService
+import com.team.app.utils.Constants
 import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -61,35 +62,52 @@ class HomePageViewModel @Inject constructor(
 
     suspend fun giveFood(item: Item, attributes: Attributes) {
         if (item.name == "") return
+        if (attributes.hunger == Constants.MAX_HUNGER) return
 
         viewModelScope.launch {
             playSound(R.raw.eat)
         }
 
         attributesRepo.updateHunger(attributes.hunger + item.actionValue)
+        // avoid more than 100% hunger
+        if (attributesRepo.getAttributes().hunger > Constants.MAX_HUNGER) {
+            attributesRepo.updateHunger(Constants.MAX_HUNGER)
+        }
         giveGeneric(item, attributes)
     }
 
     suspend fun giveToy(item: Item, attributes: Attributes) {
         if (item.name == "") return
+        if (attributes.happiness == Constants.MAX_HAPPINESS) return
 
         viewModelScope.launch {
             playSound(R.raw.toy)
         }
 
         attributesRepo.updateHappiness(attributes.happiness + item.actionValue)
+        // avoid more than 100% happiness
+        if (attributesRepo.getAttributes().happiness > Constants.MAX_HAPPINESS) {
+            attributesRepo.updateHappiness(Constants.MAX_HAPPINESS)
+        }
         giveGeneric(item, attributes)
+
     }
 
     suspend fun giveItem(item: Item, attributes: Attributes) {
         if (item.name == "") return
 
-        viewModelScope.launch {
-            playSound(R.raw.item)
-        }
-
         if (item.itemType == ItemType.MEDICINE) {
+            if (attributes.health == Constants.MAX_HEALTH) return
+
+            viewModelScope.launch {
+                playSound(R.raw.item)
+            }
+
             attributesRepo.updateHealth(attributes.health + item.actionValue)
+            // avoid more than 100% health
+            if (attributesRepo.getAttributes().health > Constants.MAX_HEALTH) {
+                attributesRepo.updateHealth(Constants.MAX_HEALTH)
+            }
             giveGeneric(item, attributes)
         }
     }
@@ -117,7 +135,7 @@ class HomePageViewModel @Inject constructor(
         setFigureState(attributes)
     }
 
-    private suspend fun playSound(@RawRes res: Int) = soundService.play(res)
+    private fun playSound(@RawRes res: Int) = soundService.play(res)
 
     private suspend fun fetchStepData() {
         stepCounter.addSteps()

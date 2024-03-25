@@ -78,5 +78,5 @@ class ShopViewModel @Inject constructor(
         }
     }
 
-    private suspend fun playSound(@RawRes res: Int) = soundService.play(res)
+    private fun playSound(@RawRes res: Int) = soundService.play(res)
 }
