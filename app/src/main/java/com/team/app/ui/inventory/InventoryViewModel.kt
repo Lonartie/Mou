@@ -18,7 +18,7 @@ class InventoryViewModel @Inject constructor(
 ) : ViewModel() {
     fun getItemsWithTypes(types: List<ItemType>) = runBlocking {
         invRepo.getItems().filter {
-            types.contains(it.item.itemType)
+            types.contains(it.item.itemType) && it.item.name != ""
         }
     }
 
