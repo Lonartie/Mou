@@ -31,4 +31,6 @@ sealed class Screen(
     ) {
         fun createRoute(symbol: String) = "investment/${symbol.replace("/", "&")}"
     }
+
+    data object TicTacToe : Screen(route = "tic_tac_toe")
 }

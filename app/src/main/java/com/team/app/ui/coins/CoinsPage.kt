@@ -35,12 +35,13 @@ fun CoinsPage(
     goBack: () -> Unit = {},
     openStepOverview: () -> Unit = {},
     openInvestments: () -> Unit = {},
+    openTicTacToe: () -> Unit = {},
     viewModel: CoinsPageViewModel = hiltViewModel()
 ) {
     Scaffold(
         topBar = { TopAppBar(onBackClick = goBack) }
     ) { contentPadding ->
-        Content(openStepOverview, openInvestments, contentPadding)
+        Content(openStepOverview, openInvestments, openTicTacToe, contentPadding)
     }
 }
 
@@ -79,6 +80,7 @@ fun TopAppBar(
 fun Content(
     openWalking: () -> Unit = {},
     openInvestments: () -> Unit = {},
+    openTicTacToe: () -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     Column(
@@ -88,7 +90,7 @@ fun Content(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Text(
-            "You earn coins by walking or by investing in stocks. " +
+            "You earn coins by walking, by investing in stocks or by playing Tic Tac Toe. " +
                     "You can use coins to buy items in the shop."
         )
 
@@ -123,6 +125,23 @@ fun Content(
                     .wrapContentHeight(align = Alignment.CenterVertically),
                 textAlign = TextAlign.Center,
                 text = "Investments",
+                fontSize = 20.sp
+            )
+        }
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            onClick = openTicTacToe,
+
+            ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentHeight(align = Alignment.CenterVertically),
+                textAlign = TextAlign.Center,
+                text = "Tic Tac Toe",
                 fontSize = 20.sp
             )
         }

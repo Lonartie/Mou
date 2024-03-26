@@ -48,9 +48,8 @@ import com.team.app.utils.Constants
 import com.team.app.utils.capitalize
 
 @Composable
-@Preview
+//@Preview
 fun ShopPage(
-    modifier: Modifier = Modifier,
     goBack: () -> Unit,
     viewModel: ShopPageViewModel = hiltViewModel()
 ) {

@@ -12,6 +12,7 @@ import com.team.app.ui.investment.InvestmentPage
 import com.team.app.ui.investments.InvestmentsPage
 import com.team.app.ui.shop.ShopPage
 import com.team.app.ui.stepsOverview.StepsOverviewPage
+import com.team.app.ui.tic_tac_toe.TicTacToeScreen
 
 @Composable
 fun MouNavHost(
@@ -60,6 +61,7 @@ fun MouNavHost(
                 goBack = { navController.navigateUp() },
                 openInvestments = { navController.navigate(Screen.Investments.route) },
                 openStepOverview = { navController.navigate(Screen.StepsOverview.route) }
+                openTicTacToe = { navController.navigate(Screen.TicTacToe.route) }
             )
         }
         composable(route = Screen.StepsOverview.route) {
@@ -85,6 +87,11 @@ fun MouNavHost(
             InvestmentPage(
                 goBack = { navController.navigateUp() },
                 symbol = symbol.replace("&", "/")
+            )
+        }
+        composable(route = Screen.TicTacToe.route) {
+            TicTacToeScreen(
+                goBack = { navController.navigateUp() }
             )
         }
     }
