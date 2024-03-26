@@ -35,7 +35,7 @@ class InvestmentPageViewModel @Inject constructor(
 
     private var symbol = ""
     private var type = ""
-    private var stocksData = mapOf<StocksRepository.TimeSeriesCategory, StockTimeSeries>()
+    private var stocksData = mapOf<StocksRepository.TimeSeriesCategory, StockTimeSeries?>()
     val currentPrice = mutableDoubleStateOf(0.0)
     val currentCategory = mutableStateOf(StocksRepository.TimeSeriesCategory.DAY)
     val modelProducer = CartesianChartModelProducer.build()
@@ -55,34 +55,22 @@ class InvestmentPageViewModel @Inject constructor(
         this.investmentsValue = investmentsRepo.getBalanceFlow(symbol, currentPrice.doubleValue)
         this.investments = investmentsRepo.getInvestmentsFlow(symbol)
         val stocksData = mapOf(
-            StocksRepository.TimeSeriesCategory.DAY to
-                    stocksRepo.getTimeSeries(
-                        symbol,
-                        StocksRepository.TimeSeriesCategory.DAY
-                    ),
-            StocksRepository.TimeSeriesCategory.WEEK to
-                    stocksRepo.getTimeSeries(
-                        symbol,
-                        StocksRepository.TimeSeriesCategory.WEEK
-                    ),
-            StocksRepository.TimeSeriesCategory.MONTH to
-                    stocksRepo.getTimeSeries(
-                        symbol,
-                        StocksRepository.TimeSeriesCategory.MONTH
-                    ),
-            StocksRepository.TimeSeriesCategory.YEAR to
-                    stocksRepo.getTimeSeries(
-                        symbol,
-                        StocksRepository.TimeSeriesCategory.YEAR
-                    )
+            StocksRepository.TimeSeriesCategory.DAY to null,
+            StocksRepository.TimeSeriesCategory.WEEK to null,
+            StocksRepository.TimeSeriesCategory.MONTH to null,
+            StocksRepository.TimeSeriesCategory.YEAR to null
         )
+
         this.stocksData = stocksData
-        this.type = stocksData[StocksRepository.TimeSeriesCategory.DAY]?.meta?.type ?: ""
         updateTimeSeries()
         doneLoading.value = true
     }
 
     suspend fun buy(coinsStr: String, leverageStr: String): String {
+        if (type.isEmpty()) {
+            return "Please wait for data to load"
+        }
+
         var coins = coinsStr.toIntOrNull() ?: 0
         val leverage = leverageStr.toIntOrNull() ?: 0
 
@@ -116,7 +104,7 @@ class InvestmentPageViewModel @Inject constructor(
         val balanceAfter = inv.earningsFromSell(currentPrice.doubleValue)
         attributesRepo.updateCoins(currentAttributes.coins + balanceAfter)
         investmentsRepo.removeInvestment(inv)
-        return "Earned ${balanceAfter.toInt()} coins from selling $symbol"
+        return "Earned $balanceAfter coins from selling $symbol"
     }
 
     suspend fun changeCategory(category: StocksRepository.TimeSeriesCategory) {
@@ -125,7 +113,15 @@ class InvestmentPageViewModel @Inject constructor(
     }
 
     private suspend fun updateTimeSeries() {
-        val timeSeries = stocksData[currentCategory.value] ?: return
+        if (stocksData[currentCategory.value] == null) {
+            doneLoading.value = false
+            val data = stocksRepo.getTimeSeries(symbol, currentCategory.value)
+            doneLoading.value = true
+            stocksData = stocksData + mapOf(currentCategory.value to data)
+        }
+
+        val timeSeries =  stocksData[currentCategory.value] ?: return
+
         when (currentCategory.value) {
             StocksRepository.TimeSeriesCategory.DAY -> transformDay(timeSeries)
             StocksRepository.TimeSeriesCategory.WEEK -> transformWeek(timeSeries)
