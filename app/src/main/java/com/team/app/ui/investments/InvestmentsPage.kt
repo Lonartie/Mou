@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.team.app.data.model.CombinedInvestments
 import com.team.app.data.model.Symbol
-import com.team.app.ui.components.TopAppBar
+import com.team.app.ui.common.TopAppBar
 import kotlinx.coroutines.launch
 
 @Composable

@@ -1,4 +1,4 @@
-package com.team.app.ui.components
+package com.team.app.ui.common
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack

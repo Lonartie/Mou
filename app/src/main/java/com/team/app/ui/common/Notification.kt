@@ -1,4 +1,4 @@
-package com.team.app.service
+package com.team.app.ui.common
 
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,7 +8,7 @@ import androidx.core.app.NotificationCompat
 import com.team.app.MainActivity
 import com.team.app.R
 
-class NotificationService(
+class Notification(
     private val context: Context,
 ) {
     private val notificationManager = context

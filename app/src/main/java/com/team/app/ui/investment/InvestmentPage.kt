@@ -44,8 +44,8 @@ import com.patrykandpatrick.vico.core.model.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.model.ExtraStore
 import com.team.app.data.model.Investment
 import com.team.app.data.repositories.StocksRepository
-import com.team.app.ui.components.Graph
-import com.team.app.ui.components.TopAppBar
+import com.team.app.ui.common.Graph
+import com.team.app.ui.common.TopAppBar
 import com.team.app.utils.earningsFromSell
 import kotlinx.coroutines.launch
 import java.util.Locale

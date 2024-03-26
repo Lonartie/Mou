@@ -40,14 +40,14 @@ class StepsOverviewPageViewModel @Inject constructor(
         val day = 24L * 60 * 60 * 1000
 
         val groupBy = when (currentCategory.value) {
-            "Day" -> hour
+            "Day" -> 15L * 60 * 1000
             "Week" -> day
             "Month" -> day
             else -> 0
         }
 
         val valueCount = when(currentCategory.value) {
-            "Day" -> 24
+            "Day" -> 8
             "Week" -> 7
             "Month" -> 30
             else -> 0
