@@ -16,11 +16,10 @@ import javax.inject.Inject
 class InvestmentsPageViewModel @Inject constructor(
     private val stocksRepo: StocksRepository,
     private val investmentsRepo: InvestmentsRepository,
-    private val networkRepo: NetworkRepository
+    networkRepo: NetworkRepository
 ) : ViewModel() {
 
     val myInvestments = mutableStateOf(emptyList<CombinedInvestments>())
-    val searchText = mutableStateOf("")
     val searchedStocks = mutableStateOf(emptyList<Symbol>())
     val networkStatus = networkRepo.networkStatus
     val prices = mutableStateOf(emptyList<Double>())
@@ -62,7 +61,6 @@ class InvestmentsPageViewModel @Inject constructor(
     }
 
     suspend fun searchStock(query: String) {
-        searchText.value = query
         if (query.isEmpty()) {
             searchedStocks.value = emptyList()
             return
@@ -70,9 +68,5 @@ class InvestmentsPageViewModel @Inject constructor(
 
         searchedStocks.value = stocksRepo.searchSymbol(query)
             .distinctBy { listOf(it.symbol, it.instrumentName, it.instrumentType) }
-    }
-
-    suspend fun updateSearch(query: String) {
-        searchText.value = query
     }
 }

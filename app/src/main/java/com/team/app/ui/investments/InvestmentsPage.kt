@@ -21,6 +21,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -43,7 +44,6 @@ fun InvestmentsPage(
     viewModel: InvestmentsPageViewModel = hiltViewModel()
 ) {
     val myInvestments = viewModel.myInvestments.value
-    val searchText = viewModel.searchText.value
     val searchedStocks = viewModel.searchedStocks.value
     val networkStatus = viewModel.networkStatus.collectAsState(false).value
     val prices = viewModel.prices.value
@@ -62,8 +62,6 @@ fun InvestmentsPage(
             Content(
                 investments = myInvestments,
                 prices = prices,
-                searchText = searchText,
-                updateSearchText = viewModel::updateSearch,
                 onSearchTextChange = viewModel::searchStock,
                 searchedStocks = searchedStocks,
                 openInvestment = openInvestment,
@@ -93,8 +91,6 @@ fun Content(
         )
     ),
     prices: List<Double> = listOf(1.0),
-    searchText: String = "AAPL",
-    updateSearchText: suspend (String) -> Unit = {},
     onSearchTextChange: suspend (String) -> Unit = {},
     searchedStocks: List<Symbol> = listOf(
         Symbol("AAPL", "Apple Inc.", "Germany", "Common Stock", "USD")
@@ -104,6 +100,8 @@ fun Content(
     doneLoading: Boolean = false
 ) {
     val coro = rememberCoroutineScope()
+    val queryText = remember { mutableStateOf("") }
+    val active = remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -112,11 +110,11 @@ fun Content(
     ) {
         // Search bar
         SearchBar(
-            query = searchText,
-            onQueryChange = { text -> coro.launch { updateSearchText(text) } },
+            query = queryText.value,
+            onQueryChange = { queryText.value = it },
             onSearch = { text -> coro.launch { onSearchTextChange(text) } },
-            active = searchText.isNotEmpty(),
-            onActiveChange = { if (!it) coro.launch { updateSearchText("") } },
+            active = active.value,
+            onActiveChange = { active.value = it },
             placeholder = { Text("Search") },
             modifier = Modifier
                 .fillMaxWidth()

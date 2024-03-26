@@ -1,7 +1,6 @@
 package com.team.app.ui.investment
 
 import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.patrykandpatrick.vico.core.model.CartesianChartModelProducer
@@ -31,7 +30,7 @@ class InvestmentPageViewModel @Inject constructor(
     private val stocksRepo: StocksRepository,
     private val attributesRepo: AttributesRepository,
     private val investmentsRepo: InvestmentsRepository,
-    private val networkRepo: NetworkRepository
+    networkRepo: NetworkRepository
 ) : ViewModel() {
 
     private var symbol = ""
@@ -43,8 +42,6 @@ class InvestmentPageViewModel @Inject constructor(
     val xAxisKey = ExtraStore.Key<List<String>>()
     val minMaxKey = ExtraStore.Key<Pair<Float, Float>>()
     val networkStatus = networkRepo.networkStatus
-    val coins = mutableIntStateOf(0)
-    val leverage = mutableIntStateOf(1)
     val balance: Flow<Int> = attributesRepo.getAttributesFlow().map {it.coins}
     var investmentsValue: Flow<Double>? = null
     var investments: Flow<List<Investment>>? = null
@@ -85,41 +82,33 @@ class InvestmentPageViewModel @Inject constructor(
         doneLoading.value = true
     }
 
-    fun changeCoins(input: String) {
-        coins.intValue = input.toIntOrNull() ?: coins.intValue
-    }
+    suspend fun buy(coinsStr: String, leverageStr: String): String {
+        var coins = coinsStr.toIntOrNull() ?: 0
+        val leverage = leverageStr.toIntOrNull() ?: 0
 
-    fun changeLeverage(input: String) {
-        leverage.intValue = input.toIntOrNull() ?: leverage.intValue
-    }
-
-    suspend fun buy(): String {
-        var localCoins = coins.intValue
         val currentAttributes = attributesRepo.getAttributes()
-        if (currentAttributes.coins < localCoins) {
+        if (currentAttributes.coins < coins) {
             return "Not enough coins"
         }
-        if (localCoins <= 5) {
+        if (coins <= 5) {
             return "Enter amount of coins >= 5"
         }
-        if (0 >= leverage.intValue || leverage.intValue > 100) {
+        if (0 >= leverage || leverage > 100) {
             return "Leverage must be between 1 and 100"
         }
-        localCoins -= 5 // fee
-        attributesRepo.updateCoins(currentAttributes.coins - coins.intValue)
+        coins -= 5 // fee
+        attributesRepo.updateCoins(currentAttributes.coins - coins)
         val investment = Investment(
             id = 0,
             symbol = symbol,
             price = currentPrice.doubleValue,
-            amount = localCoins.toDouble(),
-            leverage = leverage.intValue.toDouble(),
+            amount = coins.toDouble(),
+            leverage = leverage.toDouble(),
             date = System.currentTimeMillis(),
             type = type
         )
         investmentsRepo.addInvestment(investment)
-        coins.intValue = 0
-        leverage.intValue = 0
-        return "Invested $localCoins coins in $symbol"
+        return "Invested $coins coins in $symbol"
     }
 
     suspend fun onSell(inv: Investment): String {
