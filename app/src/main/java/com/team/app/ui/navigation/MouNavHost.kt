@@ -11,6 +11,7 @@ import com.team.app.ui.inventory.InventoryScreen
 import com.team.app.ui.investment.InvestmentPage
 import com.team.app.ui.investments.InvestmentsPage
 import com.team.app.ui.shop.ShopPage
+import com.team.app.ui.stepsOverview.StepsOverviewPage
 
 @Composable
 fun MouNavHost(
@@ -57,8 +58,14 @@ fun MouNavHost(
         composable(route = Screen.Coins.route) {
             CoinsPage(
                 goBack = { navController.navigateUp() },
-                openInvestments = { navController.navigate(Screen.Investments.route) }
+                openInvestments = { navController.navigate(Screen.Investments.route) },
+                openStepOverview = { navController.navigate(Screen.StepsOverview.route) }
             )
+        }
+        composable(route = Screen.StepsOverview.route) {
+             StepsOverviewPage(
+                 goBack = { navController.navigateUp() }
+             )
         }
         composable(route = Screen.Investments.route) {
             InvestmentsPage(

@@ -22,6 +22,7 @@ sealed class Screen(
 
     data object Investments : Screen(route = "investments")
 
+    data object StepsOverview : Screen(route = "steps-overview")
     data object Investment : Screen(
         route = "investment/{symbol}",
         navArguments = listOf(

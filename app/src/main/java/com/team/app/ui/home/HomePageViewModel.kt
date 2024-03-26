@@ -53,10 +53,6 @@ class HomePageViewModel @Inject constructor(
     }
 
     suspend fun onStart() {
-        // print secret api key provided by buildConfigField
-
-        val appleSymbols = stocksRepo.searchSymbol("nvidia", 25)
-        println("nvidia symbols: $appleSymbols")
         updateHotbar()
         setFigureState(attributesRepo.getAttributes())
         changeCoins()

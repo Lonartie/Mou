@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.team.app.data.database.model.StepCountData
-import retrofit2.http.DELETE
 
 @Dao
 interface StepsDao {
@@ -27,4 +26,7 @@ interface StepsDao {
 
     @Query("DELETE FROM steps")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM steps WHERE timestamp >= :timestamp")
+    suspend fun getStepCountDataSince(timestamp: Long): List<StepCountData>
 }

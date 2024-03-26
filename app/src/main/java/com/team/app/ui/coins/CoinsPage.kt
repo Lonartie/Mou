@@ -33,13 +33,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @Preview
 fun CoinsPage(
     goBack: () -> Unit = {},
+    openStepOverview: () -> Unit = {},
     openInvestments: () -> Unit = {},
     viewModel: CoinsPageViewModel = hiltViewModel()
 ) {
     Scaffold(
         topBar = { TopAppBar(onBackClick = goBack) }
     ) { contentPadding ->
-        Content({}, openInvestments, contentPadding)
+        Content(openStepOverview, openInvestments, contentPadding)
     }
 }
 

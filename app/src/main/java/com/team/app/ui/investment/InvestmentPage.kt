@@ -58,6 +58,7 @@ import com.patrykandpatrick.vico.core.model.ExtraStore
 import com.patrykandpatrick.vico.sample.showcase.rememberMarker
 import com.team.app.data.model.Investment
 import com.team.app.data.repositories.StocksRepository
+import com.team.app.ui.components.Graph
 import com.team.app.utils.earningsFromSell
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -300,56 +301,6 @@ fun Content(
             }
         }
     }
-}
-
-@Composable
-@Preview
-fun Graph(
-    modelProducer: CartesianChartModelProducer = CartesianChartModelProducer.build(),
-    xAxisKey: ExtraStore.Key<List<String>> = ExtraStore.Key(),
-    minMaxKey: ExtraStore.Key<Pair<Float, Float>> = ExtraStore.Key(),
-) {
-
-    val minMaxOverrider = object : AxisValueOverrider {
-        override fun getMinY(minX: Float, maxX: Float, extraStore: ExtraStore): Float {
-            return AxisValueOverrider.fixed(
-                minY = extraStore[minMaxKey].first,
-                maxY = extraStore[minMaxKey].second
-            ).getMinY(minX, maxX, extraStore)
-        }
-
-        override fun getMaxY(minY: Float, maxY: Float, extraStore: ExtraStore): Float {
-            return AxisValueOverrider.fixed(
-                minY = extraStore[minMaxKey].first,
-                maxY = extraStore[minMaxKey].second
-            ).getMaxY(minY, maxY, extraStore)
-        }
-
-    }
-
-    val lineLayer = rememberLineCartesianLayer(
-        axisValueOverrider = minMaxOverrider
-    )
-    val chart = rememberCartesianChart(
-        lineLayer,
-        startAxis = rememberStartAxis(
-            itemPlacer = remember {
-                AxisItemPlacer.Vertical.count(count = { 4 })
-            }
-        ),
-        bottomAxis = rememberBottomAxis(
-            valueFormatter = { x, chartValues, _ ->
-                chartValues.model.extraStore[xAxisKey][x.toInt()]
-            },
-        )
-    )
-    val marker = rememberMarker()
-
-    CartesianChartHost(
-        chart = chart,
-        modelProducer = modelProducer,
-        marker = marker,
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

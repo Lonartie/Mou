@@ -1,7 +1,6 @@
 package com.team.app.data.repositories
 
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -13,14 +12,11 @@ import com.team.app.data.database.model.StartTimestamp
 import com.team.app.data.database.model.StepCountData
 import com.team.app.service.StepCounterService
 import com.team.app.utils.Constants
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
-import java.time.Instant
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.math.max
+import com.team.app.data.model.StepCountData as StepCountDataModel
 
 class StepCounterRepository @Inject constructor(
     val stepCounterService: StepCounterService,
@@ -44,7 +40,8 @@ class StepCounterRepository @Inject constructor(
         if (lastSteps.isEmpty()) {
             val stepCountData = StepCountData(
                 steps = steps - lastLogin.stepcount,
-                lastLoginId = lastLogin.id)
+                lastLoginId = lastLogin.id
+            )
             Log.d(Constants.STEP_COUNTER_TAG, "Adding step count: $stepCountData")
             stepsDao.insertAll(stepCountData)
             return stepCountData.steps.toInt()
@@ -53,7 +50,8 @@ class StepCounterRepository @Inject constructor(
             val difference = max(0, (steps - lastLogin.stepcount) - maxSteps.toInt())
             val stepCountData = StepCountData(
                 steps = difference,
-                lastLoginId = lastLogin.id)
+                lastLoginId = lastLogin.id
+            )
             Log.d(Constants.STEP_COUNTER_TAG, "Adding step count: $stepCountData")
             stepsDao.insertAll(stepCountData)
             return stepCountData.steps.toInt()
@@ -73,6 +71,12 @@ class StepCounterRepository @Inject constructor(
             return 0
         }
         return data.sumOf { it.steps }
+    }
+
+    suspend fun getStepCountDataSince(beginTime: Long): List<StepCountDataModel> {
+        return stepsDao
+            .getStepCountDataSince(beginTime)
+            .map { StepCountDataModel(it.steps, it.timestamp) }
     }
 
 }
