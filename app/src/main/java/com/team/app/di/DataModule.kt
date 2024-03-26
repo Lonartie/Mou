@@ -25,8 +25,8 @@ import com.team.app.data.repositories.NetworkRepository
 import com.team.app.data.repositories.SettingsRepository
 import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.data.repositories.StocksRepository
-import com.team.app.service.DialogService
-import com.team.app.service.NotificationService
+import com.team.app.ui.common.Dialog
+import com.team.app.ui.common.Notification
 import com.team.app.service.SoundService
 import com.team.app.service.StepCounterService
 import com.team.app.utils.Constants.Companion.STOCKS_API_BASE
@@ -87,8 +87,8 @@ class DataModule {
     }
 
     @Provides
-    fun providesNotificationService(@ApplicationContext context: Context): NotificationService {
-        return NotificationService(context)
+    fun providesNotificationService(@ApplicationContext context: Context): Notification {
+        return Notification(context)
     }
 
     @Provides
@@ -130,8 +130,8 @@ class DataModule {
     }
 
     @Provides
-    fun provideDialogService(@ApplicationContext context: Context): DialogService {
-        return DialogService(context)
+    fun provideDialogService(@ApplicationContext context: Context): Dialog {
+        return Dialog(context)
     }
 
     // provide StepCounterDao

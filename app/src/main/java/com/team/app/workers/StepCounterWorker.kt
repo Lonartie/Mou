@@ -7,7 +7,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.StepCounterRepository
-import com.team.app.service.NotificationService
+import com.team.app.ui.common.Notification
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
@@ -17,7 +17,7 @@ class StepCounterWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val repository: StepCounterRepository,
-    private val notificationService: NotificationService,
+    private val notificationService: Notification,
     private val attributesRepository: AttributesRepository
 ) : CoroutineWorker(appContext, workerParams) {
     companion object {

@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patrykandpatrick.vico.core.model.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.model.ExtraStore
-import com.team.app.ui.components.Graph
+import com.team.app.ui.common.Graph
 import kotlinx.coroutines.launch
 
 @Composable

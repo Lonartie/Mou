@@ -65,7 +65,7 @@ import com.team.app.data.model.Hotbar
 import com.team.app.data.model.InventoryItem
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
-import com.team.app.service.DialogService
+import com.team.app.ui.common.Dialog
 import com.team.app.utils.Constants
 import com.team.app.utils.toFormattedCoins
 import kotlinx.coroutines.launch
@@ -83,7 +83,7 @@ fun HomePage(
         initial = Attributes(0, 0, 0, 0)
     ).value
     val hotbar = viewModel.hotbar.value
-    val diagService = DialogService(LocalContext.current)
+    val diagService = Dialog(LocalContext.current)
 
     LaunchedEffect(Unit) {
         viewModel.onStart()

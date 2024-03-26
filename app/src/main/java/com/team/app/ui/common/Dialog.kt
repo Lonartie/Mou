@@ -1,9 +1,9 @@
-package com.team.app.service
+package com.team.app.ui.common
 
 import android.app.AlertDialog
 import android.content.Context
 
-class DialogService(private val context: Context) {
+class Dialog(private val context: Context) {
     fun showAlertDialog(
         title: String,
         message: String,

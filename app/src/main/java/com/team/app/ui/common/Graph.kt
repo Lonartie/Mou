@@ -1,4 +1,4 @@
-package com.team.app.ui.components
+package com.team.app.ui.common
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember

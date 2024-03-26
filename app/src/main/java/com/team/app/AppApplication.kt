@@ -10,12 +10,11 @@ import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.team.app.workers.StepCounterWorker
-import com.team.app.service.NotificationService
-import com.team.app.service.NotificationService.Companion.NOTIFICATION_CHANNEL_ID
+import com.team.app.ui.common.Notification.Companion.NOTIFICATION_CHANNEL_ID
+import com.team.app.workers.InvestmentWorker
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -29,11 +28,28 @@ class AppApplication : Application(), Configuration.Provider {
     override fun onCreate() {
 
         super.onCreate()
-        val myWork = PeriodicWorkRequestBuilder<StepCounterWorker>(
+        val stepCounterWorker = PeriodicWorkRequestBuilder<StepCounterWorker>(
             15, TimeUnit.MINUTES).build()
-        WorkManager.getInstance(this).
-                enqueueUniquePeriodicWork("StepCounterWorker",
-                    ExistingPeriodicWorkPolicy.UPDATE, myWork)
+        val attributeWorker = PeriodicWorkRequestBuilder<StepCounterWorker>(
+            1, TimeUnit.HOURS).build()
+        val investmentWorker = PeriodicWorkRequestBuilder<InvestmentWorker>(
+            15, TimeUnit.MINUTES).build()
+
+        WorkManager
+            .getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "StepCounterWorker",
+                ExistingPeriodicWorkPolicy.UPDATE, stepCounterWorker
+            )
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "AttributeWorker",
+                ExistingPeriodicWorkPolicy.UPDATE, attributeWorker
+            )
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "InvestmentWorker",
+                ExistingPeriodicWorkPolicy.UPDATE, investmentWorker)
         Log.d("AppApplication", "WorkManager started")
         createNotificationChannel()
     }
