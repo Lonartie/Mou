@@ -24,3 +24,18 @@ fun Investment.earningsFromSell(currentPrice: Double): Int {
     val balance = coins * (currentPrice / this.price)
     return (balance - (this.amount * (this.leverage - 1)) - 5).toInt()
 }
+
+fun Int.toFormattedCoins(): String {
+    val suffix = arrayOf("", "k", "Mio.")
+
+    var num = this
+    var i = 0
+    while (num >= 1000) {
+        num /= 1000
+        i++
+    }
+
+    if (i >= suffix.size) return "much"
+
+    return "$num${suffix[i]}"
+}

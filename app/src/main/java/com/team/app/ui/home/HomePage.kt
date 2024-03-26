@@ -63,6 +63,7 @@ import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
 import com.team.app.service.DialogService
 import com.team.app.utils.Constants
+import com.team.app.utils.toFormattedCoins
 import kotlinx.coroutines.launch
 
 @Composable
@@ -110,11 +111,11 @@ fun HomePage(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Preview
 @Composable
 fun TopRow(
-    attributes: Attributes = Attributes(10, 20, 30, 40),
+    attributes: Attributes = Attributes(100, 20, 30, 40),
     openShop: suspend () -> Unit = {},
     openMoneyScreen: suspend () -> Unit = {}
 ) {
@@ -174,7 +175,7 @@ fun TopRow(
                             scaleY = 1.2f
                         )
                 )
-                Text(attributes.coins.toString() + "€", fontSize = 15.sp)
+                Text(attributes.coins.toFormattedCoins(), fontSize = 15.sp)
             }
             Image(
                 painterResource(id = R.drawable.shop),
