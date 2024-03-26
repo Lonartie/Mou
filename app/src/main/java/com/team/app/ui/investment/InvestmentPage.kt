@@ -20,12 +20,15 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,8 +64,6 @@ fun InvestmentPage(
     val minMaxKey = viewModel.minMaxKey
     val networkStatus = viewModel.networkStatus.collectAsState(false).value
     val coro = rememberCoroutineScope()
-    val coins = viewModel.coins.intValue
-    val leverage = viewModel.leverage.intValue
     val balance = viewModel.balance.collectAsState(0.0).value.toDouble()
     val investmentsValue = viewModel.investmentsValue?.collectAsState(0.0)?.value ?: 0.0
     val investments = viewModel.investments?.collectAsState(emptyList())?.value ?: emptyList()
@@ -86,13 +87,9 @@ fun InvestmentPage(
                 contentPadding = contentPadding,
                 xAxisKey = xAxisKey,
                 minMaxKey = minMaxKey,
-                coins = coins,
-                leverage = leverage,
-                onCoinsChange = viewModel::changeCoins,
-                onLeverageChange = viewModel::changeLeverage,
-                onBuy = {
+                onBuy = { coins, leverage ->
                     coro.launch {
-                        val msg = viewModel.buy()
+                        val msg = viewModel.buy(coins, leverage)
                         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                     }
                 },
@@ -130,11 +127,7 @@ fun Content(
     modelProducer: CartesianChartModelProducer = CartesianChartModelProducer.build(),
     xAxisKey: ExtraStore.Key<List<String>> = ExtraStore.Key(),
     minMaxKey: ExtraStore.Key<Pair<Float, Float>> = ExtraStore.Key(),
-    coins: Int = 0,
-    leverage: Int = 1,
-    onCoinsChange: (String) -> Unit = {},
-    onLeverageChange: (String) -> Unit = {},
-    onBuy: () -> Unit = {},
+    onBuy: (String, String) -> Unit = {_,_ ->},
     onSell: (Investment) -> Unit = {},
     balance: Double = 0.0,
     investmentsValue: Double = 0.0,
@@ -219,27 +212,40 @@ fun Content(
                     Text("Investments: ${"%.2f".format(investmentsValue)}")
                 }
 
+                val coins = remember{ mutableStateOf("0") }
                 TextField(
                     label = { Text("Coins") },
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = MaterialTheme.colorScheme.onSurface
                     ),
-                    value = coins.toString(),
-                    onValueChange = onCoinsChange,
+                    value = coins.value,
+                    onValueChange = {
+                        if (it.toIntOrNull() != null || it.isEmpty()) {
+                            coins.value = it
+                        }
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
-                    )
+                    ),
+                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End)
                 )
+
+                val leverage = remember{ mutableStateOf("1") }
                 TextField(
                     label = { Text("Leverage") },
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = MaterialTheme.colorScheme.onSurface
                     ),
-                    value = leverage.toString(),
-                    onValueChange = onLeverageChange,
+                    value = leverage.value,
+                    onValueChange = {
+                        if (it.toIntOrNull() != null || it.isEmpty()) {
+                            leverage.value = it
+                        }
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
-                    )
+                    ),
+                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End)
                 )
 
                 Row(
@@ -247,7 +253,11 @@ fun Content(
                     horizontalArrangement = Arrangement.SpaceEvenly
 
                 ) {
-                    Button(onClick = onBuy) {
+                    Button(onClick = {
+                        onBuy(coins.value, leverage.value)
+                        coins.value = 0.toString()
+                        leverage.value = 1.toString()
+                    }) {
                         Text("Invest")
                     }
                 }
