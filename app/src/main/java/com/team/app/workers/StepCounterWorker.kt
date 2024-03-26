@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.service.NotificationService
 import dagger.assisted.Assisted
@@ -16,29 +17,52 @@ private const val TAG = "StepCounterWorker"
 class StepCounterWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
-    val repository: StepCounterRepository,
-    val notificationService: NotificationService,
+    private val repository: StepCounterRepository,
+    private val notificationService: NotificationService,
+    private val attributesRepository: AttributesRepository
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
 
-        Log.d(TAG, "Starting worker...")
-        val walkedSteps: Long = repository.getStepsSinceStart()
-        sendWalkedStepsNotification(walkedSteps)
 
-        val steps = repository.insertStepCount()
-        if (steps == 0) {
-            Log.d(TAG, "No new steps since last termination")
-            return Result.success()
+        Log.d(TAG, "Starting worker...")
+        coroutineScope {
+            val walkedSteps: Long = repository.getStepsSinceStart()
+            sendWalkedStepsNotification(walkedSteps)
         }
+
+        coroutineScope {
+            val steps = repository.insertStepCount()
+            if (steps == 0) {
+                Log.d(TAG, "No new steps since last termination")
+            }
+        }
+
+        coroutineScope {
+            decreaseAttributes()
+        }
+
+
 
 
         Log.d(TAG, "Stopping worker...")
         return Result.success()
     }
 
-    suspend fun sendWalkedStepsNotification(steps: Long) {
+    private fun sendWalkedStepsNotification(steps: Long) {
+        if (steps == 0L) return
         notificationService.showNotification("You walked  $steps steps")
+    }
+
+    private suspend fun decreaseAttributes() {
+        // Finde eine methode, die die Attribute prozentual verringert, aber immer um einen Sockelwert
+        val attr = attributesRepository.getAttributes()
+        val newHunger = attr.hunger - attr.hunger * 0.25
+        val newHappiness = attr.happiness - attr.happiness * 0.25
+        val newHealth = attr.health - attr.health * 0.25
+        attributesRepository.updateHunger(newHunger.toInt())
+        attributesRepository.updateHappiness(newHappiness.toInt())
+        attributesRepository.updateHealth(newHealth.toInt())
     }
 
 }
