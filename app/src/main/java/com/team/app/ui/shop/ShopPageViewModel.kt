@@ -58,19 +58,27 @@ class ShopPageViewModel @Inject constructor(
                 inventoryItems.first { it.item.name != "" && it.item.itemType == type }
             }
 
-            if (foodItem == Constants.INVALID_INVENTORY_ITEM && inventoryContainsType(ItemType.FOOD)) {
+            if (foodItem == Constants.INVALID_INVENTORY_ITEM
+                && inventoryContainsType(ItemType.FOOD)
+            ) {
                 val id = inventoryRepo.getIdOfItem(firstItemOfType(ItemType.FOOD))!!
                 println("Setting food to $id")
                 hotbarRepo.setFood(id)
-            } else if (toyItem == Constants.INVALID_INVENTORY_ITEM && inventoryContainsType(ItemType.TOY)) {
+            } else if (toyItem == Constants.INVALID_INVENTORY_ITEM
+                && inventoryContainsType(ItemType.TOY)
+            ) {
                 val id = inventoryRepo.getIdOfItem(firstItemOfType(ItemType.TOY))!!
                 println("Setting toy to $id")
                 hotbarRepo.setToy(id)
-            } else if (miscItem == Constants.INVALID_INVENTORY_ITEM && inventoryContainsType(ItemType.MEDICINE)) {
+            } else if (miscItem == Constants.INVALID_INVENTORY_ITEM
+                && inventoryContainsType(ItemType.MEDICINE)
+            ) {
                 val id = inventoryRepo.getIdOfItem(firstItemOfType(ItemType.MEDICINE))!!
                 println("Setting misc to $id")
                 hotbarRepo.setMisc(id)
-            } else if (miscItem == Constants.INVALID_INVENTORY_ITEM && inventoryContainsType(ItemType.MISC)) {
+            } else if (miscItem == Constants.INVALID_INVENTORY_ITEM
+                && inventoryContainsType(ItemType.MISC)
+            ) {
                 val id = inventoryRepo.getIdOfItem(firstItemOfType(ItemType.MISC))!!
                 println("Setting misc to $id")
                 hotbarRepo.setMisc(id)

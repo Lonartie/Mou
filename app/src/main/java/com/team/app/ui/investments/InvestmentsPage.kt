@@ -13,19 +13,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -39,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.team.app.data.model.CombinedInvestments
 import com.team.app.data.model.Symbol
+import com.team.app.ui.components.TopAppBar
 import kotlinx.coroutines.launch
 
 @Composable
@@ -63,7 +57,7 @@ fun InvestmentsPage(
     }
 
     Scaffold(modifier = Modifier.fillMaxSize(),
-        topBar = { TopAppBar(onBackClick = goBack) }) { contentPadding ->
+        topBar = { TopAppBar("Investments", onBackClick = goBack) }) { contentPadding ->
         if (networkStatus) {
             Content(
                 investments = myInvestments,
@@ -86,29 +80,6 @@ fun InvestmentsPage(
             )
         }
     }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-@Preview
-fun TopAppBar(
-    modifier: Modifier = Modifier,
-    onBackClick: () -> Unit = {},
-) {
-    CenterAlignedTopAppBar(title = {
-        Text(
-            text = "Investments", color = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-    }, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-        containerColor = MaterialTheme.colorScheme.primaryContainer
-    ), modifier = modifier, navigationIcon = {
-        IconButton(onClick = onBackClick) {
-            Icon(
-                imageVector = Icons.Filled.ArrowBack, contentDescription = null
-            )
-        }
-    })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

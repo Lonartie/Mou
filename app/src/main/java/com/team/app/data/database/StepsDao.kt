@@ -20,7 +20,6 @@ interface StepsDao {
     @Query("SELECT * FROM steps ORDER BY id DESC LIMIT 1")
     suspend fun getLast(): StepCountData
 
-    // get Steps with login id
     @Query("SELECT * FROM steps WHERE lastLoginId = :id")
     suspend fun getByLoginId(id: Int): List<StepCountData>
 

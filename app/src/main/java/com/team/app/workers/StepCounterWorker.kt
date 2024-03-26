@@ -12,7 +12,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
 
-private const val TAG = "StepCounterWorker"
 @HiltWorker
 class StepCounterWorker @AssistedInject constructor(
     @Assisted appContext: Context,
@@ -21,10 +20,11 @@ class StepCounterWorker @AssistedInject constructor(
     private val notificationService: NotificationService,
     private val attributesRepository: AttributesRepository
 ) : CoroutineWorker(appContext, workerParams) {
+    companion object {
+        private const val TAG = "StepCounterWorker"
+    }
 
     override suspend fun doWork(): Result {
-
-
         Log.d(TAG, "Starting worker...")
         coroutineScope {
             val walkedSteps: Long = repository.getStepsSinceStart()
@@ -41,9 +41,6 @@ class StepCounterWorker @AssistedInject constructor(
         coroutineScope {
             decreaseAttributes()
         }
-
-
-
 
         Log.d(TAG, "Stopping worker...")
         return Result.success()

@@ -26,8 +26,6 @@ interface InventoryDao {
     @Query("SELECT * FROM inventory")
     fun getItemsFlow(): Flow<InventoryItem>
 
-    //@Query("SELECT * FROM inventory WHERE ")
-
     @Query("SELECT * FROM inventory WHERE id = :id")
     suspend fun getItem(id: Int): InventoryItem?
 

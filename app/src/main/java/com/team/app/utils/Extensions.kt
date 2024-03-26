@@ -19,7 +19,6 @@ fun Item.toInventoryItem(quantity: Int): InventoryItem {
 
 fun String.capitalize(): String = this.lowercase().replaceFirstChar { it.uppercase() }
 
-
 fun Investment.earningsFromSell(currentPrice: Double): Int {
     val coins = this.amount.toInt() * this.leverage
     val balance = coins * (currentPrice / this.price)

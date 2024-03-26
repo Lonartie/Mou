@@ -14,6 +14,7 @@ class SoundService(
             mediaPlayer!!.stop()
             mediaPlayer!!.release()
         }
+
         mediaPlayer = MediaPlayer.create(context, res)
         mediaPlayer?.start()
     }

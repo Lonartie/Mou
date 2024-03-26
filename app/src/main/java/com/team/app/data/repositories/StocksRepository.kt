@@ -14,8 +14,6 @@ class StocksRepository(
         YEAR
     }
 
-    suspend fun getAllStocks() = stocksService.stocks().body()!!.data
-
     suspend fun searchSymbol(symbol: String, size: Int = 30): List<Symbol> {
         return stocksService
             .searchSymbol(symbol, size).body()!!.data

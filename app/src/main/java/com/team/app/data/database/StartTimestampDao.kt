@@ -8,7 +8,6 @@ import com.team.app.data.database.model.StartTimestamp
 @Dao
 interface StartTimestampDao {
 
-    //insert
     @Insert
     suspend fun insert(startTimestamp: StartTimestamp)
 
@@ -18,7 +17,6 @@ interface StartTimestampDao {
     @Query("SELECT * FROM start_timestamp WHERE id = :id")
     suspend fun getById(id: Int): StartTimestamp
 
-    // get item with largest id
     @Query("SELECT * FROM start_timestamp ORDER BY id DESC LIMIT 1")
     suspend fun getLast(): StartTimestamp
 

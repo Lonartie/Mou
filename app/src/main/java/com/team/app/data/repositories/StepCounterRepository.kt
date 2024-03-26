@@ -1,10 +1,5 @@
 package com.team.app.data.repositories
 
-import android.content.ContentValues.TAG
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.util.Log
 import com.team.app.data.database.StartTimestampDao
 import com.team.app.data.database.StepsDao
@@ -12,17 +7,15 @@ import com.team.app.data.database.model.StartTimestamp
 import com.team.app.data.database.model.StepCountData
 import com.team.app.service.StepCounterService
 import com.team.app.utils.Constants
-import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
-import kotlin.coroutines.resume
 import kotlin.math.max
 import com.team.app.data.model.StepCountData as StepCountDataModel
 
 class StepCounterRepository @Inject constructor(
-    val stepCounterService: StepCounterService,
-    val stepsDao : StepsDao,
-    val timestampsDao : StartTimestampDao,
-    ) {
+    private val stepCounterService: StepCounterService,
+    private val stepsDao: StepsDao,
+    private val timestampsDao: StartTimestampDao,
+) {
 
     suspend fun insertFirstStartTimestamp() {
         if (timestampsDao.getAll().isEmpty()) {
@@ -32,7 +25,7 @@ class StepCounterRepository @Inject constructor(
         }
     }
 
-    suspend fun insertStepCount() : Int {
+    suspend fun insertStepCount(): Int {
         val steps = stepCounterService.steps()
         val lastLogin = timestampsDao.getLast()
         val lastSteps = stepsDao.getByLoginId(lastLogin.id)

@@ -1,6 +1,5 @@
 package com.team.app.data.network
 
-import com.team.app.data.model.StockData
 import com.team.app.data.model.StockPrice
 import com.team.app.data.model.StockTimeSeries
 import com.team.app.data.model.SymbolData
@@ -9,9 +8,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface StocksService {
-    @GET("stocks")
-    suspend fun stocks(): Response<StockData>
-
     @GET("symbol_search")
     suspend fun searchSymbol(
         @Query("symbol") symbol: String,

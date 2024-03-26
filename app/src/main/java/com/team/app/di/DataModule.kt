@@ -10,22 +10,22 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.team.app.data.database.AttributesDatabase
 import com.team.app.data.database.InvestmentsDatabase
 import com.team.app.data.database.ItemsDatabase
+import com.team.app.data.database.StartTimestampDao
 import com.team.app.data.database.StepCounterDatabase
 import com.team.app.data.database.StepsDao
 import com.team.app.data.network.StocksService
 import com.team.app.data.network.interceptors.RateLimitInterceptor
 import com.team.app.data.network.interceptors.StockApiKeyInterceptor
-import com.team.app.data.repositories.StepCounterRepository
-import com.team.app.data.database.StartTimestampDao
 import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.InvestmentsRepository
 import com.team.app.data.repositories.ItemsRepository
-import com.team.app.service.DialogService
 import com.team.app.data.repositories.NetworkRepository
 import com.team.app.data.repositories.SettingsRepository
+import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.data.repositories.StocksRepository
+import com.team.app.service.DialogService
 import com.team.app.service.NotificationService
 import com.team.app.service.SoundService
 import com.team.app.service.StepCounterService
@@ -75,7 +75,8 @@ class DataModule {
     @Provides
     @Singleton
     fun provideAttributesDatabase(@ApplicationContext context: Context): AttributesDatabase {
-        return Room.databaseBuilder(context, AttributesDatabase::class.java, "attributes_database")
+        return Room
+            .databaseBuilder(context, AttributesDatabase::class.java, "attributes_database")
             .createFromAsset("database/prefilled_attributes.db")
             .build()
     }
@@ -136,7 +137,8 @@ class DataModule {
     // provide StepCounterDao
     @Provides
     fun providesStepDatabase(@ApplicationContext context: Context): StepCounterDatabase {
-        return Room.databaseBuilder(context, StepCounterDatabase::class.java, "stepcounterdatabase")
+        return Room
+            .databaseBuilder(context, StepCounterDatabase::class.java, "stepcounterdatabase")
             .build()
     }
 
@@ -153,7 +155,11 @@ class DataModule {
     }
 
     @Provides
-    fun providesStepCounterRepository(stepCounterService: StepCounterService, stepsDao: StepsDao, timestampDao: StartTimestampDao) : StepCounterRepository {
+    fun providesStepCounterRepository(
+        stepCounterService: StepCounterService,
+        stepsDao: StepsDao,
+        timestampDao: StartTimestampDao
+    ): StepCounterRepository {
         return StepCounterRepository(stepCounterService, stepsDao, timestampDao)
     }
 
@@ -174,13 +180,19 @@ class DataModule {
 
     @Provides
     fun providesInvestmentsDatabase(@ApplicationContext context: Context): InvestmentsDatabase {
-        return Room.databaseBuilder(context, InvestmentsDatabase::class.java, "investments_database")
+        return Room.databaseBuilder(
+            context,
+            InvestmentsDatabase::class.java,
+            "investments_database"
+        )
             .fallbackToDestructiveMigration()
             .build()
     }
 
     @Provides
-    fun providesInvestmentsRepository(investmentsDatabase: InvestmentsDatabase): InvestmentsRepository {
+    fun providesInvestmentsRepository(
+        investmentsDatabase: InvestmentsDatabase
+    ): InvestmentsRepository {
         return InvestmentsRepository(investmentsDatabase.investmentsDao())
     }
 }

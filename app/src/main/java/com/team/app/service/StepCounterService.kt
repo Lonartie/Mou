@@ -13,9 +13,8 @@ import kotlin.coroutines.resume
 class StepCounterService @Inject constructor(
     private val sensorManager: SensorManager
 ) {
-
-
     private val stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+
     suspend fun steps() = suspendCancellableCoroutine { continuation ->
         Log.d(ContentValues.TAG, "Registering sensor listener... ")
 
@@ -45,7 +44,8 @@ class StepCounterService @Inject constructor(
                 .registerListener(
                     listener,
                     stepCounterSensor,
-                    SensorManager.SENSOR_DELAY_UI)
+                    SensorManager.SENSOR_DELAY_UI
+                )
             Log.d(ContentValues.TAG, "Sensor listener registered: $supportedAndEnabled")
         }
     }
