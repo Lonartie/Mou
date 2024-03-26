@@ -113,10 +113,7 @@ fun InventoryTopAppBar(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = stringResource(id = R.string.inventory),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                Text(text = stringResource(id = R.string.inventory))
 
                 Spacer(modifier = Modifier.weight(1f))
 

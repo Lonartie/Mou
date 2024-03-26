@@ -11,6 +11,7 @@ import com.team.app.ui.inventory.InventoryScreen
 import com.team.app.ui.investment.InvestmentPage
 import com.team.app.ui.investments.InvestmentsPage
 import com.team.app.ui.shop.ShopPage
+import com.team.app.ui.tic_tac_toe.TicTacToeScreen
 
 @Composable
 fun MouNavHost(
@@ -18,7 +19,7 @@ fun MouNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route
+        startDestination = Screen.TicTacToe.route
     ) {
         composable(
             route = Screen.Home.route
@@ -78,6 +79,11 @@ fun MouNavHost(
             InvestmentPage(
                 goBack = { navController.navigateUp() },
                 symbol = symbol.replace("&", "/")
+            )
+        }
+        composable(route = Screen.TicTacToe.route) {
+            TicTacToeScreen(
+                goBack = { navController.navigateUp() }
             )
         }
     }

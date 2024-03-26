@@ -27,6 +27,8 @@ class Constants {
         const val MAX_HAPPINESS = 100
         const val MAX_HEALTH = 100
 
+        const val TIC_TAC_TOE_PRIZE = 50
+
 //        const val GOOGLE_BOOKS_API_BASE = "https://www.googleapis.com/books/v1/"
         const val STEP_COUNTER_TAG = "STEP_COUNT_LISTENER"
     }
