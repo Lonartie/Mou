@@ -14,7 +14,7 @@ class Notification(
     private val notificationManager = context
         .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-    fun showNotification(messgae: String) {
+    fun showNotification(message: String, title: String = "Food time Notification") {
         val activityIntent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             context,
@@ -25,8 +25,8 @@ class Notification(
         
         val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.baseline_fastfood_24)
-            .setContentTitle("Food time Notification")
-            .setContentText(messgae)
+            .setContentTitle(title)
+            .setContentText(message)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)

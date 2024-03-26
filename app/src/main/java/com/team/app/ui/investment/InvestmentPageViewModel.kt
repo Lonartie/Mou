@@ -121,6 +121,7 @@ class InvestmentPageViewModel @Inject constructor(
         }
 
         val timeSeries =  stocksData[currentCategory.value] ?: return
+        this.type = timeSeries.meta.type
 
         when (currentCategory.value) {
             StocksRepository.TimeSeriesCategory.DAY -> transformDay(timeSeries)

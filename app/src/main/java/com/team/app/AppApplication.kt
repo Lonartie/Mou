@@ -2,19 +2,19 @@ package com.team.app
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.util.Log
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.team.app.workers.StepCounterWorker
 import com.team.app.ui.common.Notification.Companion.NOTIFICATION_CHANNEL_ID
 import com.team.app.workers.InvestmentWorker
+import com.team.app.workers.StepCounterWorker
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -31,9 +31,9 @@ class AppApplication : Application(), Configuration.Provider {
         val stepCounterWorker = PeriodicWorkRequestBuilder<StepCounterWorker>(
             15, TimeUnit.MINUTES).build()
         val attributeWorker = PeriodicWorkRequestBuilder<StepCounterWorker>(
-            1, TimeUnit.HOURS).build()
-        val investmentWorker = PeriodicWorkRequestBuilder<InvestmentWorker>(
             15, TimeUnit.MINUTES).build()
+        val investmentWorker = PeriodicWorkRequestBuilder<InvestmentWorker>(
+            1, TimeUnit.HOURS).build()
 
         WorkManager
             .getInstance(this)
