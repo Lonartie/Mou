@@ -34,7 +34,6 @@ class TicTacToeViewModel @Inject constructor(
     }
 
     fun humanMove(i: Int, j: Int) {
-        println("called humanMove")
         // only handle clicks if the human is currently playing
         if (state.value.gameOver || state.value.currentPlayer != Player.HUMAN) return
 
@@ -52,36 +51,107 @@ class TicTacToeViewModel @Inject constructor(
         }
 
         checkGameOver()
-        printBoard(state.value.board)
     }
 
     fun botMove() {
-        viewModelScope.launch {
-            println("called botMove")
-            val i = Random.nextInt(0, 3)
-            val j = Random.nextInt(0, 3)
+        if (!blockLine(Player.BOT) && !blockLine(Player.HUMAN)) randomBotMove()
+    }
 
-            if (state.value.board[i][j] == null) {
-                delay(500)
-                state.update {
-                    val newBoard = it.board.also { board ->
-                        board[i][j] = Player.BOT
-                    }
-                    it.copy(
-                        currentPlayer = Player.HUMAN,
-                        board = newBoard
-                    )
-                }
+    private fun blockLine(player: Player): Boolean {
+        if (state.value.gameOver) return true
 
-                checkGameOver()
-            } else {
-                botMove()
+        val board = state.value.board
+        var targetCount: Int
+        var nullCount: Int
+        var blockRow = 0
+
+        for (x in 0..2) {
+            // check row x for blocking move
+            targetCount = board[x].count { it == player }
+            nullCount = board[x].count { it == null }
+            if (targetCount == 2 && nullCount == 1) {
+                placeBotToken(x, board[x].indexOf(null))
+                return true
             }
+
+            // check column x for blocking move
+            targetCount = 0
+            nullCount = 0
+            for (i in 0..2) {
+                if (board[i][x] == player) targetCount++
+                if (board[i][x] == null) {
+                    nullCount++
+                    blockRow = i
+                }
+            }
+            if (targetCount == 2 && nullCount == 1) {
+                placeBotToken(blockRow, x)
+                return true
+            }
+        }
+
+        // check first diagonal for blocking move
+        targetCount = 0
+        nullCount = 0
+        for (i in 0..2) {
+            if (board[i][i] == player) targetCount++
+            if (board[i][i] == null) {
+                nullCount++
+                blockRow = i
+            }
+        }
+        if (targetCount == 2 && nullCount == 1) {
+            placeBotToken(blockRow, blockRow)
+            return true
+        }
+
+        // check second diagonal for blocking move
+        targetCount = 0
+        nullCount = 0
+        for (i in 0..2) {
+            if (board[i][2 - i] == player) targetCount++
+            if (board[i][2 - i] == null) {
+                nullCount++
+                blockRow = i
+            }
+        }
+        if (targetCount == 2 && nullCount == 1) {
+            placeBotToken(blockRow, 2 - blockRow)
+            return true
+        }
+
+        return false
+    }
+
+    private fun placeBotToken(i: Int, j: Int) {
+        viewModelScope.launch {
+            delay(500)
+            state.update {
+                val newBoard = it.board.also { board ->
+                    board[i][j] = Player.BOT
+                }
+                it.copy(
+                    currentPlayer = Player.HUMAN,
+                    board = newBoard
+                )
+            }
+
+            checkGameOver()
+        }
+    }
+
+    private fun randomBotMove() {
+        val i = Random.nextInt(0, 3)
+        val j = Random.nextInt(0, 3)
+
+        if (state.value.board[i][j] == null) {
+            placeBotToken(i, j)
+        } else {
+            randomBotMove()
         }
     }
 
     private fun checkGameOver() {
-        println("called checkGameOver")
         if (someoneWon() || boardIsFull()) {
             state.update {
                 it.copy(gameOver = true)
@@ -97,21 +167,20 @@ class TicTacToeViewModel @Inject constructor(
     }
 
     private fun someoneWon(): Boolean {
-        println("called someoneWon")
         val board = state.value.board
-        for (i in 0..2) {
-            // check row i for winning condition
-            if (board[i][0] != null && board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
+        for (x in 0..2) {
+            // check row x for winning condition
+            if (board[x][0] != null && board[x][0] == board[x][1] && board[x][1] == board[x][2]) {
                 state.update {
-                    it.copy(winner = board[i][0])
+                    it.copy(winner = board[x][0])
                 }
                 return true
             }
 
-            // check column i for winning condition
-            if (board[0][i] != null && board[0][i] == board[1][i] && board[1][i] == board[2][i]) {
+            // check column x for winning condition
+            if (board[0][x] != null && board[0][x] == board[1][x] && board[1][x] == board[2][x]) {
                 state.update {
-                    it.copy(winner = board[0][i])
+                    it.copy(winner = board[0][x])
                 }
                 return true
             }
@@ -135,21 +204,11 @@ class TicTacToeViewModel @Inject constructor(
     }
 
     private fun boardIsFull(): Boolean {
-        println("called boardIsFull")
         for (row in state.value.board) {
             for (token in row) {
                 if (token == null) return false
             }
         }
         return true
-    }
-
-    private fun printBoard(board: Array<Array<Player?>>) {
-        board.forEach {
-            it.forEach { player ->
-                print(player?.toString() ?: ".... ")
-            }
-            println()
-        }
     }
 }

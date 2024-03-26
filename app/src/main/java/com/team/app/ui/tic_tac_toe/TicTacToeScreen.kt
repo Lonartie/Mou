@@ -173,7 +173,6 @@ fun Board(
     ),
     onClick: (Int, Int) -> Unit = { _, _ -> }
 ) {
-    println("called Board")
     val color = MaterialTheme.colorScheme.onPrimaryContainer
 
     Canvas(
@@ -189,7 +188,6 @@ fun Board(
                 }
             }
     ) {
-        println("drawing board")
         drawBoard(color = color)
         for (i in state.board.indices) {
             for (j in state.board[i].indices) {

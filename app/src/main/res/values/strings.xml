@@ -18,7 +18,6 @@
     <string name="ttt_new_game">NEW GAME</string>
     <string name="ttt_current_player">Current player:</string>
     <string name="ttt_human_won">Congratulations, you won!\nYou received %d coins.</string>
-    <string name="ttt_prize">You received %d coins.</string>
     <string name="ttt_bot_won">The bot won.</string>
     <string name="ttt_draw">Draw - no one won.</string>
 </resources>
