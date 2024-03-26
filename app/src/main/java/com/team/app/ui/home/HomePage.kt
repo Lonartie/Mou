@@ -2,6 +2,8 @@
 
 package com.team.app.ui.home
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,6 +28,7 @@ import androidx.compose.material.icons.rounded.ControlPoint
 import androidx.compose.material.icons.rounded.Fastfood
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -55,6 +58,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.team.app.MainActivity
 import com.team.app.R
 import com.team.app.data.model.Attributes
 import com.team.app.data.model.Hotbar
@@ -73,7 +77,7 @@ fun HomePage(
     selectToy: () -> Unit = {},
     selectItem: () -> Unit = {},
     openCoins: () -> Unit = {},
-    viewModel: HomePageViewModel = hiltViewModel()
+    viewModel: HomePageViewModel = hiltViewModel(),
 ) {
     val attributes = viewModel.attributes.collectAsState(
         initial = Attributes(0, 0, 0, 0)
@@ -189,7 +193,6 @@ fun TopRow(
         }
     })
 }
-
 @Preview
 @Composable
 fun Content(
