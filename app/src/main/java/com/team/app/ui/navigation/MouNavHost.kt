@@ -60,7 +60,7 @@ fun MouNavHost(
             CoinsPage(
                 goBack = { navController.navigateUp() },
                 openInvestments = { navController.navigate(Screen.Investments.route) },
-                openStepOverview = { navController.navigate(Screen.StepsOverview.route) }
+                openStepOverview = { navController.navigate(Screen.StepsOverview.route) },
                 openTicTacToe = { navController.navigate(Screen.TicTacToe.route) }
             )
         }
