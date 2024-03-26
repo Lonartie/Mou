@@ -54,10 +54,16 @@ class TicTacToeViewModel @Inject constructor(
     }
 
     fun botMove() {
-        if (!blockLine(Player.BOT) && !blockLine(Player.HUMAN)) randomBotMove()
+        // 1. Check if BOT is about to win
+        // 2. Check if HUMAN is about to win
+        // 3. Check if BOT can create a line with 2 tokens
+        if (!tryLine(Player.BOT, 2) &&
+            !tryLine(Player.HUMAN, 2) &&
+            !tryLine(Player.BOT, 1)
+        ) randomBotMove()
     }
 
-    private fun blockLine(player: Player): Boolean {
+    private fun tryLine(target: Player, maxTargets: Int): Boolean {
         if (state.value.gameOver) return true
 
         val board = state.value.board
@@ -67,9 +73,9 @@ class TicTacToeViewModel @Inject constructor(
 
         for (x in 0..2) {
             // check row x for blocking move
-            targetCount = board[x].count { it == player }
+            targetCount = board[x].count { it == target }
             nullCount = board[x].count { it == null }
-            if (targetCount == 2 && nullCount == 1) {
+            if (targetCount == maxTargets && nullCount == 3 - maxTargets) {
                 placeBotToken(x, board[x].indexOf(null))
                 return true
             }
@@ -78,13 +84,13 @@ class TicTacToeViewModel @Inject constructor(
             targetCount = 0
             nullCount = 0
             for (i in 0..2) {
-                if (board[i][x] == player) targetCount++
+                if (board[i][x] == target) targetCount++
                 if (board[i][x] == null) {
                     nullCount++
                     blockRow = i
                 }
             }
-            if (targetCount == 2 && nullCount == 1) {
+            if (targetCount == maxTargets && nullCount == 3 - maxTargets) {
                 placeBotToken(blockRow, x)
                 return true
             }
@@ -94,13 +100,13 @@ class TicTacToeViewModel @Inject constructor(
         targetCount = 0
         nullCount = 0
         for (i in 0..2) {
-            if (board[i][i] == player) targetCount++
+            if (board[i][i] == target) targetCount++
             if (board[i][i] == null) {
                 nullCount++
                 blockRow = i
             }
         }
-        if (targetCount == 2 && nullCount == 1) {
+        if (targetCount == maxTargets && nullCount == 3 - maxTargets) {
             placeBotToken(blockRow, blockRow)
             return true
         }
@@ -109,13 +115,13 @@ class TicTacToeViewModel @Inject constructor(
         targetCount = 0
         nullCount = 0
         for (i in 0..2) {
-            if (board[i][2 - i] == player) targetCount++
+            if (board[i][2 - i] == target) targetCount++
             if (board[i][2 - i] == null) {
                 nullCount++
                 blockRow = i
             }
         }
-        if (targetCount == 2 && nullCount == 1) {
+        if (targetCount == maxTargets && nullCount == 3 - maxTargets) {
             placeBotToken(blockRow, 2 - blockRow)
             return true
         }
