@@ -9,4 +9,5 @@ data class StepCountData (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo val steps: Long,
     @ColumnInfo val lastLoginId: Int,
+    @ColumnInfo val timestamp: Long = System.currentTimeMillis()
 )
