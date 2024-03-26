@@ -19,7 +19,7 @@ fun MouNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.TicTacToe.route
+        startDestination = Screen.Home.route
     ) {
         composable(
             route = Screen.Home.route
@@ -58,7 +58,8 @@ fun MouNavHost(
         composable(route = Screen.Coins.route) {
             CoinsPage(
                 goBack = { navController.navigateUp() },
-                openInvestments = { navController.navigate(Screen.Investments.route) }
+                openInvestments = { navController.navigate(Screen.Investments.route) },
+                openTicTacToe = { navController.navigate(Screen.TicTacToe.route) }
             )
         }
         composable(route = Screen.Investments.route) {

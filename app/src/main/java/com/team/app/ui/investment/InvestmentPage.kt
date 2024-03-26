@@ -139,8 +139,8 @@ fun InvestmentPage(
 @Composable
 @Preview
 fun TopAppBar(
-    title: String,
     modifier: Modifier = Modifier,
+    title: String = "",
     onBackClick: () -> Unit = {},
 ) {
     CenterAlignedTopAppBar(title = {
