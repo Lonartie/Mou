@@ -28,6 +28,7 @@ import com.team.app.data.repositories.SettingsRepository
 import com.team.app.data.repositories.StocksRepository
 import com.team.app.service.NotificationService
 import com.team.app.service.SoundService
+import com.team.app.service.StepCounterService
 import com.team.app.utils.Constants.Companion.STOCKS_API_BASE
 import com.team.app.utils.dataStore
 import dagger.Module
@@ -152,8 +153,13 @@ class DataModule {
     }
 
     @Provides
-    fun providesStepCounterRepository(sensorManager: SensorManager, stepsDao: StepsDao, timestampDao: StartTimestampDao) : StepCounterRepository {
-        return StepCounterRepository(sensorManager, stepsDao, timestampDao)
+    fun providesStepCounterRepository(stepCounterService: StepCounterService, stepsDao: StepsDao, timestampDao: StartTimestampDao) : StepCounterRepository {
+        return StepCounterRepository(stepCounterService, stepsDao, timestampDao)
+    }
+
+    @Provides
+    fun providesStepCounterService(sensorManager: SensorManager): StepCounterService {
+        return StepCounterService(sensorManager)
     }
 
     @Provides

@@ -11,6 +11,7 @@ import com.team.app.data.database.StartTimestampDao
 import com.team.app.data.database.StepsDao
 import com.team.app.data.database.model.StartTimestamp
 import com.team.app.data.database.model.StepCountData
+import com.team.app.service.StepCounterService
 import com.team.app.utils.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,44 +23,10 @@ import kotlin.coroutines.resume
 import kotlin.math.max
 
 class StepCounterRepository @Inject constructor(
-    val sensorManager: SensorManager,
+    val stepCounterService: StepCounterService,
     val stepsDao : StepsDao,
     val timestampsDao : StartTimestampDao,
     ) {
-    private val stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-    suspend fun steps() = suspendCancellableCoroutine { continuation ->
-        Log.d(TAG, "Registering sensor listener... ")
-
-        val listener: SensorEventListener by lazy {
-            object : SensorEventListener {
-                override fun onSensorChanged(event: SensorEvent?) {
-                    if (event == null) return
-
-                    val stepsSinceLastReboot = event.values[0].toLong()
-                    Log.d(TAG, "Steps since last reboot: $stepsSinceLastReboot")
-
-                    sensorManager.unregisterListener(this)
-                    Log.d(TAG, "Sensor listener unregistered")
-
-                    if (continuation.isActive) {
-                        continuation.resume(stepsSinceLastReboot)
-                    }
-                }
-
-                override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-                    Log.d(TAG, "Accuracy changed to: $accuracy")
-                }
-            }
-        }
-        if (stepCounterSensor != null) {
-            val supportedAndEnabled = sensorManager
-                .registerListener(
-                    listener,
-                    stepCounterSensor,
-                    SensorManager.SENSOR_DELAY_UI)
-            Log.d(TAG, "Sensor listener registered: $supportedAndEnabled")
-        }
-    }
 
     suspend fun insertFirstStartTimestamp() {
         if (timestampsDao.getAll().isEmpty()) {
@@ -70,7 +37,7 @@ class StepCounterRepository @Inject constructor(
     }
 
     suspend fun insertStepCount() : Int {
-        val steps = steps()
+        val steps = stepCounterService.steps()
         val lastLogin = timestampsDao.getLast()
         val lastSteps = stepsDao.getByLoginId(lastLogin.id)
 
@@ -96,7 +63,7 @@ class StepCounterRepository @Inject constructor(
     suspend fun insertStartTimestamp() {
         val timestamp = System.currentTimeMillis()
         Log.d(Constants.STEP_COUNTER_TAG, "Adding timestamp: $timestamp")
-        timestampsDao.insert(StartTimestamp(0, timestamp, steps()))
+        timestampsDao.insert(StartTimestamp(0, timestamp, stepCounterService.steps()))
     }
 
     suspend fun getStepsSinceStart(): Long {

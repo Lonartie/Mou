@@ -9,6 +9,7 @@ import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.service.NotificationService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.coroutineScope
 
 private const val TAG = "StepCounterWorker"
 @HiltWorker
@@ -20,9 +21,10 @@ class StepCounterWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
+
         Log.d(TAG, "Starting worker...")
-        val walkedSteps = repository.getStepsSinceStart()
-        notificationService.showNotification("You walked  $walkedSteps steps")
+        val walkedSteps: Long = repository.getStepsSinceStart()
+        sendWalkedStepsNotification(walkedSteps)
 
         val steps = repository.insertStepCount()
         if (steps == 0) {
@@ -33,6 +35,10 @@ class StepCounterWorker @AssistedInject constructor(
 
         Log.d(TAG, "Stopping worker...")
         return Result.success()
+    }
+
+    suspend fun sendWalkedStepsNotification(steps: Long) {
+        notificationService.showNotification("You walked  $steps steps")
     }
 
 }

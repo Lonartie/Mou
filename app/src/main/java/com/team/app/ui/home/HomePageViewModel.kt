@@ -59,7 +59,7 @@ class HomePageViewModel @Inject constructor(
         println("nvidia symbols: $appleSymbols")
         updateHotbar()
         setFigureState(attributesRepo.getAttributes())
-        changeCoins() // currently this throws so subsequent functions are not called
+        changeCoins()
     }
 
     suspend fun giveFood(item: Item, attributes: Attributes) {
