@@ -4,10 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -111,43 +109,47 @@ fun Content(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (!dataPresent) {
-            Text(
-                text = "No data available",
-                fontSize = 20.sp,
-            )
-        }
-
-        Graph(
-            modelProducer = modelProducer,
-            xAxisKey = xAxisKey,
-            minMaxKey = minMaxKey
-        )
-
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            for (category in categories.reversed()) {
-                Button(
-                    onClick = { onCategoryChanged(category) },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor =
-                        if (category == currentCategory)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.secondary
-                    )
-                ) {
-                    Text(text = category)
+            if (!dataPresent) {
+                Text(
+                    text = "No data available",
+                    fontSize = 20.sp,
+                )
+            }
+
+            Graph(
+                modelProducer = modelProducer,
+                xAxisKey = xAxisKey,
+                minMaxKey = minMaxKey
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                for (category in categories.reversed()) {
+                    Button(
+                        onClick = { onCategoryChanged(category) },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor =
+                            if (category == currentCategory)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.secondary
+                        )
+                    ) {
+                        Text(text = category)
+                    }
                 }
             }
         }
