@@ -80,13 +80,17 @@ fun HomePage(
     ).value
     val hotbar = viewModel.hotbar.value
     val context = LocalContext.current
-    val alertMessage = stringResource(R.string.coins_reward_formatted,
-        viewModel.earnedCoins.intValue)
+    val alertMessage = stringResource(R.string.coins_reward_formatted)
 
     LaunchedEffect(Unit) {
         viewModel.onStart()
         if (viewModel.earnedCoins.intValue > 0) {
-            Toast.makeText(context, alertMessage, Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context, alertMessage
+                    .format(
+                        viewModel.earnedCoins.intValue
+                    ), Toast.LENGTH_SHORT
+            ).show()
             viewModel.playSound(R.raw.pickup_coin)
         }
     }

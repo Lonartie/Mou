@@ -41,6 +41,8 @@ class StepCounterRepository @Inject constructor(
         if (data.isEmpty())
             return 0
 
+        println("Steps data: $data")
+
         var sum = 0L
         for (i in 0 until data.size - 1) {
             if (data[i].steps > data[i + 1].steps) {
