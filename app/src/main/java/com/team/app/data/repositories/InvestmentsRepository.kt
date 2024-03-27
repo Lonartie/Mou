@@ -9,7 +9,7 @@ import com.team.app.data.model.Investment as InvestmentModel
 class InvestmentsRepository(
     private val investmentsDao: InvestmentsDao
 ) {
-    fun getInvestmentsFlow(): Flow<List<InvestmentModel>> {
+    private fun getInvestmentsFlow(): Flow<List<InvestmentModel>> {
         return investmentsDao
             .getInvestmentsFlow()
             .map { investments ->

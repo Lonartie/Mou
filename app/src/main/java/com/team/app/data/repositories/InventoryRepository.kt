@@ -17,13 +17,13 @@ class InventoryRepository(
         val invItems = inventoryDao.getItems()
         println("invItems: $invItems")
         val invItem = inventoryDao.getItem(id)
-        if (invItem != null) {
-            return InventoryItemModel(
+        return if (invItem != null) {
+            InventoryItemModel(
                 itemsRepo.getItemByID(invItem.itemID),
                 invItem.quantity
             )
         } else {
-            return INVALID_INVENTORY_ITEM
+            INVALID_INVENTORY_ITEM
         }
     }
 

@@ -109,7 +109,7 @@ class HomePageViewModel @Inject constructor(
         }
     }
 
-    suspend fun giveGeneric(item: Item, attributes: Attributes) {
+    private suspend fun giveGeneric(item: Item, attributes: Attributes) {
         if (item.name == "") return
 
         val items = inventoryRepo.getItems()
@@ -155,7 +155,7 @@ class HomePageViewModel @Inject constructor(
 
     }
 
-    suspend fun resetAttributes() {
+    private suspend fun resetAttributes() {
         attributesRepo.updateHunger(Constants.MAX_HUNGER)
         attributesRepo.updateHappiness(Constants.MAX_HAPPINESS)
         attributesRepo.updateHealth(Constants.MAX_HEALTH)
@@ -164,7 +164,7 @@ class HomePageViewModel @Inject constructor(
 
     suspend fun isDead() = attributesRepo.isDead()
 
-    suspend fun increaseDieCount() {
+    private suspend fun increaseDieCount() {
         settings.incDieCount()
     }
 

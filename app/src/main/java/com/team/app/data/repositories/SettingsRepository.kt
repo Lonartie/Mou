@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 
-class SettingsRepository(val dataStore: DataStore<Preferences>) {
+class SettingsRepository(private val dataStore: DataStore<Preferences>) {
 
     private companion object {
         val DIE_COUNT = intPreferencesKey("die_count")

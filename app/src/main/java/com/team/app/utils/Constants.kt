@@ -11,7 +11,7 @@ class Constants {
 
         const val STOCKS_API_BASE = "https://api.twelvedata.com/"
 
-        val ITEM_NAME_TO_RESOURCE_MAP = mapOf(
+        private val ITEM_NAME_TO_RESOURCE_MAP = mapOf(
             "Chicken" to R.drawable.chicken_leg,
             "Mouse" to R.drawable.toy_mouse,
             "Health Potion" to R.drawable.potion,

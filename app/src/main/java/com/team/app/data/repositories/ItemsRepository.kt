@@ -11,15 +11,15 @@ class ItemsRepository(
 ) {
     suspend fun getItemByID(id: Int): ItemModel {
         val item = itemsDao.getItem(id)
-        if (item != null) {
-            return ItemModel(
+        return if (item != null) {
+            ItemModel(
                 ItemType.entries[item.type],
                 item.name,
                 item.price,
                 item.actionValue
             )
         } else {
-            return INVALID_ITEM
+            INVALID_ITEM
         }
     }
 
