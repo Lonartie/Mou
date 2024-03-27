@@ -52,7 +52,7 @@ class AppApplication : Application(), Configuration.Provider {
             .getInstance(this)
             .enqueueUniquePeriodicWork(
                 "InvestmentWorker",
-                ExistingPeriodicWorkPolicy.UPDATE, investmentWorker)
+                ExistingPeriodicWorkPolicy.KEEP, investmentWorker)
         Log.d("AppApplication", "WorkManager started")
         createNotificationChannel()
     }
