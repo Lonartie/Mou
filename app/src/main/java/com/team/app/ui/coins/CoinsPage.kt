@@ -23,11 +23,13 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.team.app.R
 
 @Composable
 @Preview
@@ -55,7 +57,7 @@ fun TopAppBar(
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = "Coins",
+                text = stringResource(id = R.string.coins),
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         },
@@ -89,10 +91,7 @@ fun Content(
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        Text(
-            "You earn coins by walking, by investing in stocks or by playing Tic Tac Toe. " +
-                    "You can use coins to buy items in the shop."
-        )
+        Text(text = stringResource(id = R.string.coins_page_description))
 
         Divider()
 
@@ -107,7 +106,7 @@ fun Content(
                     .fillMaxSize()
                     .wrapContentHeight(align = Alignment.CenterVertically),
                 textAlign = TextAlign.Center,
-                text = "Walking",
+                text = stringResource(id = R.string.walking),
                 fontSize = 20.sp,
             )
         }
@@ -124,7 +123,7 @@ fun Content(
                     .fillMaxSize()
                     .wrapContentHeight(align = Alignment.CenterVertically),
                 textAlign = TextAlign.Center,
-                text = "Investments",
+                text = stringResource(id = R.string.investments),
                 fontSize = 20.sp
             )
         }
@@ -141,7 +140,7 @@ fun Content(
                     .fillMaxSize()
                     .wrapContentHeight(align = Alignment.CenterVertically),
                 textAlign = TextAlign.Center,
-                text = "Tic Tac Toe",
+                text = stringResource(id = R.string.tic_tac_toe),
                 fontSize = 20.sp
             )
         }

@@ -1,23 +1,60 @@
 <resources>
+    <!-- GENERAL -->
     <string name="app_name">Mou</string>
-    <string name="shop">Shop</string>
-    <string name="current_balance">Current balance:</string>
-    <string name="inventory">Inventory</string>
-    <string name="no_items">You do not own items of this category.</string>
-    <string name="select_item">SELECT ITEM</string>
     <string name="happiness">Happiness</string>
     <string name="hunger">Hunger</string>
     <string name="health">Health</string>
-    <string name="coins">Coins</string>
+    <string name="back_button">Back button</string>
+
+    <!-- SHOP -->
+    <string name="shop">Shop</string>
+    <string name="current_balance">Current balance:</string>
+
+    <!-- INVENTORY -->
+    <string name="inventory">Inventory</string>
     <string name="items">Items</string>
     <string name="food">Food</string>
     <string name="toys">Toys</string>
-    <string name="back_button">Back button</string>
-    <string name="tic_tac_toe">Tic Tac Toe</string>
+    <string name="select_item">SELECT ITEM</string>
+    <string name="no_items">You do not own items of this category.</string>
+
+    <!-- COINS -->
+    <string name="coins">Coins</string>
+    <string name="coins_page_description">
+        You earn coins by walking, by investing in stocks or by playing Tic Tac Toe.
+        You can use coins to buy items in the shop.
+    </string>
+
+    <!-- STEPS -->
+    <string name="walking">Walking</string>
+    <string name="steps_title">Steps Overview</string>
+    <string name="no_data">No data available</string>
+
+    <!-- INVESTMENTS -->
+    <string name="investments">Investments</string>
+    <string name="no_connection">No network connection</string>
+    <string name="invest">Invest</string>
+    <string name="balance_formatted">Balance: %s</string>
+    <string name="investments_formatted">Investments: %s</string>
+    <string name="leverage">Leverage</string>
+    <string name="sell">Sell</string>
+    <string name="search">Search</string>
+
+    <!-- TIC-TAC-TOE -->
+    <string name="tic_tac_toe">Tic-Tac-Toe</string>
     <string name="ttt_start">START GAME</string>
     <string name="ttt_new_game">NEW GAME</string>
-    <string name="ttt_current_player">Current player:</string>
-    <string name="ttt_human_won">Congratulations, you won!\nYou received %d coins.</string>
+    <string name="ttt_current_player_formatted">Current player: %s</string>
+    <string name="ttt_human_won_formatted">Congratulations, you won!\nYou received %d coins.</string>
     <string name="ttt_bot_won">The bot won.</string>
     <string name="ttt_draw">Draw - no one won.</string>
+
+    <!-- PERMISSIONS -->
+    <string name="grant_permission">Grant permission</string>
+    <string name="ok">OK</string>
+    <string name="permission_required">Permission required</string>
+
+    <!-- REWARDS -->
+    <string name="reward">Reward</string>
+    <string name="coins_reward_formatted">You earned %d coins!</string>
 </resources>

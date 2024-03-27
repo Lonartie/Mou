@@ -27,10 +27,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.team.app.R
 import com.team.app.data.model.CombinedInvestments
 import com.team.app.data.model.Symbol
 import com.team.app.ui.common.TopAppBar
@@ -57,7 +59,13 @@ fun InvestmentsPage(
     }
 
     Scaffold(modifier = Modifier.fillMaxSize(),
-        topBar = { TopAppBar("Investments", onBackClick = goBack) }) { contentPadding ->
+        topBar = {
+            TopAppBar(
+                title = stringResource(id = R.string.investments),
+                onBackClick = goBack
+            )
+        }
+    ) { contentPadding ->
         if (networkStatus) {
             Content(
                 investments = myInvestments,
@@ -74,7 +82,7 @@ fun InvestmentsPage(
                     .fillMaxSize()
                     .padding(contentPadding),
                 textAlign = TextAlign.Center,
-                text = "No network connection"
+                text = stringResource(id = R.string.no_connection)
             )
         }
     }
@@ -115,7 +123,7 @@ fun Content(
             onSearch = { text -> coro.launch { onSearchTextChange(text) } },
             active = active.value,
             onActiveChange = { active.value = it },
-            placeholder = { Text("Search") },
+            placeholder = { Text(text = stringResource(id = R.string.search)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),

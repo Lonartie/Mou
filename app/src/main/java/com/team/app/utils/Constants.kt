@@ -37,5 +37,15 @@ class Constants {
         const val TIC_TAC_TOE_PRIZE = 50
 
         const val STEP_COUNTER_TAG = "STEP_COUNT_LISTENER"
+
+        // Permissions
+        const val PERMISSION_DECLINED = "You declined the permission permanently. " +
+                "Please go to your settings to grant it manually"
+
+        const val NOTIFICATION_INFO = "This app wants to send you notifications received rewards " +
+                "and when your mini-me needs you"
+        const val TRACK_STEPS_INFO = "This app wants to track your steps inorder to " +
+                "reward you with coins"
+        const val MOVEMENT_INFO = "This app wants to track your movement to reward you with coins"
     }
 }

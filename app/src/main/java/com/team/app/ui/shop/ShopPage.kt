@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -44,13 +45,12 @@ import com.team.app.utils.Constants
 import com.team.app.utils.capitalize
 
 @Composable
-//@Preview
 fun ShopPage(
     goBack: () -> Unit,
     viewModel: ShopPageViewModel = hiltViewModel()
 ) {
-    val items = viewModel.itemsFlow.collectAsState(emptyList()).value
-    val attributes = viewModel.attributesFlow.collectAsState(null).value
+    val items by viewModel.itemsFlow.collectAsState(emptyList())
+    val attributes by viewModel.attributesFlow.collectAsState(null)
 
     Scaffold(
         topBar = {
@@ -61,10 +61,10 @@ fun ShopPage(
         }
     ) { contentPadding ->
         Background(
-            image = R.drawable.background_evening,
             modifier = Modifier
                 .fillMaxSize()
-                .scale(5f)
+                .scale(5f),
+            image = R.drawable.background_evening
         )
 
         Column(

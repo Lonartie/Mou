@@ -20,9 +20,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.team.app.R
+import com.team.app.utils.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,9 +50,9 @@ fun PermissionDialog(
                     )
                     Text(
                         text = if (isPermaDecline) {
-                            "Grant permission"
+                            stringResource(id = R.string.grant_permission)
                         } else {
-                            "OK"
+                            stringResource(id = R.string.ok)
                         },
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -84,9 +87,9 @@ interface perTextProv {
 class NotiPerTextProv : perTextProv {
     override fun getDesc(isPermaDecline: Boolean): String {
         return if (isPermaDecline) {
-            "You declinded the permission permanent, got to your settings and turn it on manually"
+            Constants.PERMISSION_DECLINED
         } else {
-            "This app wants to send you notifications for new coins and when your mini-me needs you"
+            Constants.NOTIFICATION_INFO
         }
     }
 }
@@ -94,9 +97,9 @@ class NotiPerTextProv : perTextProv {
 class SensorTextProv : perTextProv {
     override fun getDesc(isPermaDecline: Boolean): String {
         return if (isPermaDecline) {
-            "You declinded the permission permanent, got to your settings and turn it on manually"
+            Constants.PERMISSION_DECLINED
         } else {
-            "This app wants to track how many steps you take inorder to reward coins to you"
+            Constants.TRACK_STEPS_INFO
         }
     }
 }
@@ -104,9 +107,9 @@ class SensorTextProv : perTextProv {
 class ActivityTextProv : perTextProv {
     override fun getDesc(isPermaDecline: Boolean): String {
         return if (isPermaDecline) {
-            "You declinded the permission permanent, got to your settings and turn it on manually"
+            Constants.PERMISSION_DECLINED
         } else {
-            "This app wants to track your movement to award coins to you"
+            Constants.MOVEMENT_INFO
         }
     }
 }
