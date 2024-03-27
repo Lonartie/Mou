@@ -27,8 +27,8 @@ interface ItemsDao {
     @Query("SELECT * FROM items")
     fun getItemsFlow(): Flow<List<Item>>
 
-    @Query("SELECT * FROM items WHERE name != ''")
-    fun getItemsNoInvalidFlow(): Flow<List<Item>>
+    @Query("SELECT * FROM items WHERE name != '' ORDER BY type, name")
+    fun getSortedItemsNoInvalidFlow(): Flow<List<Item>>
 
     @Query("SELECT * FROM items WHERE id = :id")
     suspend fun getItem(id: Int): Item?

@@ -17,6 +17,8 @@ class InventoryViewModel @Inject constructor(
     fun getItemsWithTypes(types: List<ItemType>) = runBlocking {
         invRepo.getItems().filter {
             types.contains(it.item.itemType) && it.item.name != ""
+        }.sortedBy {
+            it.item.name
         }
     }
 
