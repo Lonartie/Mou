@@ -35,7 +35,7 @@ class ItemsRepository(
             }
         }
 
-    fun getItemsNoInvalidFlow() = itemsDao.getItemsNoInvalidFlow()
+    fun getItemsNoInvalidFlow() = itemsDao.getSortedItemsNoInvalidFlow()
         .map { items ->
             items.map {
                 ItemModel(
