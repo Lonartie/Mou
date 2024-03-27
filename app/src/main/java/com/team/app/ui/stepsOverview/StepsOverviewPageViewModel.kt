@@ -48,7 +48,7 @@ class StepsOverviewPageViewModel @Inject constructor(
             else -> 0
         }
 
-        val valueCount = when(currentCategory.value) {
+        val valueCount = when (currentCategory.value) {
             "Day" -> 24
             "Week" -> 7
             "Month" -> 30
@@ -60,12 +60,18 @@ class StepsOverviewPageViewModel @Inject constructor(
         val xPresets = (current - valueCount * groupBy)..current step groupBy
 
         val additiveData = stepCounterRepo.getStepCountDataModelSince(beginTime)
+        println("additiveData: $additiveData")
         val data = mutableListOf<StepCountData>()
 
         for (i in 1 until additiveData.size) {
             val timestamp = additiveData[i].timestamp
             val steps = max(0, additiveData[i].steps - additiveData[i - 1].steps)
-            data.add(StepCountData(timestamp, steps))
+            data.add(
+                StepCountData(
+                    timestamp = timestamp,
+                    steps = steps
+                )
+            )
         }
 
         dataPresent.value = data.isNotEmpty()

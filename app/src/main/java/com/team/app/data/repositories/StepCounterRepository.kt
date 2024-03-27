@@ -70,7 +70,12 @@ class StepCounterRepository @Inject constructor(
 
     suspend fun getStepCountDataModelSince(beginTime: Long): List<StepCountDataModel> {
         return getStepCountDataSince(beginTime)
-            .map { StepCountDataModel(it.timestamp, it.steps) }
+            .map {
+                StepCountDataModel(
+                    timestamp = it.timestamp,
+                    steps = it.steps
+                )
+            }
     }
 
     private suspend fun getStepCountDataSince(beginTime: Long): List<StepCountData> {
