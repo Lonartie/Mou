@@ -1,10 +1,11 @@
 package com.team.app.ui.permission
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 
 
 class PermissionViewModel (): ViewModel(){
-    val permissionQueue = mutableListOf<String>()
+    val permissionQueue = mutableStateListOf<String>()
 
     fun dismissDialog(){
         permissionQueue.removeFirst()
