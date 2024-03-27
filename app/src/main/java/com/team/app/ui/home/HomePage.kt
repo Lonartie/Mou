@@ -87,6 +87,7 @@ fun HomePage(
         viewModel.onStart()
         if (viewModel.earnedCoins.intValue > 0) {
             Toast.makeText(context, alertMessage, Toast.LENGTH_SHORT).show()
+            viewModel.playSound(R.raw.pickup_coin)
         }
     }
 

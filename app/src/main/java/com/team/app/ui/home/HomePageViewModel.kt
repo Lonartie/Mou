@@ -16,7 +16,7 @@ import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.SettingsRepository
 import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.data.repositories.StocksRepository
-import com.team.app.service.SoundService
+import com.team.app.utils.SoundManager
 import com.team.app.utils.Constants
 import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +32,7 @@ class HomePageViewModel @Inject constructor(
     private val attributesRepo: AttributesRepository,
     private val inventoryRepo: InventoryRepository,
     private val hotbarRepo: HotbarRepository,
-    private val soundService: SoundService,
+    private val soundManager: SoundManager,
     private val stocksRepo: StocksRepository
 ) : ViewModel() {
 
@@ -64,7 +64,7 @@ class HomePageViewModel @Inject constructor(
         if (attributes.hunger == Constants.MAX_HUNGER) return
 
         viewModelScope.launch {
-            playSound(R.raw.eat)
+            playSound(R.raw.use_food)
         }
 
         attributesRepo.updateHunger(attributes.hunger + item.actionValue)
@@ -80,7 +80,7 @@ class HomePageViewModel @Inject constructor(
         if (attributes.happiness == Constants.MAX_HAPPINESS) return
 
         viewModelScope.launch {
-            playSound(R.raw.toy)
+            playSound(R.raw.use_toy)
         }
 
         attributesRepo.updateHappiness(attributes.happiness + item.actionValue)
@@ -99,7 +99,7 @@ class HomePageViewModel @Inject constructor(
             if (attributes.health == Constants.MAX_HEALTH) return
 
             viewModelScope.launch {
-                playSound(R.raw.item)
+                playSound(R.raw.use_item)
             }
 
             attributesRepo.updateHealth(attributes.health + item.actionValue)
@@ -134,7 +134,7 @@ class HomePageViewModel @Inject constructor(
         setFigureState(attributes)
     }
 
-    private fun playSound(@RawRes res: Int) = soundService.play(res)
+    fun playSound(@RawRes res: Int) = soundManager.play(res)
 
     private suspend fun changeCoins() {
         stepCounter.insertFirstStartTimestamp()

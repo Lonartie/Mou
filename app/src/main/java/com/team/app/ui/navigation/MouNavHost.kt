@@ -12,7 +12,7 @@ import com.team.app.ui.investment.InvestmentPage
 import com.team.app.ui.investments.InvestmentsPage
 import com.team.app.ui.shop.ShopPage
 import com.team.app.ui.stepsOverview.StepsOverviewPage
-import com.team.app.ui.ticTacToe.TicTacToeScreen
+import com.team.app.ui.tictactoe.TicTacToeScreen
 
 @Composable
 fun MouNavHost(

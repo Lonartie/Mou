@@ -1,10 +1,10 @@
-package com.team.app.service
+package com.team.app.utils
 
 import android.content.Context
 import android.media.MediaPlayer
 import androidx.annotation.RawRes
 
-class SoundService(
+class SoundManager(
     private val context: Context
 ) {
     private var mediaPlayer: MediaPlayer? = null

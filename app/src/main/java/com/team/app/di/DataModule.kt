@@ -27,7 +27,7 @@ import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.data.repositories.StocksRepository
 import com.team.app.ui.common.Dialog
 import com.team.app.ui.common.Notification
-import com.team.app.service.SoundService
+import com.team.app.utils.SoundManager
 import com.team.app.service.StepCounterService
 import com.team.app.utils.Constants.Companion.STOCKS_API_BASE
 import com.team.app.utils.dataStore
@@ -125,8 +125,8 @@ class DataModule {
     }
 
     @Provides
-    fun provideSoundService(@ApplicationContext context: Context): SoundService {
-        return SoundService(context)
+    fun provideSoundService(@ApplicationContext context: Context): SoundManager {
+        return SoundManager(context)
     }
 
     @Provides

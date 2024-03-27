@@ -10,7 +10,7 @@ import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.ItemsRepository
-import com.team.app.service.SoundService
+import com.team.app.utils.SoundManager
 import com.team.app.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ import javax.inject.Inject
 class ShopPageViewModel @Inject constructor(
     private val inventoryRepo: InventoryRepository,
     private val hotbarRepo: HotbarRepository,
-    private val soundService: SoundService,
+    private val soundManager: SoundManager,
     private val attributesRepo: AttributesRepository,
     itemsRepo: ItemsRepository
 ) : ViewModel() {
@@ -86,5 +86,5 @@ class ShopPageViewModel @Inject constructor(
         }
     }
 
-    private fun playSound(@RawRes res: Int) = soundService.play(res)
+    private fun playSound(@RawRes res: Int) = soundManager.play(res)
 }
