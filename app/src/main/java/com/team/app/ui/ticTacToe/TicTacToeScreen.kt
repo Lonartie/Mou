@@ -4,20 +4,16 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,8 +22,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -41,9 +35,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.team.app.R
 import com.team.app.data.model.tic_tac_toe.GameState
 import com.team.app.data.model.tic_tac_toe.Player
-import com.team.app.ui.home.Background
+import com.team.app.ui.common.TopAppBar
 import com.team.app.utils.Constants
-import com.team.app.utils.capitalize
 
 @Composable
 fun TicTacToeScreen(
@@ -53,27 +46,20 @@ fun TicTacToeScreen(
     val state by viewModel.state.collectAsState()
 
     Scaffold(
-        topBar = { TicTacToeAppBar(onBackClick = goBack) },
+        topBar = {
+            TopAppBar(title = stringResource(id = R.string.tic_tac_toe), onBackClick = goBack)
+        }
     ) { contentPadding ->
-        Background(
-            modifier = Modifier
-                .fillMaxSize()
-                .scale(5f),
-            image = R.drawable.background_evening
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(contentPadding),
+                .padding(contentPadding)
+                .offset(y = (-40).dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (state.currentPlayer != null) {
-                GameInfoBox(
-                    state = state,
-                    modifier = Modifier.clip(shape = RoundedCornerShape(12.dp))
-                )
+                GameInfoBox(state = state)
                 Spacer(modifier = Modifier.size(40.dp))
             }
 
@@ -84,25 +70,18 @@ fun TicTacToeScreen(
 
             if (!state.gameOver && state.currentPlayer == Player.BOT) viewModel.botMove()
 
-            if (state.currentPlayer == null) {
+            if (state.currentPlayer == null || state.gameOver) {
                 Spacer(modifier = Modifier.size(40.dp))
                 Button(
-                    onClick = viewModel::startGame
+                    onClick = viewModel::startGame,
+                    elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 4.dp)
                 ) {
                     Text(
-                        text = stringResource(id = R.string.ttt_start),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-            }
-
-            if (state.gameOver) {
-                Spacer(modifier = Modifier.size(40.dp))
-                Button(
-                    onClick = viewModel::restartGame
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.ttt_new_game),
+                        text = if (state.currentPlayer == null) {
+                            stringResource(id = R.string.ttt_start)
+                        } else {
+                            stringResource(id = R.string.ttt_new_game)
+                        },
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -111,38 +90,22 @@ fun TicTacToeScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-@Preview
-fun TicTacToeAppBar(
-    onBackClick: () -> Unit = {}
-) {
-    CenterAlignedTopAppBar(
-        title = { Text(text = stringResource(id = R.string.tic_tac_toe)) },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = stringResource(id = R.string.back_button)
-                )
-            }
-        }
-    )
-}
-
 @Composable
 @Preview(showBackground = true)
 fun GameInfoBox(
     modifier: Modifier = Modifier,
     state: GameState = GameState()
 ) {
-    Box(
-        modifier = modifier.background(color = MaterialTheme.colorScheme.secondaryContainer)
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        ),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
     ) {
-        val infoString = if (!state.gameOver) {
-            stringResource(
-                R.string.ttt_current_player_formatted, state.currentPlayer.toString().capitalize()
-            )
+        val infoString = if (!state.gameOver && state.currentPlayer == Player.BOT) {
+            stringResource(R.string.ttt_bot_playing)
+        } else if (!state.gameOver && state.currentPlayer == Player.HUMAN) {
+            stringResource(id = R.string.ttt_human_playing)
         } else if (state.winner == Player.HUMAN) {
             stringResource(
                 R.string.ttt_human_won_formatted, Constants.TIC_TAC_TOE_PRIZE
@@ -153,12 +116,12 @@ fun GameInfoBox(
             stringResource(id = R.string.ttt_draw)
         }
 
-            Text(
-                text = infoString,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                modifier = Modifier.padding(16.dp)
-            )
+        Text(
+            text = infoString,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier.padding(16.dp)
+        )
 
     }
 }
@@ -178,23 +141,29 @@ fun Board(
 ) {
     val color = MaterialTheme.colorScheme.onPrimaryContainer
 
-    Canvas(
-        modifier = modifier
-            .background(color = MaterialTheme.colorScheme.primaryContainer)
-            .size(300.dp)
-            .pointerInput(true) {
-                detectTapGestures {
-                    val i = 3 * it.y.toInt() / size.height
-                    val j = 3 * it.x.toInt() / size.width
-
-                    onClick(i, j)
-                }
-            }
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
     ) {
-        drawBoard(color = color)
-        for (i in state.board.indices) {
-            for (j in state.board[i].indices) {
-                drawToken(state.board[i][j], i, j, color)
+        Canvas(
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.primaryContainer)
+                .size(300.dp)
+                .pointerInput(true) {
+                    detectTapGestures {
+                        val i = 3 * it.y.toInt() / size.height
+                        val j = 3 * it.x.toInt() / size.width
+
+                        onClick(i, j)
+                    }
+                }
+                .padding(4.dp)
+        ) {
+            drawBoard(color = color)
+            for (i in state.board.indices) {
+                for (j in state.board[i].indices) {
+                    drawToken(state.board[i][j], i, j, color)
+                }
             }
         }
     }
