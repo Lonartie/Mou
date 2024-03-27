@@ -46,7 +46,7 @@ class AppApplication : Application(), Configuration.Provider {
             .getInstance(this)
             .enqueueUniquePeriodicWork(
                 "AttributeWorker",
-                ExistingPeriodicWorkPolicy.UPDATE, attributeWorker
+                ExistingPeriodicWorkPolicy.KEEP, attributeWorker
             )
         WorkManager
             .getInstance(this)
