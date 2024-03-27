@@ -143,7 +143,6 @@ class HomePageViewModel @Inject constructor(
         stepCounter.insertStartTimestamp()
         stepCounter.insertStepCount()
         earnedCoins.intValue = steps.toInt()
-
     }
 
     private fun getMinimalAttributeValue(attributes: Attributes): Int {

@@ -8,7 +8,6 @@ import com.team.app.data.database.model.StepCountData
 import com.team.app.service.StepCounterService
 import com.team.app.utils.Constants
 import javax.inject.Inject
-import kotlin.math.max
 import com.team.app.data.model.StepCountData as StepCountDataModel
 
 class StepCounterRepository @Inject constructor(
@@ -28,27 +27,15 @@ class StepCounterRepository @Inject constructor(
     suspend fun insertStepCount(): Int {
         val steps = stepCounterService.steps()
         val lastLogin = timestampsDao.getLast()
-        val lastSteps = stepsDao.getByLoginId(lastLogin.id)
 
-        if (lastSteps.isEmpty()) {
-            val stepCountData = StepCountData(
-                steps = steps - lastLogin.stepcount,
-                lastLoginId = lastLogin.id
-            )
-            Log.d(Constants.STEP_COUNTER_TAG, "Adding step count: $stepCountData")
-            stepsDao.insertAll(stepCountData)
-            return stepCountData.steps.toInt()
-        } else {
-            val maxSteps = lastSteps.maxOf { it.steps }
-            val difference = max(0, (steps - lastLogin.stepcount) - maxSteps.toInt())
-            val stepCountData = StepCountData(
-                steps = difference,
-                lastLoginId = lastLogin.id
-            )
-            Log.d(Constants.STEP_COUNTER_TAG, "Adding step count: $stepCountData")
-            stepsDao.insertAll(stepCountData)
-            return stepCountData.steps.toInt()
-        }
+        val stepCountData = StepCountData(
+            steps = steps,
+            lastLoginId = lastLogin.id
+        )
+
+        stepsDao.insertAll(stepCountData)
+        return steps.toInt()
+
     }
 
     suspend fun insertStartTimestamp() {
@@ -58,12 +45,21 @@ class StepCounterRepository @Inject constructor(
     }
 
     suspend fun getStepsSinceStart(): Long {
-        val lastLoginId = timestampsDao.getLast().id
-        val data = stepsDao.getByLoginId(lastLoginId)
-        if (data.isEmpty()) {
+        val lastLogin = timestampsDao.getLast()
+        val data = stepsDao.getByLoginId(lastLogin.id)
+
+        if (data.isEmpty())
             return 0
+
+        var sum = 0L
+        for (i in 0 until data.size - 1) {
+            if (data[i].steps > data[i + 1].steps) {
+                sum += data[i].steps
+            }
         }
-        return data.sumOf { it.steps }
+        sum += data.last().steps
+
+        return sum - lastLogin.stepcount
     }
 
     suspend fun getStepCountDataSince(beginTime: Long): List<StepCountDataModel> {

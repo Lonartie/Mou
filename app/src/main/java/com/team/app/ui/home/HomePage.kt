@@ -2,6 +2,7 @@
 
 package com.team.app.ui.home
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -79,12 +80,17 @@ fun HomePage(
         initial = Attributes(0, 0, 0, 0)
     ).value
     val hotbar = viewModel.hotbar.value
-    val diagService = Dialog(LocalContext.current)
+    val context = LocalContext.current
+    val diagService = Dialog(context)
+    val coro = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.onStart()
-        diagService.showAlertDialog(
-            "Belohnung", "Du hast ${viewModel.earnedCoins.intValue}€ verdient!")
+        Toast.makeText(
+            context,
+            "Du hast ${viewModel.earnedCoins.intValue} verdient!",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     Scaffold(
@@ -189,6 +195,7 @@ fun TopRow(
         }
     })
 }
+
 @Preview
 @Composable
 fun Content(
