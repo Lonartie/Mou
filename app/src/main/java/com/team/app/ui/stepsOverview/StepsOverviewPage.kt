@@ -24,12 +24,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patrykandpatrick.vico.core.model.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.model.ExtraStore
+import com.team.app.R
 import com.team.app.ui.common.Graph
 import kotlinx.coroutines.launch
 
@@ -53,7 +55,7 @@ fun StepsOverviewPage(
             .fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = "Steps overview",
+                title = stringResource(id = R.string.steps_title),
                 onBackClick = goBack
             )
         }
@@ -119,7 +121,7 @@ fun Content(
         ) {
             if (!dataPresent) {
                 Text(
-                    text = "No data available",
+                    text = stringResource(id = R.string.no_data),
                     fontSize = 20.sp,
                 )
             }

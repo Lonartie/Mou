@@ -83,14 +83,12 @@ fun HomePage(
     val context = LocalContext.current
     val diagService = Dialog(context)
     val coro = rememberCoroutineScope()
+    val alertMessage = stringResource(R.string.coins_reward_formatted,
+        viewModel.earnedCoins.intValue)
 
     LaunchedEffect(Unit) {
         viewModel.onStart()
-        Toast.makeText(
-            context,
-            "Du hast ${viewModel.earnedCoins.intValue} verdient!",
-            Toast.LENGTH_SHORT
-        ).show()
+        Toast.makeText(context, alertMessage, Toast.LENGTH_SHORT).show()
     }
 
     Scaffold(
@@ -203,10 +201,10 @@ fun Content(
     figureState: Int = R.drawable.figure_happy
 ) {
     Background(
-        image = R.drawable.background_evening,
         modifier = Modifier
             .fillMaxSize()
-            .scale(5f)
+            .scale(5f),
+        image = R.drawable.background_evening
     )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -221,9 +219,9 @@ fun Content(
                 .weight(1f)
         )
         Figure(
-            image = figureState,
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            image = figureState
         )
         Ground(
             modifier = Modifier
@@ -403,8 +401,8 @@ fun NavigationButton(
 @Preview
 @Composable
 fun Figure(
-    image: Int = R.drawable.figure_happy,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    image: Int = R.drawable.figure_happy
 ) {
     Image(
         painter = painterResource(id = image),
@@ -426,8 +424,8 @@ fun Ground(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun Background(
-    image: Int = R.drawable.background_evening,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    image: Int = R.drawable.background_evening
 ) {
     Image(
         painter = painterResource(id = image),

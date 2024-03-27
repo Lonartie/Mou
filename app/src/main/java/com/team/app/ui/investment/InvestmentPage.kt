@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patrykandpatrick.vico.core.model.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.model.ExtraStore
+import com.team.app.R
 import com.team.app.data.model.Investment
 import com.team.app.data.repositories.StocksRepository
 import com.team.app.ui.common.Graph
@@ -57,7 +59,6 @@ fun InvestmentPage(
     symbol: String = "AAPL",
     viewModel: InvestmentPageViewModel = hiltViewModel()
 ) {
-    val title = "Investment: $symbol"
     val currentCategory = viewModel.currentCategory.value
     val modelProducer = viewModel.modelProducer
     val xAxisKey = viewModel.xAxisKey
@@ -78,7 +79,13 @@ fun InvestmentPage(
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
-        topBar = { TopAppBar(title = title, onBackClick = goBack) }) { contentPadding ->
+        topBar = {
+            TopAppBar(
+                title = stringResource(R.string.investment_formatted, symbol),
+                onBackClick = goBack
+            )
+        }
+    ) { contentPadding ->
         if (networkStatus) {
             Content(
                 currentCategory = currentCategory,
@@ -111,7 +118,7 @@ fun InvestmentPage(
                     .fillMaxSize()
                     .padding(contentPadding),
                 textAlign = TextAlign.Center,
-                text = "No network connection"
+                text = stringResource(id = R.string.no_connection)
             )
         }
     }
@@ -127,7 +134,7 @@ fun Content(
     modelProducer: CartesianChartModelProducer = CartesianChartModelProducer.build(),
     xAxisKey: ExtraStore.Key<List<String>> = ExtraStore.Key(),
     minMaxKey: ExtraStore.Key<Pair<Float, Float>> = ExtraStore.Key(),
-    onBuy: (String, String) -> Unit = {_,_ ->},
+    onBuy: (String, String) -> Unit = { _, _ -> },
     onSell: (Investment) -> Unit = {},
     balance: Double = 0.0,
     investmentsValue: Double = 0.0,
@@ -199,7 +206,7 @@ fun Content(
             ) {
 
                 Text(
-                    text = "Invest",
+                    text = stringResource(id = R.string.invest),
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp
                 )
@@ -208,13 +215,17 @@ fun Content(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Text("Balance: ${"%.2f".format(balance)}")
-                    Text("Investments: ${"%.2f".format(investmentsValue)}")
+                    Text(text = stringResource(R.string.balance_formatted, "%.2f".format(balance)))
+                    Text(
+                        text = stringResource(
+                            R.string.investments_formatted, "%.2f".format(investmentsValue)
+                        )
+                    )
                 }
 
-                val coins = remember{ mutableStateOf("0") }
+                val coins = remember { mutableStateOf("0") }
                 TextField(
-                    label = { Text("Coins") },
+                    label = { Text(text = stringResource(id = R.string.coins)) },
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = MaterialTheme.colorScheme.onSurface
                     ),
@@ -230,9 +241,9 @@ fun Content(
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End)
                 )
 
-                val leverage = remember{ mutableStateOf("1") }
+                val leverage = remember { mutableStateOf("1") }
                 TextField(
-                    label = { Text("Leverage") },
+                    label = { Text(text = stringResource(id = R.string.leverage)) },
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = MaterialTheme.colorScheme.onSurface
                     ),
@@ -258,7 +269,7 @@ fun Content(
                         coins.value = 0.toString()
                         leverage.value = 1.toString()
                     }) {
-                        Text("Invest")
+                        Text(text = stringResource(id = R.string.invest))
                     }
                 }
 
@@ -311,7 +322,7 @@ fun InvestmentCard(
             Button(
                 onClick = { onSell(investment) }
             ) {
-                Text("Sell")
+                Text(text = stringResource(id = R.string.sell))
             }
         }
     }

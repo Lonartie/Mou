@@ -56,10 +56,10 @@ fun TicTacToeScreen(
         topBar = { TicTacToeAppBar(onBackClick = goBack) },
     ) { contentPadding ->
         Background(
-            image = R.drawable.background_evening,
             modifier = Modifier
                 .fillMaxSize()
-                .scale(5f)
+                .scale(5f),
+            image = R.drawable.background_evening
         )
 
         Column(
@@ -140,10 +140,13 @@ fun GameInfoBox(
         modifier = modifier.background(color = MaterialTheme.colorScheme.secondaryContainer)
     ) {
         val infoString = if (!state.gameOver) {
-            stringResource(id = R.string.ttt_current_player) + " " +
-                    state.currentPlayer.toString().capitalize()
+            stringResource(
+                R.string.ttt_current_player_formatted, state.currentPlayer.toString().capitalize()
+            )
         } else if (state.winner == Player.HUMAN) {
-            stringResource(id = R.string.ttt_human_won, Constants.TIC_TAC_TOE_PRIZE)
+            stringResource(
+                R.string.ttt_human_won_formatted, Constants.TIC_TAC_TOE_PRIZE
+            )
         } else if (state.winner == Player.BOT) {
             stringResource(id = R.string.ttt_bot_won)
         } else {

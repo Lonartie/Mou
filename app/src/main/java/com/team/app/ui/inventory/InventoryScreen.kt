@@ -63,10 +63,10 @@ fun InventoryScreen(
         }
     ) { contentPadding ->
         Background(
-            image = R.drawable.background_evening,
             modifier = Modifier
                 .fillMaxSize()
-                .scale(5f)
+                .scale(5f),
+            image = R.drawable.background_evening
         )
 
         Column(

@@ -14,7 +14,7 @@ class Notification(
     private val notificationManager = context
         .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-    fun showNotification(message: String, title: String = "Food time Notification") {
+    fun showNotification(message: String, title: String = NOTIFICATION_TITLE) {
         val activityIntent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             context,
@@ -38,6 +38,7 @@ class Notification(
     }
 
     companion object {
+        const val NOTIFICATION_TITLE = "Food time notification"
         const val NOTIFICATION_CHANNEL_ID = "channel"
     }
 }
