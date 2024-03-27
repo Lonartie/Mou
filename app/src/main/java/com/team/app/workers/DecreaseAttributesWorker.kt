@@ -21,20 +21,20 @@ class DecreaseAttributesWorker @AssistedInject constructor(
         // worker works every 15 minutes
         val callsPerDay = 24 * (60 / 15)
 
-        val decreaseHunger = 100.0 / callsPerDay // 100% per day
-        val decreaseHappiness = 50.0 / callsPerDay // 50% per day
-        val decreaseHealth = 100.0 / callsPerDay // 100% per day if hunger or happiness is 0
+        val decreaseHunger = 3
+        val decreaseHappiness = 2
+        val decreaseHealth = 3
 
         val currentAttributes = attributesRepo.getAttributes()
         val newAttributes = currentAttributes.copy(
             hunger = (currentAttributes.hunger - decreaseHunger)
-                .coerceAtLeast(0.0).toInt(),
+                .coerceAtLeast(0),
             happiness = (currentAttributes.happiness - decreaseHappiness)
-                .coerceAtLeast(0.0).toInt(),
+                .coerceAtLeast(0),
             health =
             if (currentAttributes.hunger == 0 && currentAttributes.happiness == 0)
                 (currentAttributes.health - decreaseHealth)
-                    .coerceAtLeast(0.0).toInt()
+                    .coerceAtLeast(0)
             else
                 currentAttributes.health
         )
