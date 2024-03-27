@@ -2,10 +2,12 @@ package com.team.app.ui.tictactoe
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.team.app.R
 import com.team.app.data.model.tic_tac_toe.GameState
 import com.team.app.data.model.tic_tac_toe.Player
 import com.team.app.data.repositories.AttributesRepository
 import com.team.app.utils.Constants
+import com.team.app.utils.SoundManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,8 @@ import kotlin.random.Random
 
 @HiltViewModel
 class TicTacToeViewModel @Inject constructor(
-    private val attributesRepo: AttributesRepository
+    private val attributesRepo: AttributesRepository,
+    private val soundManager: SoundManager
 ) : ViewModel() {
     val state = MutableStateFlow(GameState())
 
@@ -162,6 +165,7 @@ class TicTacToeViewModel @Inject constructor(
             }
             if (state.value.winner == Player.HUMAN) {
                 viewModelScope.launch {
+                    soundManager.play(R.raw.tic_tac_toe_win)
                     attributesRepo.updateCoins(
                         attributesRepo.getAttributes().coins + Constants.TIC_TAC_TOE_PRIZE
                     )
