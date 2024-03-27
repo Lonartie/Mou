@@ -8,6 +8,7 @@ import com.team.app.data.database.model.StepCountData
 import com.team.app.service.StepCounterService
 import com.team.app.utils.Constants
 import javax.inject.Inject
+import kotlin.math.max
 import com.team.app.data.model.StepCountData as StepCountDataModel
 
 class StepCounterRepository @Inject constructor(
@@ -60,7 +61,7 @@ class StepCounterRepository @Inject constructor(
     suspend fun getStepsSinceStart(): Long {
         val lastLogin = timestampsDao.getLast()
         val steps = getStepCountFromData(stepsDao.getByLoginId(lastLogin.id))
-        return steps - lastLogin.stepcount
+        return max(0, steps - lastLogin.stepcount)
     }
 
     suspend fun getStepCountSince(beginTime: Long): Long {
