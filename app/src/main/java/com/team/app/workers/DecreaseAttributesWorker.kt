@@ -43,7 +43,9 @@ class DecreaseAttributesWorker @AssistedInject constructor(
         attributesRepo.updateHappiness(newAttributes.happiness)
         attributesRepo.updateHealth(newAttributes.health)
 
-        if (newAttributes.health < 50) {
+        if (newAttributes.health == 0) {
+            notificationService.showNotification("Your pet has died!")
+        } else if (newAttributes.health < 50) {
             notificationService.showNotification("Your pet is sick!")
         } else if (newAttributes.happiness < 50 && newAttributes.hunger < 50) {
             notificationService.showNotification("Your pet is unhappy and hungry!")
