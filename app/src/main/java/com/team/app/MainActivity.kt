@@ -26,7 +26,6 @@ import com.team.app.ui.permission.PermissionViewModel
 import com.team.app.ui.permission.SensorTextProv
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -87,16 +86,12 @@ class MainActivity : ComponentActivity() {
 
                         },
                         onGoToSettings = ::openAppSettings
-
-
                     )
                 }
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
-
                     LaunchedEffect(Unit) {
                         multiplePermissionLauncher.launch(
                             arrayOf(
@@ -106,13 +101,10 @@ class MainActivity : ComponentActivity() {
                             )
                         )
                     }
-
-
                     val navController = rememberNavController()
                     MouNavHost(navController = navController)
                 }
             }
-
         }
     }
 }
