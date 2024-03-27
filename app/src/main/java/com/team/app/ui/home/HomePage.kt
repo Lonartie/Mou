@@ -7,6 +7,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,7 +44,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -149,16 +149,16 @@ fun TopRow(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 AttributeBar(
-                    progress = attributes.hunger.toFloat() / 100,
-                    icon = Icons.Rounded.Fastfood,
-                    name = stringResource(id = R.string.hunger),
-                    color = Color.hsl(30f, 0.96f, 0.55f, 1f)
-                )
-                AttributeBar(
                     progress = attributes.happiness.toFloat() / 100,
                     icon = Icons.Rounded.ChildCare,
                     name = stringResource(id = R.string.happiness),
                     color = Color.Yellow,
+                )
+                AttributeBar(
+                    progress = attributes.hunger.toFloat() / 100,
+                    icon = Icons.Rounded.Fastfood,
+                    name = stringResource(id = R.string.hunger),
+                    color = Color.hsl(30f, 0.96f, 0.55f, 1f)
                 )
                 AttributeBar(
                     progress = attributes.health.toFloat() / 100,
@@ -202,13 +202,16 @@ fun TopRow(
 @Composable
 fun Content(
     innerPadding: PaddingValues = PaddingValues(0.dp),
-    figureState: Int = R.drawable.figure_happy
+    figureState: Int = R.drawable.figure_happy,
 ) {
     Background(
         modifier = Modifier
-            .fillMaxSize()
-            .scale(5f),
-        image = R.drawable.background_evening
+            .fillMaxSize(),
+        image = if(isSystemInDarkTheme()){
+            R.drawable.background_darkmode
+        } else {
+            R.drawable.background_lightmode
+        }
     )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
