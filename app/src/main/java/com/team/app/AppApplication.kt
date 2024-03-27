@@ -56,6 +56,7 @@ class AppApplication : Application(), Configuration.Provider {
         Log.d("AppApplication", "WorkManager started")
         createNotificationChannel()
     }
+    
 
 
     override fun getWorkManagerConfiguration(): Configuration {

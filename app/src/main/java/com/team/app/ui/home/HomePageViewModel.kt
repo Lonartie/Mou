@@ -57,6 +57,8 @@ class HomePageViewModel @Inject constructor(
         updateHotbar()
         setFigureState(attributesRepo.getAttributes())
         changeCoins()
+
+        decreaseHealth()
     }
 
     suspend fun giveFood(item: Item, attributes: Attributes) {
@@ -157,6 +159,28 @@ class HomePageViewModel @Inject constructor(
 
     }
 
+    suspend fun resetAttributes() {
+        attributesRepo.updateHunger(Constants.MAX_HUNGER)
+        attributesRepo.updateHappiness(Constants.MAX_HAPPINESS)
+        attributesRepo.updateHealth(Constants.MAX_HEALTH)
+        setFigureState(attributesRepo.getAttributes())
+    }
+
+    suspend fun isDead() = attributesRepo.isDead()
+
+    suspend fun increaseDieCount() {
+        settings.incDieCount()
+    }
+
+    suspend fun handleDied() {
+        increaseDieCount()
+        resetAttributes()
+    }
+
+    fun getDieCount() = settings.getDieCountFlow
+
+    suspend fun getDieCountNow() = settings.getDieCount()
+
     private fun setFigureState(attributes: Attributes) {
         val minimalValue = getMinimalAttributeValue(attributes)
         figureState.intValue = when {
@@ -164,5 +188,10 @@ class HomePageViewModel @Inject constructor(
             minimalValue >= 50 -> R.drawable.figure_lonely
             else -> R.drawable.figure_angry
         }
+    }
+
+    suspend fun decreaseHealth() {
+        attributesRepo.updateHealth(attributesRepo.getAttributes().health - 10)
+        //setFigureState(attributesRepo.getAttributes())
     }
 }

@@ -58,4 +58,6 @@
     <!-- REWARDS -->
     <string name="reward">Reward</string>
     <string name="coins_reward_formatted">You earned %d coins!</string>
+    <string name="alert_died_title">Oh no!</string>
+    <string name="alert_dialog_content">Your pet has died %1$d times</string>
 </resources>

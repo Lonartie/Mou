@@ -106,6 +106,10 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+    }
 }
 
 fun Activity.openAppSettings() {

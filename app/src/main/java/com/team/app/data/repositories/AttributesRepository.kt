@@ -49,4 +49,9 @@ class AttributesRepository(
         val attr = attributesDao.getAttributes()[0]
         attributesDao.updateAttributes(attr.copy(health = health))
     }
+
+    suspend fun isDead(): Boolean {
+        val attr = attributesDao.getAttributes()[0]
+        return attr.health <= 0
+    }
 }

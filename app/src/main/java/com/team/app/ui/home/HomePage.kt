@@ -62,8 +62,10 @@ import com.team.app.data.model.Hotbar
 import com.team.app.data.model.InventoryItem
 import com.team.app.data.model.Item
 import com.team.app.data.model.ItemType
+import com.team.app.ui.common.Dialog
 import com.team.app.utils.Constants
 import com.team.app.utils.toFormattedCoins
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
@@ -75,6 +77,7 @@ fun HomePage(
     openCoins: () -> Unit = {},
     viewModel: HomePageViewModel = hiltViewModel(),
 ) {
+
     val attributes = viewModel.attributes.collectAsState(
         initial = Attributes(0, 0, 0, 0)
     ).value
@@ -92,6 +95,20 @@ fun HomePage(
                     ), Toast.LENGTH_SHORT
             ).show()
             viewModel.playSound(R.raw.pickup_coin)
+        }
+    }
+
+
+    LaunchedEffect(Unit) {
+        if (viewModel.isDead()) {
+            viewModel.handleDied()
+            Dialog(context).showAlertDialog(
+                context.getString(R.string.alert_died_title),
+                context.getString(
+                    R.string.alert_dialog_content,
+                    viewModel.getDieCountNow()
+                )
+            )
         }
     }
 
@@ -115,7 +132,7 @@ fun HomePage(
             )
         }
     ) { innerPadding ->
-        Content(innerPadding, viewModel.figureState.value)
+        Content(innerPadding, viewModel.figureState.intValue)
     }
 }
 
@@ -190,9 +207,7 @@ fun TopRow(
                 contentDescription = stringResource(id = R.string.items),
                 modifier = Modifier
                     .size(40.dp)
-                    .combinedClickable(
-                        onClick = { coro.launch { openShop() } }
-                    )
+                    .combinedClickable(onClick = { coro.launch { openShop() } })
             )
         }
     })
@@ -385,7 +400,10 @@ fun NavigationButton(
                     color = Color.White,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .offset(x = 5.dp, y = (-15).dp)
+                        .offset(
+                            x = 5.dp,
+                            y = (-15).dp
+                        )
                         .padding(5.dp)
                         .drawBehind {
                             drawCircle(
