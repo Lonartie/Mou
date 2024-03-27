@@ -38,10 +38,6 @@ class StepCounterWorker @AssistedInject constructor(
             }
         }
 
-        coroutineScope {
-            decreaseAttributes()
-        }
-
         Log.d(TAG, "Stopping worker...")
         return Result.success()
     }
@@ -50,16 +46,4 @@ class StepCounterWorker @AssistedInject constructor(
         if (steps == 0L) return
         notificationService.showNotification("You walked  $steps steps")
     }
-
-    private suspend fun decreaseAttributes() {
-        // Finde eine methode, die die Attribute prozentual verringert, aber immer um einen Sockelwert
-        val attr = attributesRepository.getAttributes()
-        val newHunger = attr.hunger - attr.hunger * 0.25
-        val newHappiness = attr.happiness - attr.happiness * 0.25
-        val newHealth = attr.health - attr.health * 0.25
-        attributesRepository.updateHunger(newHunger.toInt())
-        attributesRepository.updateHappiness(newHappiness.toInt())
-        attributesRepository.updateHealth(newHealth.toInt())
-    }
-
 }
