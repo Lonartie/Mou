@@ -59,7 +59,6 @@ fun InvestmentPage(
     symbol: String = "AAPL",
     viewModel: InvestmentPageViewModel = hiltViewModel()
 ) {
-    val title = "Investment: $symbol"
     val currentCategory = viewModel.currentCategory.value
     val modelProducer = viewModel.modelProducer
     val xAxisKey = viewModel.xAxisKey
@@ -80,7 +79,13 @@ fun InvestmentPage(
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
-        topBar = { TopAppBar(title = title, onBackClick = goBack) }) { contentPadding ->
+        topBar = {
+            TopAppBar(
+                title = stringResource(R.string.investment_formatted, symbol),
+                onBackClick = goBack
+            )
+        }
+    ) { contentPadding ->
         if (networkStatus) {
             Content(
                 currentCategory = currentCategory,
@@ -129,7 +134,7 @@ fun Content(
     modelProducer: CartesianChartModelProducer = CartesianChartModelProducer.build(),
     xAxisKey: ExtraStore.Key<List<String>> = ExtraStore.Key(),
     minMaxKey: ExtraStore.Key<Pair<Float, Float>> = ExtraStore.Key(),
-    onBuy: (String, String) -> Unit = {_,_ ->},
+    onBuy: (String, String) -> Unit = { _, _ -> },
     onSell: (Investment) -> Unit = {},
     balance: Double = 0.0,
     investmentsValue: Double = 0.0,
@@ -211,12 +216,14 @@ fun Content(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Text(text = stringResource(R.string.balance_formatted, "%.2f".format(balance)))
-                    Text(text = stringResource(
-                        R.string.investments_formatted, "%.2f".format(investmentsValue)
-                    ))
+                    Text(
+                        text = stringResource(
+                            R.string.investments_formatted, "%.2f".format(investmentsValue)
+                        )
+                    )
                 }
 
-                val coins = remember{ mutableStateOf("0") }
+                val coins = remember { mutableStateOf("0") }
                 TextField(
                     label = { Text(text = stringResource(id = R.string.coins)) },
                     colors = TextFieldDefaults.textFieldColors(
@@ -234,7 +241,7 @@ fun Content(
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End)
                 )
 
-                val leverage = remember{ mutableStateOf("1") }
+                val leverage = remember { mutableStateOf("1") }
                 TextField(
                     label = { Text(text = stringResource(id = R.string.leverage)) },
                     colors = TextFieldDefaults.textFieldColors(

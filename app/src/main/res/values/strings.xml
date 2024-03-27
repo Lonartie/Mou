@@ -8,7 +8,6 @@
 
     <!-- SHOP -->
     <string name="shop">Shop</string>
-    <string name="current_balance">Current balance:</string>
 
     <!-- INVENTORY -->
     <string name="inventory">Inventory</string>
@@ -36,6 +35,7 @@
     <string name="invest">Invest</string>
     <string name="balance_formatted">Balance: %s</string>
     <string name="investments_formatted">Investments: %s</string>
+    <string name="investment_formatted">Investment: %s</string>
     <string name="leverage">Leverage</string>
     <string name="sell">Sell</string>
     <string name="search">Search</string>
