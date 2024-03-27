@@ -84,8 +84,8 @@ class InvestmentPageViewModel @Inject constructor(
         if (0 >= leverage || leverage > 100) {
             return "Leverage must be between 1 and 100"
         }
-        coins -= 5 // fee
         attributesRepo.updateCoins(currentAttributes.coins - coins)
+        coins -= 5 // fee
         val investment = Investment(
             id = 0,
             symbol = symbol,

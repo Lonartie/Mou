@@ -42,12 +42,13 @@ class InvestmentWorker @AssistedInject constructor(
         println("Max: $maxPercentage")
 
         val message: String
-        if (minPercentage.first.symbol == maxPercentage.first.symbol) {
+        if (minPercentage.first.symbol == maxPercentage.first.symbol ||
+            minPercentage.second == 0.0 || maxPercentage.second == 0.0) {
             message = if (minPercentage.second <= -0.01) {
                 "Attention: Your investment in ${minPercentage.first.symbol} " +
                         "has decreased by ${"%.2f".format(minPercentage.second)}%"
-            } else if (minPercentage.second >= 0.01) {
-                "Congratulations: Your investment in ${minPercentage.first.symbol} " +
+            } else if (maxPercentage.second >= 0.01) {
+                "Congratulations: Your investment in ${maxPercentage.first.symbol} " +
                         "has increased by ${"%.2f".format(maxPercentage.second)}%"
             } else {
                 ""
