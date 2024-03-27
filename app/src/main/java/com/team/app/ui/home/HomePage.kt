@@ -145,16 +145,16 @@ fun TopRow(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 AttributeBar(
-                    progress = attributes.happiness.toFloat() / 100,
-                    icon = Icons.Rounded.ChildCare,
-                    name = stringResource(id = R.string.happiness),
-                    color = Color.Yellow,
-                )
-                AttributeBar(
                     progress = attributes.hunger.toFloat() / 100,
                     icon = Icons.Rounded.Fastfood,
                     name = stringResource(id = R.string.hunger),
                     color = Color.hsl(30f, 0.96f, 0.55f, 1f)
+                )
+                AttributeBar(
+                    progress = attributes.happiness.toFloat() / 100,
+                    icon = Icons.Rounded.ChildCare,
+                    name = stringResource(id = R.string.happiness),
+                    color = Color.Yellow,
                 )
                 AttributeBar(
                     progress = attributes.health.toFloat() / 100,
