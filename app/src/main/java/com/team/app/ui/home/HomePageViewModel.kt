@@ -55,8 +55,6 @@ class HomePageViewModel @Inject constructor(
         updateHotbar()
         setFigureState(attributesRepo.getAttributes())
         changeCoins()
-
-        decreaseHealth()
     }
 
     suspend fun giveFood(item: Item, attributes: Attributes) {
@@ -184,10 +182,5 @@ class HomePageViewModel @Inject constructor(
             minimalValue >= 50 -> R.drawable.figure_lonely
             else -> R.drawable.figure_angry
         }
-    }
-
-    suspend fun decreaseHealth() {
-        attributesRepo.updateHealth(attributesRepo.getAttributes().health - 10)
-        //setFigureState(attributesRepo.getAttributes())
     }
 }
