@@ -34,7 +34,6 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.BODY_SENSORS,
         Manifest.permission.ACTIVITY_RECOGNITION
     )
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -62,15 +61,12 @@ class MainActivity : ComponentActivity() {
                             Manifest.permission.POST_NOTIFICATIONS -> {
                                 NotiPerTextProv()
                             }
-
                             Manifest.permission.BODY_SENSORS -> {
                                 SensorTextProv()
                             }
-
                             Manifest.permission.ACTIVITY_RECOGNITION -> {
                                 ActivityTextProv()
                             }
-
                             else -> return@forEach
                         },
                         isPermaDecline = !shouldShowRequestPermissionRationale(
@@ -82,8 +78,6 @@ class MainActivity : ComponentActivity() {
                         onOk = {
                             viewModel.dismissDialog()
                             multiplePermissionLauncher.launch(arrayOf(permission))
-
-
                         },
                         onGoToSettings = ::openAppSettings
                     )
