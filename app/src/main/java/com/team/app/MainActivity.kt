@@ -3,6 +3,7 @@ package com.team.app
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager.PERMISSION_DENIED
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -15,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.AppTheme
@@ -53,34 +55,40 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 )
-                permissionQueue.reversed().forEach {
+                permissionQueue
+                    .reversed()
+                    .forEach {
                         permission,
-                    ->
-                    PermissionDialog(
-                        permission = when (permission) {
-                            Manifest.permission.POST_NOTIFICATIONS -> {
-                                NotiPerTextProv()
-                            }
-                            Manifest.permission.BODY_SENSORS -> {
-                                SensorTextProv()
-                            }
-                            Manifest.permission.ACTIVITY_RECOGNITION -> {
-                                ActivityTextProv()
-                            }
-                            else -> return@forEach
-                        },
-                        isPermaDecline = !shouldShowRequestPermissionRationale(
-                            permission
-                        ),
-                        onDismiss = {
-                            viewModel::dismissDialog
-                        },
-                        onOk = {
-                            viewModel.dismissDialog()
-                            multiplePermissionLauncher.launch(arrayOf(permission))
-                        },
-                        onGoToSettings = ::openAppSettings
-                    )
+                    -> if(ContextCompat.checkSelfPermission(applicationContext,permission) == PERMISSION_DENIED) {
+                        PermissionDialog(
+                            permission = when (permission) {
+                                Manifest.permission.POST_NOTIFICATIONS -> {
+                                    NotiPerTextProv()
+                                }
+
+                                Manifest.permission.BODY_SENSORS -> {
+                                    SensorTextProv()
+                                }
+
+                                Manifest.permission.ACTIVITY_RECOGNITION -> {
+                                    ActivityTextProv()
+                                }
+
+                                else -> return@forEach
+                            },
+                            isPermaDecline = !this.shouldShowRequestPermissionRationale(
+                                permission
+                            ),
+                            onDismiss = {
+                                viewModel::dismissDialog
+                            },
+                            onOk = {
+                                viewModel.dismissDialog()
+                                multiplePermissionLauncher.launch(arrayOf(permission))
+                            },
+                            onGoToSettings = ::openAppSettings
+                        )
+                    }
                 }
                 Surface(
                     modifier = Modifier.fillMaxSize(),
