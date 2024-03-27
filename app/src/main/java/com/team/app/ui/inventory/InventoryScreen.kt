@@ -173,7 +173,7 @@ fun ItemCard(
                     ),
                     contentDescription = inventoryItem.item.name,
                     modifier = Modifier
-                        .scale(Constants.getItemScalingFactor(inventoryItem.item.name) * 0.5f)
+                        .scale(1.2f * 0.5f)
                 )
 
                 Text(

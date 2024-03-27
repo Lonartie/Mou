@@ -12,21 +12,20 @@ class Constants {
         const val STOCKS_API_BASE = "https://api.twelvedata.com/"
 
         val ITEM_NAME_TO_RESOURCE_MAP = mapOf(
-            "Chicken" to Pair(R.drawable.chicken_leg, 1.2f),
-            "Mouse" to Pair(R.drawable.toy_mouse, 1.2f),
-            "Health Potion" to Pair(R.drawable.potion, 1.2f),
-            "Cola" to Pair(R.drawable.food_1_cola, 1.2f),
-            "Burger" to Pair(R.drawable.food_2_burger, 1.2f),
-            "Pills" to Pair(R.drawable.healt_item_1_pills, 1.2f),
-            "Plaster" to Pair(R.drawable.health_item_2_plaster, 1.2f),
-            "Medipack" to Pair(R.drawable.health_item_3_medipack, 1.2f),
-            "PS5" to Pair(R.drawable.toy_1_ps5, 1.2f),
-            "Ball" to Pair(R.drawable.toy_2_ball, 1.2f),
-            "Chalk" to Pair(R.drawable.toy_3_chalk, 1.2f),
+            "Chicken" to R.drawable.chicken_leg,
+            "Mouse" to R.drawable.toy_mouse,
+            "Health Potion" to R.drawable.potion,
+            "Cola" to R.drawable.food_1_cola,
+            "Burger" to R.drawable.food_2_burger,
+            "Pills" to R.drawable.healt_item_1_pills,
+            "Plaster" to R.drawable.health_item_2_plaster,
+            "Medipack" to R.drawable.health_item_3_medipack,
+            "PS5" to R.drawable.toy_1_ps5,
+            "Ball" to R.drawable.toy_2_ball,
+            "Chalk" to R.drawable.toy_3_chalk,
         )
 
-        @DrawableRes fun getItemResource(name: String) = ITEM_NAME_TO_RESOURCE_MAP[name]?.first ?: R.drawable.red_x
-        fun getItemScalingFactor(name: String) = ITEM_NAME_TO_RESOURCE_MAP[name]?.second ?: 1f
+        @DrawableRes fun getItemResource(name: String) = ITEM_NAME_TO_RESOURCE_MAP[name] ?: R.drawable.red_x
 
         val INVALID_ITEM = Item(ItemType.MISC, "", 0, 0)
         val INVALID_INVENTORY_ITEM = InventoryItem(INVALID_ITEM, 0)

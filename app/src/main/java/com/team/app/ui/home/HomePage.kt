@@ -2,8 +2,6 @@
 
 package com.team.app.ui.home
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,7 +26,6 @@ import androidx.compose.material.icons.rounded.ControlPoint
 import androidx.compose.material.icons.rounded.Fastfood
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -58,7 +55,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.team.app.MainActivity
 import com.team.app.R
 import com.team.app.data.model.Attributes
 import com.team.app.data.model.Hotbar
@@ -264,7 +260,6 @@ fun BottomRow(
             NavigationButton(
                 name = stringResource(id = R.string.food),
                 image = painterResource(Constants.getItemResource(hotbar.foodItem.item.name)),
-                scale = Constants.getItemScalingFactor(hotbar.foodItem.item.name),
                 counter = hotbar.foodItem.quantity,
                 onClick = {
                     coro.launch {
@@ -277,7 +272,6 @@ fun BottomRow(
             NavigationButton(
                 name = stringResource(id = R.string.toys),
                 image = painterResource(Constants.getItemResource(hotbar.toyItem.item.name)),
-                scale = Constants.getItemScalingFactor(hotbar.toyItem.item.name),
                 counter = hotbar.toyItem.quantity,
                 onClick = { coro.launch { giveToy(hotbar.toyItem.item, attributes) } },
                 onLongClick = { coro.launch { selectToy() } }
@@ -286,7 +280,6 @@ fun BottomRow(
             NavigationButton(
                 name = stringResource(id = R.string.items),
                 image = painterResource(Constants.getItemResource(hotbar.miscItem.item.name)),
-                scale = Constants.getItemScalingFactor(hotbar.miscItem.item.name),
                 counter = hotbar.miscItem.quantity,
                 onClick = {
                     coro.launch {
@@ -347,7 +340,7 @@ fun NavigationButton(
     name: String = "Name",
     image: Painter = painterResource(id = R.drawable.chicken_leg),
     counter: Int = 0,
-    scale: Float = 1.0f,
+    scale: Float = 1.2f,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {}
 ) {
