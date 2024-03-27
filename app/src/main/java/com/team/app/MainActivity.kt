@@ -65,15 +65,12 @@ class MainActivity : ComponentActivity() {
                                 Manifest.permission.POST_NOTIFICATIONS -> {
                                     NotiPerTextProv()
                                 }
-
                                 Manifest.permission.BODY_SENSORS -> {
                                     SensorTextProv()
                                 }
-
                                 Manifest.permission.ACTIVITY_RECOGNITION -> {
                                     ActivityTextProv()
                                 }
-
                                 else -> return@forEach
                             },
                             isPermaDecline = !this.shouldShowRequestPermissionRationale(

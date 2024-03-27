@@ -40,12 +40,14 @@ class Constants {
 
         // Permissions
         const val PERMISSION_DECLINED = "You declined the permission permanently. " +
-                "Please go to your settings to grant it manually"
+                "Please go to your settings to grant it manually" +
+                "After granting the permission please restart the app to proceed"
 
-        const val NOTIFICATION_INFO = "This app wants to send you notifications received rewards " +
-                "and when your mini-me needs you"
-        const val TRACK_STEPS_INFO = "This app wants to track your steps inorder to " +
-                "reward you with coins"
-        const val MOVEMENT_INFO = "This app wants to track your movement to reward you with coins"
+        const val NOTIFICATION_INFO = "We need this permission to send you notifications for various reasons, like \n" +
+                "reminder too feed your mini-me or if you got coins to collect, its required"
+        const val TRACK_STEPS_INFO = "We need this permission to keep accurate progress of your steps \n" +
+                "its required"
+        const val MOVEMENT_INFO = "We need this permission to keep accurate progress of your steps \n" +
+                "its required"
     }
 }
