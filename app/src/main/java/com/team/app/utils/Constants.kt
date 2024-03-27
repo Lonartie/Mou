@@ -15,7 +15,7 @@ class Constants {
             "Chicken" to R.drawable.chicken_leg,
             "Mouse" to R.drawable.toy_mouse,
             "Health Potion" to R.drawable.potion,
-            "Cola" to R.drawable.food_1_cola,
+            "Coke" to R.drawable.food_1_cola,
             "Burger" to R.drawable.food_2_burger,
             "Pills" to R.drawable.healt_item_1_pills,
             "Plaster" to R.drawable.health_item_2_plaster,
