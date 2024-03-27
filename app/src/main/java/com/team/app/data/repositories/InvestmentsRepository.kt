@@ -63,12 +63,6 @@ class InvestmentsRepository(
         }
     }
 
-    suspend fun getBalance(symbol: String, currentPrice: Double): Double {
-        return getInvestments()
-            .filter { it.symbol == symbol }
-            .sumOf { it.amount * (currentPrice / it.price) }
-    }
-
     fun getBalanceFlow(symbol: String, currentPrice: Double): Flow<Double> {
         return getInvestmentsFlow()
             .map { investments ->

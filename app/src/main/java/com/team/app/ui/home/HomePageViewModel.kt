@@ -15,7 +15,6 @@ import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.SettingsRepository
 import com.team.app.data.repositories.StepCounterRepository
-import com.team.app.data.repositories.StocksRepository
 import com.team.app.utils.SoundManager
 import com.team.app.utils.Constants
 import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
@@ -32,8 +31,7 @@ class HomePageViewModel @Inject constructor(
     private val attributesRepo: AttributesRepository,
     private val inventoryRepo: InventoryRepository,
     private val hotbarRepo: HotbarRepository,
-    private val soundManager: SoundManager,
-    private val stocksRepo: StocksRepository
+    private val soundManager: SoundManager
 ) : ViewModel() {
 
     val figureState = mutableIntStateOf(R.drawable.figure_happy)
@@ -176,8 +174,6 @@ class HomePageViewModel @Inject constructor(
         increaseDieCount()
         resetAttributes()
     }
-
-    fun getDieCount() = settings.getDieCountFlow
 
     suspend fun getDieCountNow() = settings.getDieCount()
 

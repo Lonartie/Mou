@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.team.app.data.repositories.AttributesRepository
 import com.team.app.data.repositories.StepCounterRepository
 import com.team.app.ui.common.Notification
 import dagger.assisted.Assisted
@@ -17,8 +16,7 @@ class StepCounterWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val repository: StepCounterRepository,
-    private val notificationService: Notification,
-    private val attributesRepository: AttributesRepository
+    private val notificationService: Notification
 ) : CoroutineWorker(appContext, workerParams) {
     companion object {
         private const val TAG = "StepCounterWorker"

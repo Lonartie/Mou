@@ -9,26 +9,9 @@ class HotbarRepository(
     private val hotbarDao: HotbarDao,
     private val inventoryRepo: InventoryRepository
 ) {
-    fun getItemsFlow() = hotbarDao.getItemsFlow().map { hotbar ->
-        Hotbar(
-            foodItem = inventoryRepo.getItemByID(hotbar.food),
-            toyItem = inventoryRepo.getItemByID(hotbar.toy),
-            miscItem = inventoryRepo.getItemByID(hotbar.misc)
-        )
-    }
 
     suspend fun getHotbar() : Hotbar {
         return hotbarDao.getItems()[0].let {
-            Hotbar(
-                foodItem = inventoryRepo.getItemByID(it.food),
-                toyItem = inventoryRepo.getItemByID(it.toy),
-                miscItem = inventoryRepo.getItemByID(it.misc)
-            )
-        }
-    }
-
-    fun getHotbarFlow() : Flow<Hotbar> {
-        return hotbarDao.getItemsFlow().map {
             Hotbar(
                 foodItem = inventoryRepo.getItemByID(it.food),
                 toyItem = inventoryRepo.getItemByID(it.toy),

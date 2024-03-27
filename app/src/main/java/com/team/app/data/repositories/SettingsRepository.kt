@@ -28,12 +28,6 @@ class SettingsRepository(val dataStore: DataStore<Preferences>) {
         return data
     }
 
-    suspend fun saveDieCount(dieCount: Int) {
-        dataStore.edit { preferences ->
-            preferences[DIE_COUNT] = dieCount
-        }
-    }
-
     suspend fun incDieCount() {
         dataStore.edit { preferences ->
             preferences[DIE_COUNT] = (preferences[DIE_COUNT] ?: 0) + 1

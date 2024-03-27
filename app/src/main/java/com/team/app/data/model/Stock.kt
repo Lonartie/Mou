@@ -11,8 +11,3 @@ data class Stock(
     @Json(name = "type") val type: String,
 )
 
-@JsonClass(generateAdapter = true)
-data class StockData(
-    @Json(name = "data") val data: List<Stock>
-)
-

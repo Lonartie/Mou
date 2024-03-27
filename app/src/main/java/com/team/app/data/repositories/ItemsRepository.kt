@@ -23,18 +23,6 @@ class ItemsRepository(
         }
     }
 
-    fun getItemsFlow() = itemsDao.getItemsFlow()
-        .map { items ->
-            items.map {
-                ItemModel(
-                    ItemType.entries[it.type],
-                    it.name,
-                    it.price,
-                    it.actionValue
-                )
-            }
-        }
-
     fun getItemsNoInvalidFlow() = itemsDao.getSortedItemsNoInvalidFlow()
         .map { items ->
             items.map {

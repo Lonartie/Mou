@@ -10,13 +10,6 @@ import com.team.app.data.model.Investment
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-fun Item.toInventoryItem(quantity: Int): InventoryItem {
-    return InventoryItem(
-        itemID = id,
-        quantity = quantity
-    )
-}
-
 fun String.capitalize(): String = this.lowercase().replaceFirstChar { it.uppercase() }
 
 fun Investment.earningsFromSell(currentPrice: Double): Int {

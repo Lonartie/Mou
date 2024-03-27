@@ -66,11 +66,6 @@ class StepCounterRepository @Inject constructor(
         return max(0, steps - lastLogin.stepcount)
     }
 
-    suspend fun getStepCountSince(beginTime: Long): Long {
-        val data = getStepCountDataSince(beginTime)
-        return getStepCountFromData(data)
-    }
-
     suspend fun getStepCountDataModelSince(beginTime: Long): List<StepCountDataModel> {
         return getStepCountDataSince(beginTime)
             .map {

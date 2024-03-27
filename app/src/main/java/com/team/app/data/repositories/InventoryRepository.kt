@@ -60,13 +60,6 @@ class InventoryRepository(
         attributesRepo.updateCoins(coins = userCoins - item.price)
     }
 
-    fun getItemsFlow() = inventoryDao.getItemsFlow().map { invItem ->
-        InventoryItemModel(
-            itemsRepo.getItemByID(invItem.itemID),
-            invItem.quantity
-        )
-    }
-
     suspend fun getItems() = inventoryDao.getItems().map { invItem ->
         InventoryItemModel(
             itemsRepo.getItemByID(invItem.itemID),
