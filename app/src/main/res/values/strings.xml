@@ -44,7 +44,8 @@
     <string name="tic_tac_toe">Tic-Tac-Toe</string>
     <string name="ttt_start">START GAME</string>
     <string name="ttt_new_game">NEW GAME</string>
-    <string name="ttt_current_player_formatted">Current player: %s</string>
+    <string name="ttt_bot_playing">It\'s the bot\'s turn.</string>
+    <string name="ttt_human_playing">It\'s your turn.</string>
     <string name="ttt_human_won_formatted">Congratulations, you won!\nYou received %d coins.</string>
     <string name="ttt_bot_won">The bot won.</string>
     <string name="ttt_draw">Draw - no one won.</string>

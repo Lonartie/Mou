@@ -22,15 +22,13 @@ class TicTacToeViewModel @Inject constructor(
 
     fun startGame() {
         state.update {
-            it.copy(currentPlayer = Player.entries[Random.nextInt(0, 2)])
+            it.copy(
+                currentPlayer = Player.entries[Random.nextInt(0, 2)],
+                board = GameState.emptyBoard(),
+                winner = null,
+                gameOver = false
+            )
         }
-    }
-
-    fun restartGame() {
-        state.update {
-            GameState()
-        }
-        startGame()
     }
 
     fun humanMove(i: Int, j: Int) {
