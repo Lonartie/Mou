@@ -1,6 +1,7 @@
 package com.team.app.ui.inventory
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +15,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -68,8 +69,12 @@ fun InventoryScreen(
         Background(
             modifier = Modifier
                 .fillMaxSize()
-                .scale(5f),
-            image = R.drawable.background_evening
+                .scale(1.5f),
+            image = if (isSystemInDarkTheme()) {
+                R.drawable.background_darkmode
+            } else {
+                R.drawable.background_lightmode
+            }
         )
 
         Column(
@@ -137,7 +142,7 @@ fun InventoryTopAppBar(
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(id = R.string.back_button)
                 )
             }

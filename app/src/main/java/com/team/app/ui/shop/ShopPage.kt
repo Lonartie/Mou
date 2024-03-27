@@ -1,6 +1,7 @@
 package com.team.app.ui.shop
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -62,8 +63,12 @@ fun ShopPage(
         Background(
             modifier = Modifier
                 .fillMaxSize()
-                .scale(5f),
-            image = R.drawable.background_evening
+                .scale(1.5f),
+            image = if (isSystemInDarkTheme()) {
+                R.drawable.background_darkmode
+            } else {
+                R.drawable.background_lightmode
+            }
         )
 
         Column(

@@ -22,13 +22,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ChildCare
 import androidx.compose.material.icons.rounded.ControlPoint
 import androidx.compose.material.icons.rounded.Fastfood
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -207,7 +207,7 @@ fun Content(
     Background(
         modifier = Modifier
             .fillMaxSize(),
-        image = if(isSystemInDarkTheme()){
+        image = if (isSystemInDarkTheme()) {
             R.drawable.background_darkmode
         } else {
             R.drawable.background_lightmode
@@ -317,13 +317,13 @@ fun AttributeBar(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         LinearProgressIndicator(
-            progress = progress,
+            progress = { progress },
             modifier = Modifier
                 .height(10.dp)
                 .fillMaxWidth()
                 .weight(1f)
                 .clip(MaterialTheme.shapes.medium),
-            color = color
+            color = color,
         )
         Spacer(modifier = Modifier.width(10.dp))
         Icon(
