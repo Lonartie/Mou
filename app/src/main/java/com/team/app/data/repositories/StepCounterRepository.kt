@@ -18,9 +18,7 @@ class StepCounterRepository @Inject constructor(
 
     suspend fun insertFirstStartTimestamp() {
         if (timestampsDao.getAll().isEmpty()) {
-            val timestamp = System.currentTimeMillis()
-            Log.d(Constants.STEP_COUNTER_TAG, "Adding first timestamp: $timestamp")
-            timestampsDao.insert(StartTimestamp(0, timestamp, 0))
+            insertStartTimestamp()
         }
     }
 
@@ -38,16 +36,7 @@ class StepCounterRepository @Inject constructor(
 
     }
 
-    suspend fun insertStartTimestamp() {
-        val timestamp = System.currentTimeMillis()
-        Log.d(Constants.STEP_COUNTER_TAG, "Adding timestamp: $timestamp")
-        timestampsDao.insert(StartTimestamp(0, timestamp, stepCounterService.steps()))
-    }
-
-    suspend fun getStepsSinceStart(): Long {
-        val lastLogin = timestampsDao.getLast()
-        val data = stepsDao.getByLoginId(lastLogin.id)
-
+    private fun getStepCountFromData(data: List<StepCountData>): Long {
         if (data.isEmpty())
             return 0
 
@@ -59,13 +48,34 @@ class StepCounterRepository @Inject constructor(
         }
         sum += data.last().steps
 
-        return sum - lastLogin.stepcount
+        return sum
     }
 
-    suspend fun getStepCountDataSince(beginTime: Long): List<StepCountDataModel> {
+    suspend fun insertStartTimestamp() {
+        val timestamp = System.currentTimeMillis()
+        Log.d(Constants.STEP_COUNTER_TAG, "Adding timestamp: $timestamp")
+        timestampsDao.insert(StartTimestamp(0, timestamp, stepCounterService.steps()))
+    }
+
+    suspend fun getStepsSinceStart(): Long {
+        val lastLogin = timestampsDao.getLast()
+        val steps = getStepCountFromData(stepsDao.getByLoginId(lastLogin.id))
+        return steps - lastLogin.stepcount
+    }
+
+    suspend fun getStepCountSince(beginTime: Long): Long {
+        val data = getStepCountDataSince(beginTime)
+        return getStepCountFromData(data)
+    }
+
+    suspend fun getStepCountDataModelSince(beginTime: Long): List<StepCountDataModel> {
+        return getStepCountDataSince(beginTime)
+            .map { StepCountDataModel(it.timestamp, it.steps) }
+    }
+
+    private suspend fun getStepCountDataSince(beginTime: Long): List<StepCountData> {
         return stepsDao
             .getStepCountDataSince(beginTime)
-            .map { StepCountDataModel(it.steps, it.timestamp) }
     }
 
 }

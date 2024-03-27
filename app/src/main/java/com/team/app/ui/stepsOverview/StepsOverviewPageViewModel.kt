@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.patrykandpatrick.vico.core.model.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.model.ExtraStore
 import com.patrykandpatrick.vico.core.model.lineSeries
+import com.team.app.data.model.StepCountData
 import com.team.app.data.repositories.StepCounterRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
@@ -13,6 +14,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.math.max
 
 @HiltViewModel
 class StepsOverviewPageViewModel @Inject constructor(
@@ -54,12 +56,17 @@ class StepsOverviewPageViewModel @Inject constructor(
         }
 
         val current = System.currentTimeMillis()
-
         val beginTime = current - valueCount * groupBy
-
         val xPresets = (current - valueCount * groupBy)..current step groupBy
 
-        val data = stepCounterRepo.getStepCountDataSince(beginTime)
+        val additiveData = stepCounterRepo.getStepCountDataModelSince(beginTime)
+        val data = mutableListOf<StepCountData>()
+
+        for (i in 1 until additiveData.size) {
+            val timestamp = additiveData[i].timestamp
+            val steps = max(0, additiveData[i].steps - additiveData[i - 1].steps)
+            data.add(StepCountData(timestamp, steps))
+        }
 
         dataPresent.value = data.isNotEmpty()
 
@@ -107,8 +114,10 @@ class StepsOverviewPageViewModel @Inject constructor(
         println("yData: $yData")
 
         val minY = yData.minOrNull() ?: 0
-        val maxY = yData.maxOrNull() ?: 0
-
+        var maxY = yData.maxOrNull() ?: 0
+        if (maxY - minY < 1) {
+            maxY = minY + 1
+        }
         modelProducer.tryRunTransaction {
             lineSeries { series(yData) }
             updateExtras {
