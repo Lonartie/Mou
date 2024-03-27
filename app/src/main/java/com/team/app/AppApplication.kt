@@ -13,6 +13,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.team.app.ui.common.Notification.Companion.NOTIFICATION_CHANNEL_ID
+import com.team.app.workers.DecreaseAttributesWorker
 import com.team.app.workers.InvestmentWorker
 import com.team.app.workers.StepCounterWorker
 import dagger.hilt.android.HiltAndroidApp
@@ -30,7 +31,7 @@ class AppApplication : Application(), Configuration.Provider {
         super.onCreate()
         val stepCounterWorker = PeriodicWorkRequestBuilder<StepCounterWorker>(
             15, TimeUnit.MINUTES).build()
-        val attributeWorker = PeriodicWorkRequestBuilder<StepCounterWorker>(
+        val attributeWorker = PeriodicWorkRequestBuilder<DecreaseAttributesWorker>(
             15, TimeUnit.MINUTES).build()
         val investmentWorker = PeriodicWorkRequestBuilder<InvestmentWorker>(
             1, TimeUnit.HOURS).build()
@@ -41,12 +42,14 @@ class AppApplication : Application(), Configuration.Provider {
                 "StepCounterWorker",
                 ExistingPeriodicWorkPolicy.UPDATE, stepCounterWorker
             )
-        WorkManager.getInstance(this)
+        WorkManager
+            .getInstance(this)
             .enqueueUniquePeriodicWork(
                 "AttributeWorker",
                 ExistingPeriodicWorkPolicy.UPDATE, attributeWorker
             )
-        WorkManager.getInstance(this)
+        WorkManager
+            .getInstance(this)
             .enqueueUniquePeriodicWork(
                 "InvestmentWorker",
                 ExistingPeriodicWorkPolicy.UPDATE, investmentWorker)
