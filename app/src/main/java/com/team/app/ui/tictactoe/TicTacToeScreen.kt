@@ -1,4 +1,4 @@
-package com.team.app.ui.tictactoe
+package com.team.app.ui.ticTacToe
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
