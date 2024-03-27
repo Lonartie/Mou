@@ -27,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -45,6 +46,7 @@ import com.team.app.data.model.ItemType
 import com.team.app.ui.home.Background
 import com.team.app.utils.Constants
 import com.team.app.utils.capitalize
+import kotlinx.coroutines.launch
 
 @Composable
 fun InventoryScreen(
@@ -53,6 +55,7 @@ fun InventoryScreen(
     viewModel: InventoryViewModel = hiltViewModel()
 ) {
     val items = viewModel.getItemsWithTypes(itemTypes)
+    val coro = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -89,8 +92,10 @@ fun InventoryScreen(
                         modifier = Modifier.padding(8.dp),
                         inventoryItem = it,
                         onClick = {
-                            viewModel.setHotbarItem(it)
-                            onBackClick()
+                            coro.launch {
+                                viewModel.setHotbarItem(it)
+                                onBackClick()
+                            }
                         }
                     )
                 }

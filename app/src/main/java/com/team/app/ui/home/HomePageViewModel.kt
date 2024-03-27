@@ -48,8 +48,9 @@ class HomePageViewModel @Inject constructor(
         )
     )
 
-    suspend fun updateHotbar() {
+    private suspend fun updateHotbar() {
         hotbar.value = hotbarRepo.getHotbar()
+        println("Hotbar updated")
     }
 
     suspend fun onStart() {
