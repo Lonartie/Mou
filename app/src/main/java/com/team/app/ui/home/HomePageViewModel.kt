@@ -15,9 +15,9 @@ import com.team.app.data.repositories.HotbarRepository
 import com.team.app.data.repositories.InventoryRepository
 import com.team.app.data.repositories.SettingsRepository
 import com.team.app.data.repositories.StepCounterRepository
-import com.team.app.utils.SoundManager
 import com.team.app.utils.Constants
 import com.team.app.utils.Constants.Companion.INVALID_INVENTORY_ITEM
+import com.team.app.utils.SoundManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -48,7 +48,6 @@ class HomePageViewModel @Inject constructor(
 
     private suspend fun updateHotbar() {
         hotbar.value = hotbarRepo.getHotbar()
-        println("Hotbar updated")
     }
 
     suspend fun onStart() {

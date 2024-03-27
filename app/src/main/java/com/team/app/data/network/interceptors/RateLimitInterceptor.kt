@@ -34,7 +34,6 @@ class RateLimitInterceptor : Interceptor {
         val delay = getDelay()
 
         if (delay > 0) {
-            println("Rate limit exceeded, waiting $delay milliseconds")
             Thread.sleep(delay)
         }
 

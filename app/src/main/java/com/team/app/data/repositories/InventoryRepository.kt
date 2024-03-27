@@ -13,9 +13,7 @@ class InventoryRepository(
     private val attributesRepo: AttributesRepository
 ) {
     suspend fun getItemByID(id: Int): InventoryItemModel {
-        println("asked for item with id $id")
         val invItems = inventoryDao.getItems()
-        println("invItems: $invItems")
         val invItem = inventoryDao.getItem(id)
         return if (invItem != null) {
             InventoryItemModel(
